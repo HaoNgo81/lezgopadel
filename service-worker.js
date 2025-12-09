@@ -1,74 +1,43 @@
-/* service-worker.js */
-/* Simple SW with share-target handling for /lezgopadel/share-target */
-const CACHE_NAME = 'lezgo-cache-v1';
-const OFFLINE_URL = '/lezgopadel/';
+// service-worker.js - simpel og sikker caching (scope = repo mappe når registreret som './service-worker.js')
+const CACHE_NAME = 'lezgo-v1';
+const ASSETS = [
+  './',
+  './index.html',
+  './ICON-192x192.png',
+  './ICON-512x512.png'
+  // Tilføj flere assets her hvis nødvendigt (css, js, offline.html osv.)
+];
 
-self.addEventListener('install', (ev) => {
-  ev.waitUntil((async () => {
-    const cache = await caches.open(CACHE_NAME);
-    // Cache minimal shell
-    await cache.addAll([
-      OFFLINE_URL,
-      '/lezgopadel/index.html',
-      '/lezgopadel/manifest.json'
-      // icons will be fetched when needed
-    ]);
-    self.skipWaiting();
-  })());
+self.addEventListener('install', event => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS))
+  );
+  self.skipWaiting();
 });
 
-self.addEventListener('activate', (ev) => {
-  ev.waitUntil((async () => {
-    await clients.claim();
-  })());
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys().then(keys => Promise.all(
+      keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
+    )).then(() => self.clients.claim())
+  );
 });
 
-/* fetch handler: simple cache-first for app shell */
-self.addEventListener('fetch', (event) => {
-  const url = new URL(event.request.url);
-
-  // share-target POST handler
-  if (event.request.method === 'POST' && url.pathname === '/lezgopadel/share-target') {
-    event.respondWith((async () => {
-      try {
-        const formData = await event.request.formData();
-        const shareData = {
-          title: formData.get('title') || '',
-          text: formData.get('text') || '',
-          url: formData.get('url') || ''
-        };
-        // notify all clients
-        const clientList = await clients.matchAll({ includeUncontrolled: true, type: 'window' });
-        for (const client of clientList) {
-          client.postMessage({ type: 'share-target', ...shareData });
-        }
-        // redirect to app start so client can read the message
-        return Response.redirect('/lezgopadel/?shared=1', 303);
-      } catch (e) {
-        return new Response('Share failed', { status: 500 });
-      }
-    })());
+self.addEventListener('fetch', event => {
+  // online-first for navigation (gør at brugeren får opdateret startside hvis online)
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      fetch(event.request).then(res => {
+        const copy = res.clone();
+        caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy));
+        return res;
+      }).catch(() => caches.match('./'))
+    );
     return;
   }
 
-  // default fetch -> try cache then network
-  event.respondWith((async () => {
-    const cache = await caches.open(CACHE_NAME);
-    const cached = await cache.match(event.request);
-    if (cached) return cached;
-    try {
-      const networkResponse = await fetch(event.request);
-      // optionally cache GET HTML/CSS/JS/images
-      if (event.request.method === 'GET' && networkResponse && networkResponse.status === 200 && networkResponse.type !== 'opaque') {
-        // clone and store
-        const copy = networkResponse.clone();
-        cache.put(event.request, copy).catch(()=>{/* ignore */});
-      }
-      return networkResponse;
-    } catch (err) {
-      // offline fallback
-      const fallback = await cache.match('/lezgopadel/index.html');
-      return fallback || new Response('Offline', { status: 503 });
-    }
-  })());
+  // cache-first for øvrige assets
+  event.respondWith(
+    caches.match(event.request).then(resp => resp || fetch(event.request))
+  );
 });
