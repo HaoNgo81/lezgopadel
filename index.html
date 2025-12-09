@@ -61,7 +61,7 @@
       margin: 0 auto;
       object-fit: contain;
       filter: none;
-      transition: width 200ms, max-height 200ms;
+      transition: width 200ms, max-height 200ms, filter 200ms;
     }
 
     .controls{
@@ -93,6 +93,26 @@
     /* theme toggle small style */
     .theme-toggle{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:10px;border:1px solid rgba(255,255,255,.06);background:transparent;cursor:pointer}
     .theme-toggle svg{width:20px;height:20px}
+
+    /* THEME TOGGLE VISIBILITY FIX: make toggle very visible in dark mode (yellow) */
+    body:not(.light) .theme-toggle {
+      background: #facc15 !important; /* gul */
+      border-color: #facc15 !important;
+      color: #000 !important; /* sort ikon */
+      box-shadow: 0 6px 16px rgba(250,204,21,0.18);
+    }
+
+    body.light .theme-toggle {
+      background: transparent !important;
+      border-color: rgba(0,0,0,.12) !important;
+      color: #000 !important;
+      box-shadow: none;
+    }
+
+    /* Stronger yellow logo in light mode */
+    body.light #logo {
+      filter: brightness(1.35) saturate(1.9);
+    }
 
     /* ---------------- CARD ---------------- */
     .card{
@@ -146,7 +166,6 @@
 
     /* smooth transitions */
     .card, input, select, textarea, .exercise { transition: background 250ms, color 250ms, border-color 250ms; }
-
   </style>
 </head>
 
@@ -359,7 +378,6 @@
       if(theme === 'light'){
         document.body.classList.add('light');
         document.querySelector('#meta-theme-color').setAttribute('content', '#f6f8fa');
-        // icon = sun
         setThemeIcon('light');
       } else {
         document.body.classList.remove('light');
@@ -377,9 +395,9 @@
       const svg = document.getElementById('theme-icon');
       if(!svg) return;
       if(mode === 'light'){
-        svg.innerHTML = '<path d=\"M12 3v2M12 19v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1 12h2M21 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4M12 7a5 5 0 100 10 5 5 0 000-10z\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" fill=\"none\"></path>';
+        svg.innerHTML = '<path d="M12 3v2M12 19v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1 12h2M21 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4M12 7a5 5 0 100 10 5 5 0 000-10z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>';
       } else {
-        svg.innerHTML = '<path d=\"M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" fill=\"none\"></path>';
+        svg.innerHTML = '<path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>';
       }
     }
 
