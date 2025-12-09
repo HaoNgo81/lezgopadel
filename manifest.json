@@ -1,13 +1,29 @@
 {
-  "name": "LezGo Padel — Training Bank",
-  "short_name": "LezGoPadel",
-  "start_url": "/index.html",
+  "name": "LezGo Padel",
+  "short_name": "LezGo",
+  "description": "Padel training bank - sessions, exercises and session builder",
+  "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
-  "background_color": "#071226",
+  "orientation": "portrait",
   "theme_color": "#071226",
-  "icons":[
-    { "src": "/icon-192.png", "sizes":"192x192", "type":"image/png" },
-    { "src": "/icon-512.png", "sizes":"512x512", "type":"image/png" }
-  ],
-  "orientation":"portrait"
+  "background_color": "#071226",
+  "icons": [
+    {
+      "src": "ICON-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "ICON-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
 }
