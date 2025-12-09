@@ -1,105 +1,74 @@
-// service-worker.js (opdateret med Share Target håndtering)
-const CACHE_NAME = 'lezgo-v1';
-const ASSETS = [
-  './',
-  './index.html',
-  './ICON-192x192.png',
-  './ICON-512x512.png'
-];
+/* service-worker.js */
+/* Simple SW with share-target handling for /lezgopadel/share-target */
+const CACHE_NAME = 'lezgo-cache-v1';
+const OFFLINE_URL = '/lezgopadel/';
 
-self.addEventListener('install', event => {
-  event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS)));
-  self.skipWaiting();
+self.addEventListener('install', (ev) => {
+  ev.waitUntil((async () => {
+    const cache = await caches.open(CACHE_NAME);
+    // Cache minimal shell
+    await cache.addAll([
+      OFFLINE_URL,
+      '/lezgopadel/index.html',
+      '/lezgopadel/manifest.json'
+      // icons will be fetched when needed
+    ]);
+    self.skipWaiting();
+  })());
 });
 
-self.addEventListener('activate', event => {
-  event.waitUntil(
-    caches.keys().then(keys => Promise.all(
-      keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
-    )).then(() => self.clients.claim())
-  );
+self.addEventListener('activate', (ev) => {
+  ev.waitUntil((async () => {
+    await clients.claim();
+  })());
 });
 
-// Helper: send message til klienter
-async function broadcastMessage(message) {
-  const allClients = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
-  for (const client of allClients) {
-    try { client.postMessage(message); } catch(e){ console.warn('postMessage failed', e); }
-  }
-}
+/* fetch handler: simple cache-first for app shell */
+self.addEventListener('fetch', (event) => {
+  const url = new URL(event.request.url);
 
-self.addEventListener('fetch', event => {
-  // Håndter share-target POST (multipart/form-data)
-  if (event.request.method === 'POST') {
-    const ct = event.request.headers.get('content-type') || '';
-    if (ct.startsWith('multipart/form-data')) {
-      event.respondWith((async () => {
-        try {
-          // Læs formData fra request
-          const formData = await event.request.formData();
-          // Byg payload
-          const payload = { title: '', text: '', url: '', files: [] };
-
-          if (formData.has('title')) payload.title = formData.get('title') || '';
-          if (formData.has('text')) payload.text = formData.get('text') || '';
-          if (formData.has('url')) payload.url = formData.get('url') || '';
-
-          // files: kan være File/Blob eller enkelt element
-          if (formData.has('files')) {
-            const files = formData.getAll('files');
-            for (const file of files) {
-              if (file instanceof File) {
-                // Vi kan ikke poste File-objekter via postMessage direkte i alle tilfælde.
-                // Men vi kan læse som dataURL (base64) for at sende til klienten.
-                try {
-                  const arrayBuffer = await file.arrayBuffer();
-                  // konverter til base64
-                  const uint8 = new Uint8Array(arrayBuffer);
-                  let binary = '';
-                  for (let i = 0; i < uint8.byteLength; i++) binary += String.fromCharCode(uint8[i]);
-                  const base64 = btoa(binary);
-                  payload.files.push({
-                    name: file.name,
-                    type: file.type,
-                    size: file.size,
-                    data: `data:${file.type};base64,${base64}`
-                  });
-                } catch (e) {
-                  console.warn('file read failed', e);
-                }
-              }
-            }
-          }
-
-          // Broadcast payload til alle åbne klienter
-          await broadcastMessage({ type: 'share-target', payload });
-
-          // Redirect så appen åbner index med share flag (303 recommended)
-          return Response.redirect('./?shared=1', 303);
-        } catch (err) {
-          console.error('Error handling share target POST', err);
-          // fallback: redirect til root
-          return Response.redirect('./', 303);
+  // share-target POST handler
+  if (event.request.method === 'POST' && url.pathname === '/lezgopadel/share-target') {
+    event.respondWith((async () => {
+      try {
+        const formData = await event.request.formData();
+        const shareData = {
+          title: formData.get('title') || '',
+          text: formData.get('text') || '',
+          url: formData.get('url') || ''
+        };
+        // notify all clients
+        const clientList = await clients.matchAll({ includeUncontrolled: true, type: 'window' });
+        for (const client of clientList) {
+          client.postMessage({ type: 'share-target', ...shareData });
         }
-      })());
-      return; // fetch handler done
-    }
-  }
-
-  // Navigation requests: online-first to keep cache updated
-  if (event.request.mode === 'navigate') {
-    event.respondWith(
-      fetch(event.request).then(res => {
-        const copy = res.clone();
-        caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy));
-        return res;
-      }).catch(() => caches.match('./'))
-    );
+        // redirect to app start so client can read the message
+        return Response.redirect('/lezgopadel/?shared=1', 303);
+      } catch (e) {
+        return new Response('Share failed', { status: 500 });
+      }
+    })());
     return;
   }
 
-  // cache-first for other assets
-  event.respondWith(
-    caches.match(event.request).then(resp => resp || fetch(event.request))
-  );
+  // default fetch -> try cache then network
+  event.respondWith((async () => {
+    const cache = await caches.open(CACHE_NAME);
+    const cached = await cache.match(event.request);
+    if (cached) return cached;
+    try {
+      const networkResponse = await fetch(event.request);
+      // optionally cache GET HTML/CSS/JS/images
+      if (event.request.method === 'GET' && networkResponse && networkResponse.status === 200 && networkResponse.type !== 'opaque') {
+        // clone and store
+        const copy = networkResponse.clone();
+        cache.put(event.request, copy).catch(()=>{/* ignore */});
+      }
+      return networkResponse;
+    } catch (err) {
+      // offline fallback
+      const fallback = await cache.match('/lezgopadel/index.html');
+      return fallback || new Response('Offline', { status: 503 });
+    }
+  })());
 });
