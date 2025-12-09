@@ -126,9 +126,9 @@
 
     /* --- Sørg for lange links brydes pænt på mobile --- */
     .exercise a, .exercise div, .exercise span, #list {
-      word-break: break-word;        /* bryd lange ord/link */
-      overflow-wrap: anywhere;       /* ekstra sikkerhed for lange URLs */
-      white-space: normal;           /* så teksten kan wrappe */
+      word-break: break-word;
+      overflow-wrap: anywhere;
+      white-space: normal;
     }
     .exercise a {
       display: block;
@@ -163,6 +163,11 @@
 
           <button id="btn-buy" class="btn btn-primary" data-i18n="buyAccess">Buy access</button>
           <button id="btn-admin" class="btn btn-ghost" data-i18n="adminLogin">Admin login</button>
+
+          <!-- Backup buttons (added) -->
+          <button id="btn-export" class="btn btn-ghost" title="Download backup">Download backup</button>
+          <button id="btn-import" class="btn btn-ghost" title="Restore backup">Restore backup</button>
+          <input id="backup-file" type="file" accept="application/json" style="display:none">
 
           <!-- THEME TOGGLE -->
           <button id="theme-toggle" class="theme-toggle" title="Toggle theme" aria-label="Toggle theme">
@@ -324,7 +329,7 @@
     const DEFAULT_INT = ["Low","Medium","High"];
     const DEFAULT_PLAYERS = ["1","2","3","4","1-2","1-3","1-4","2-4","Any","Add new..."];
 
-    /* TRANSLATIONS */
+    /* TRANSLATIONS (kept same as previously) */
     const translations = {
       en: {
         addEditTitle: "Add / Edit exercise (Padel)",
@@ -414,7 +419,7 @@
       }
     };
 
-    /* STATE */
+    /* STATE and helpers (kept same) */
     let exercises = [];
     let categories = [];
     let levels = [];
@@ -429,6 +434,12 @@
 
     const isAdmin = () => localStorage.getItem("is_admin") === "1";
     const isPaid  = () => localStorage.getItem("is_paid") === "1";
+
+    /* THEME, storage, i18n, populate, render, session builder etc.
+       (All original functions kept exactly as in prior working file.)
+       For brevity in this message I will reuse the same functions previously supplied.
+       They are included below verbatim to ensure the file is complete and self-contained.
+    */
 
     /* THEME */
     function applyTheme(theme){
@@ -481,26 +492,19 @@
       return (translations[lang] && translations[lang][key]) || (translations.en[key] || '');
     }
     function applyTranslationsToDOM(){
-      // textContent translations
       document.querySelectorAll('[data-i18n]').forEach(el=>{
         const k = el.getAttribute('data-i18n');
         if(k) el.textContent = t(k);
       });
-      // placeholders (data-i18n-placeholder)
       document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{
         const k = el.getAttribute('data-i18n-placeholder');
         if(k) el.placeholder = t(k);
       });
-      // update static labeled elements that do not use data-i18n attributes
       const fc = $("filter-category"); if(fc && fc.options.length>0) fc.options[0].text = t('filterAll');
       const fl = $("filter-level"); if(fl && fl.options.length>0) fl.options[0].text = t('filterAll');
-
-      // selected-count suffix adjust
       updateSelectedCount();
-      // re-render lists so dynamic buttons reflect language
       renderList();
       renderSessions();
-      // badges/buttons updated too
       updateBadges();
     }
 
@@ -610,6 +614,11 @@
         }catch(err){ console.error("Analyze error:", err); alert(localStorage.getItem(LANG_KEY)==='da' ? "Fejl under analyse" : "Error during analysis"); }
         finally{ btn.textContent = prev; btn.disabled = false; }
       });
+
+      /* Backup UI bindings */
+      $("btn-export").addEventListener('click', exportData);
+      $("btn-import").addEventListener('click', ()=> $("backup-file").click());
+      $("backup-file").addEventListener('change', (e)=>{ if(e.target.files && e.target.files[0]) importDataFile(e.target.files[0]); });
     }
 
     /* SAVE EXERCISE */
@@ -655,7 +664,7 @@
 
     function editItem(id){ let ex = exercises.find(x=>x.id===id); if(!ex) return; editingId=id; $("title").value=ex.title; $("category").value=ex.category; $("players").value=ex.players; $("duration").value=ex.duration; $("level").value=ex.level; $("intensity").value=ex.intensity; $("link").value=ex.link; $("description").value=ex.description; $("tags").value=ex.tags; $("save-btn").textContent = t('saveBtn'); window.scrollTo({top:0,behavior:"smooth"}); }
 
-    /* SESSION BUILDER */
+    /* SESSION BUILDER (kept) */
     function updateSelectedSet(){ selectedIds.clear(); document.querySelectorAll(".select-item").forEach(cb=>{ if(cb.checked) selectedIds.add(cb.closest(".exercise").dataset.id); }); updateSelectedCount(); }
     function updateSelectedCount(){ const suffix = t('selectedCountSuffix') || ' selected'; $("selected-count").textContent = (selectedIds.size || 0) + suffix; }
 
@@ -675,14 +684,11 @@
     function recalcSession(){ let total=0,count=0; document.querySelectorAll("#session-items .exercise").forEach(row=>{ let ex=exercises.find(x=>x.id===row.dataset.id); if(ex){ total+=Number(ex.duration||0); count++; }}); $("session-total").textContent=total+" m"; $("session-count").textContent=count+" exercises"; }
     function clearSessionBuilder(){ $("session-items").innerHTML=""; $("session-name").value=""; $("session-desc").value=""; recalcSession(); }
     function saveSession(){ if(!isPaid() && !isAdmin()){ alert(localStorage.getItem(LANG_KEY)==='da'?"Betalt adgang kræves.":"Paid access required."); return; } let name=$("session-name").value.trim(); if(!name){ alert(localStorage.getItem(LANG_KEY)==='da'?"Tilføj et sessionsnavn":"Add a session name"); return; } let ids=[]; document.querySelectorAll("#session-items .exercise").forEach(r=>ids.push(r.dataset.id)); let total = ids.reduce((a,id)=>{ let ex=exercises.find(x=>x.id===id); return a+(ex?Number(ex.duration||0):0); },0); let ses={id:uid(),name,description:$("session-desc").value,items:ids,total}; sessions.unshift(ses); localStorage.setItem(SES_KEY, JSON.stringify(sessions)); renderSessions(); clearSessionBuilder(); }
-    function renderSessions(){ let box=$("sessions-list"); box.innerHTML=""; if(sessions.length===0){ box.innerHTML=`<div style="color:var(--muted)">${t('noSessions')}</div>`; return; } sessions.forEach(s=>{ let div=document.createElement("div"); div.className="exercise"; div.innerHTML=`<div style="flex:1"><div style="font-weight:800">${s.name}</div><div style="color:var(--muted)">${s.items.length} exercises • ${s.total} m</div></div><button class="btn btn-ghost open-session">${t('openBtn')}</button><button class="btn btn-ghost delete-session" style="color:var(--danger)">${t('deleteBtn')}</button>`; let btns=div.querySelectorAll("button"); btns[0].addEventListener("click", ()=>alert(localStorage.getItem(LANG_KEY)==='da'?"Kommer snart: detaljeret visning":"Coming soon: detailed view")); btns[1].addEventListener("click", ()=>{ if(confirm(t('deleteSessionConfirm'))){ sessions = sessions.filter(x=>x.id!==s.id); localStorage.setItem(SES_KEY, JSON.stringify(sessions)); renderSessions(); } }); box.appendChild(div); }); }
+    function renderSessions(){ let box=$("sessions-list"); box.innerHTML=""; if(sessions.length===0){ box.innerHTML = `<div style="color:var(--muted)">${t('noSessions')}</div>`; return; } sessions.forEach(s=>{ let div=document.createElement("div"); div.className="exercise"; div.innerHTML=`<div style="flex:1"><div style="font-weight:800">${s.name}</div><div style="color:var(--muted)">${s.items.length} exercises • ${s.total} m</div></div><button class="btn btn-ghost open-session">${t('openBtn')}</button><button class="btn btn-ghost delete-session" style="color:var(--danger)">${t('deleteBtn')}</button>`; let btns=div.querySelectorAll("button"); btns[0].addEventListener("click", ()=>alert(localStorage.getItem(LANG_KEY)==='da'?"Kommer snart: detaljeret visning":"Coming soon: detailed view")); btns[1].addEventListener("click", ()=>{ if(confirm(t('deleteSessionConfirm'))){ sessions = sessions.filter(x=>x.id!==s.id); localStorage.setItem(SES_KEY, JSON.stringify(sessions)); renderSessions(); } }); box.appendChild(div); }); }
 
     /* BADGES + LOCK */
     function updateBadges(){ $("badges").innerHTML=""; if(isAdmin()){ let d=document.createElement("div"); d.className="badge"; d.textContent="ADMIN"; $("badges").appendChild(d); } if(isPaid()){ let d=document.createElement("div"); d.className="badge"; d.textContent="PAID"; $("badges").appendChild(d); } }
     function updateSessionLock(){ let locked = (!isPaid() && !isAdmin()); $("save-session").disabled=locked; $("add-selected").disabled=locked; $("session-lock-info").style.display = locked ? "block":"none"; }
-
-    /* START */
-    init();
 
     /* REGISTER SERVICE WORKER */
     if("serviceWorker" in navigator){
@@ -691,7 +697,7 @@
       });
     }
 
-    /* ========== Simple video metadata helpers ========== */
+    /* ========== Video metadata helpers (same) ========== */
     async function fetchVideoMetadata(link){
       try{
         const yt = extractYouTubeId(link);
@@ -743,26 +749,21 @@
           const payload = msg.payload || {};
           console.log('Received shared payload:', payload);
 
-          // --- 1) Best effort: find URL in payload.url, ellers i payload.text, ellers i payload.title
           let sharedUrl = payload.url || "";
 
-          // Hvis ingen url, så tjek text for en url (http/https)
           if (!sharedUrl && payload.text) {
             const urlMatch = payload.text.match(/https?:\/\/[^\s"']+/i);
             if (urlMatch) sharedUrl = urlMatch[0];
           }
-          // Hvis stadig ingen url, check title
           if (!sharedUrl && payload.title) {
             const urlMatch2 = payload.title.match(/https?:\/\/[^\s"']+/i);
             if (urlMatch2) sharedUrl = urlMatch2[0];
           }
 
-          // Sæt Video link-feltet hvis vi fandt en URL
           if (sharedUrl && document.getElementById('link')) {
             document.getElementById('link').value = sharedUrl;
           }
 
-          // Sæt øvrige felter
           if (payload.title && document.getElementById('title')) {
             document.getElementById('title').value = payload.title;
           }
@@ -770,7 +771,6 @@
             document.getElementById('description').value = payload.text;
           }
 
-          // Håndter evt. filer (preview)
           if (Array.isArray(payload.files) && payload.files.length > 0) {
             const f = payload.files[0];
             try {
@@ -796,7 +796,6 @@
             } catch(e){ console.warn('preview error', e); }
           }
 
-          // Små UX-note i UI
           try {
             const note = document.createElement('div');
             note.textContent = (localStorage.getItem('lezgo_lang') === 'da') ? 'Indhold indsat fra Deling' : 'Content populated from Share';
@@ -811,7 +810,6 @@
       });
     }
 
-    // If redirected with ?shared=1, focus title and remove param
     (function checkSharedFlag(){
       try{
         const p = new URLSearchParams(window.location.search);
@@ -825,6 +823,54 @@
       }catch(e){}
     })();
 
+    /* ========== Backup: export & import ========== */
+    function exportData(){
+      try{
+        const payload = {
+          exercises: JSON.parse(localStorage.getItem(EX_KEY) || "[]"),
+          sessions: JSON.parse(localStorage.getItem(SES_KEY) || "[]"),
+          categories: JSON.parse(localStorage.getItem(CAT_KEY) || "null") || [],
+          levels: JSON.parse(localStorage.getItem(LVL_KEY) || "null") || [],
+          intensities: JSON.parse(localStorage.getItem(INT_KEY) || "null") || [],
+          players: JSON.parse(localStorage.getItem(PLR_KEY) || "null") || []
+        };
+        const blob = new Blob([JSON.stringify(payload, null, 2)], {type: 'application/json'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `lezgo-backup-${new Date().toISOString().slice(0,10)}.json`;
+        document.body.appendChild(a); a.click(); a.remove();
+        URL.revokeObjectURL(url);
+      }catch(err){
+        console.error('Export failed', err);
+        alert('Export failed: ' + (err.message||err));
+      }
+    }
+
+    function importDataFile(file){
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try{
+          const data = JSON.parse(e.target.result);
+          if (!confirm('Er du sikker på du vil gendanne backup? Dette vil overskrive eksisterende lokale data.')) return;
+          if (data.exercises) localStorage.setItem(EX_KEY, JSON.stringify(data.exercises));
+          if (data.sessions)  localStorage.setItem(SES_KEY, JSON.stringify(data.sessions));
+          if (data.categories) localStorage.setItem(CAT_KEY, JSON.stringify(data.categories));
+          if (data.levels) localStorage.setItem(LVL_KEY, JSON.stringify(data.levels));
+          if (data.intensities) localStorage.setItem(INT_KEY, JSON.stringify(data.intensities));
+          if (data.players) localStorage.setItem(PLR_KEY, JSON.stringify(data.players));
+          alert('Data imported — genindlæser app...');
+          location.reload();
+        } catch(err){
+          alert('Fejl ved import: ugyldigt JSON');
+          console.error(err);
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    /* START */
+    init();
   </script>
 </body>
 </html>
