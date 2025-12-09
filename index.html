@@ -12,7 +12,11 @@
     /* ---------------- GLOBAL RESET ---------------- */
     *, *::before, *::after { box-sizing: border-box; }
     html, body { margin: 0; padding: 0; height: 100%; overflow-x: hidden; }
-    body { font-family: Inter, system-ui, Arial, sans-serif; -webkit-font-smoothing:antialiased; transition: background 300ms, color 300ms; }
+    body { 
+      font-family: Inter, system-ui, Arial, sans-serif; 
+      -webkit-font-smoothing:antialiased; 
+      transition: background 300ms, color 300ms;
+    }
 
     /* ---------------- THEME VARIABLES (dark default) ---------------- */
     :root{
@@ -26,22 +30,30 @@
       --card-shadow: 0 8px 22px rgba(2,6,23,.6);
     }
 
-    /* Light theme overrides when body.light is present */
+    /* ---------------- NEW LIGHT MODE (soft grey) ---------------- */
     body.light{
-      --bg-top: #f6f8fa;
-      --bg-bottom: #ffffff;
+      --bg-top: #e6e9ed;
+      --bg-bottom: #f2f3f5;
       --panel: #ffffff;
-      --muted: #64748b;
+      --muted: #4a5568;
       --text: #0b1220;
       --accent: #16a34a;
       --danger: #dc2626;
-      --card-shadow: 0 6px 18px rgba(9,10,11,.06);
+      --card-shadow: 0 6px 18px rgba(0,0,0,.08);
     }
 
-    /* Update theme-color meta when switching (JS does this too) */
-    .app-bg{ background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 100%); color:var(--text); min-height:100vh; }
+    .app-bg{
+      background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
+      color:var(--text);
+      min-height:100vh;
+    }
 
-    .container { max-width: 1100px; margin: 12px auto; padding: 12px; width: 94%; }
+    .container { 
+      max-width: 1100px; 
+      margin: 12px auto; 
+      padding: 12px; 
+      width: 94%; 
+    }
 
     /* ---------------- HEADER / LOGO ---------------- */
     header{
@@ -61,7 +73,13 @@
       margin: 0 auto;
       object-fit: contain;
       filter: none;
-      transition: width 200ms, max-height 200ms, filter 200ms;
+      transition: filter 200ms, opacity 200ms;
+    }
+
+    /* Softer logo in light mode */
+    body.light #logo {
+      filter: brightness(0.92) saturate(1.15) contrast(1.1);
+      opacity: 0.9;
     }
 
     .controls{
@@ -84,34 +102,41 @@
     }
 
     .btn{
-      border:0;padding:10px 14px;border-radius:12px;font-weight:800;cursor:pointer;background:transparent;color:var(--text);
+      border:0;padding:10px 14px;border-radius:12px;
+      font-weight:800;cursor:pointer;background:transparent;color:var(--text);
     }
     .btn-primary{background:var(--accent);color:#05261a}
     .btn-ghost{background:transparent;border:1px solid rgba(255,255,255,.06);color:var(--muted)}
     .btn-danger{background:var(--danger);color:#fff}
 
-    /* theme toggle small style */
-    .theme-toggle{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:10px;border:1px solid rgba(255,255,255,.06);background:transparent;cursor:pointer}
+    /* THEME TOGGLE BUTTON */
+    .theme-toggle{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      width:44px;
+      height:44px;
+      border-radius:10px;
+      border:1px solid rgba(255,255,255,.06);
+      background:transparent;
+      cursor:pointer;
+      transition: background 200ms, border-color 200ms;
+    }
     .theme-toggle svg{width:20px;height:20px}
 
-    /* THEME TOGGLE VISIBILITY FIX: make toggle very visible in dark mode (yellow) */
+    /* Dark mode = strong, easy-to-see yellow toggle */
     body:not(.light) .theme-toggle {
-      background: #facc15 !important; /* gul */
-      border-color: #facc15 !important;
-      color: #000 !important; /* sort ikon */
-      box-shadow: 0 6px 16px rgba(250,204,21,0.18);
+      background:#facc15 !important;
+      border-color:#facc15 !important;
+      color:#000 !important;
+      box-shadow:0 6px 16px rgba(250,204,21,0.18);
     }
 
+    /* Light mode = clean black/white toggle */
     body.light .theme-toggle {
-      background: transparent !important;
-      border-color: rgba(0,0,0,.12) !important;
-      color: #000 !important;
-      box-shadow: none;
-    }
-
-    /* Stronger yellow logo in light mode */
-    body.light #logo {
-      filter: brightness(0.75) saturate(1.1) contrast(1.25);
+      background:#ffffff !important;
+      border:1px solid rgba(0,0,0,.2) !important;
+      color:#000 !important;
     }
 
     /* ---------------- CARD ---------------- */
@@ -140,32 +165,11 @@
 
     .actions-row{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
 
-    /* ---------------- LIST ---------------- */
-    .exercise{
-      display:flex;gap:10px;padding:10px;
-      border-radius:10px;border:1px solid rgba(255,255,255,.03);
-      align-items:flex-start;
-      transition: background 150ms, border-color 150ms;
-    }
-
-    .tag{
-      background:rgba(255,255,255,.03);
-      padding:6px 8px;border-radius:8px;margin-right:8px;font-size:13px;
-      display:inline-block;
-    }
-
-    /* ---------------- TWO COLUMN LAYOUT ---------------- */
-    .two-column{display:grid;grid-template-columns:1fr 360px;gap:12px;}
-    @media(max-width:900px){.two-column{grid-template-columns:1fr;}}
-
-    /* ---------------- MOBILE TWEAKS ---------------- */
+    /* ---------------- MOBILE ---------------- */
     @media(max-width:520px){
       #logo{width: min(70vw, 360px); max-height:20vh;}
       .btn{font-weight:700;}
     }
-
-    /* smooth transitions */
-    .card, input, select, textarea, .exercise { transition: background 250ms, color 250ms, border-color 250ms; }
   </style>
 </head>
 
@@ -189,16 +193,12 @@
           <button id="btn-admin" class="btn btn-ghost">Admin login</button>
 
           <!-- THEME TOGGLE -->
-          <button id="theme-toggle" class="theme-toggle" title="Toggle theme" aria-label="Toggle theme">
-            <!-- icon replaced dynamically -->
-            <svg id="theme-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 3v2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
+          <button id="theme-toggle" class="theme-toggle" title="Toggle theme">
+            <svg id="theme-icon"></svg>
           </button>
         </div>
       </div>
     </header>
-
 
     <!-- FORM ----------------------------------------------------- -->
     <section class="card">
@@ -236,7 +236,7 @@
         </div>
 
         <div style="grid-column:1/-1;">
-          <label>Video link (YouTube / Instagram / Facebook)</label>
+          <label>Video link</label>
           <input id="link" type="url" placeholder="https://...">
         </div>
 
@@ -246,11 +246,10 @@
         </div>
 
         <div style="grid-column:1/-1;">
-          <label>Tags (comma separated)</label>
-          <input id="tags" type="text" placeholder="e.g. Cross, Chiquita, Vibora">
+          <label>Tags</label>
+          <input id="tags" type="text" placeholder="Cross, Banda, Chiquita">
         </div>
 
-        <!-- BUTTONS ROW -->
         <div class="actions-row" style="grid-column:1/-1;margin-top:4px;">
           <div style="display:flex;gap:10px;flex-wrap:wrap">
             <button id="save-btn" class="btn btn-primary">➕ Save exercise</button>
@@ -261,7 +260,6 @@
         </div>
       </form>
     </section>
-
 
     <!-- EXERCISE LIST + SESSION BUILDER --------------------------- -->
     <section class="card">
