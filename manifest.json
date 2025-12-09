@@ -1,24 +1,15 @@
 {
   "name": "LezGo Padel — Training Bank",
-  "short_name": "LezGoPadel",
-  "start_url": "/lezgopadel/",
-  "scope": "/lezgopadel/",
+  "short_name": "LezGo",
+  "description": "Training bank for padel øvelser",
+  "start_url": "./",
+  "scope": "./",
   "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#0f1720",
   "theme_color": "#0f1720",
-  "description": "Training bank for padel exercises",
   "icons": [
     { "src": "ICON-192x192.png", "sizes": "192x192", "type": "image/png" },
     { "src": "ICON-512x512.png", "sizes": "512x512", "type": "image/png" }
-  ],
-  "share_target": {
-    "action": "/lezgopadel/share-target",
-    "method": "POST",
-    "enctype": "multipart/form-data",
-    "params": {
-      "title": "title",
-      "text": "text",
-      "url": "url"
-    }
-  }
+  ]
 }
