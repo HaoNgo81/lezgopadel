@@ -22,17 +22,47 @@
     }
     .container{max-width:1100px;margin:12px auto;padding:12px;width:94%}
 
-    /* Header & logo */
-    header{display:flex;flex-direction:column;align-items:center;gap:12px;margin-bottom:12px}
-    #logo{height:120px;max-height:18vh;width:auto}
-    .controls{display:flex;gap:10px;align-items:center;width:100%;justify-content:space-between;flex-wrap:wrap}
-    .badges{display:flex;gap:8px;align-items:center}
+    /* ---------- Logo + header (REPLACE THIS BLOCK) ---------- */
+header{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:12px;
+  margin-bottom:12px;
+  padding-top:6px;
+}
 
-    .badge{background:rgba(255,255,255,.06);padding:6px 10px;border-radius:8px;font-weight:700;color:var(--muted)}
-    .btn{border:0;padding:10px 14px;border-radius:12px;font-weight:800;cursor:pointer}
-    .btn-primary{background:var(--accent);color:#05261a}
-    .btn-ghost{background:transparent;border:1px solid rgba(255,255,255,.06);color:var(--muted);padding:10px 14px;border-radius:12px}
-    .btn-danger{background:var(--danger);color:#fff;border-radius:12px;padding:10px 14px}
+/* gør logo responsivt og centreret */
+#logo{
+  width: min(60vw, 420px); /* max-bredde 420px, ellers 60% af viewport */
+  max-height: 24vh;       /* ikke højere end 24% af viewport-højde */
+  height: auto;
+  display:block;
+  margin: 0 auto;
+  object-fit: contain;
+}
+
+/* controls (knapper + sprog) — holder dem pænt tilpasset */
+.controls{
+  display:flex;
+  gap:12px;
+  align-items:center;
+  width:100%;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  padding: 0 6px; /* lidt luft til kanterne på mobil */
+}
+
+/* badges og knapper placering */
+.badges{display:flex;gap:8px;align-items:center}
+.badge{background:rgba(255,255,255,.06);padding:6px 10px;border-radius:8px;font-weight:700;color:var(--muted)}
+/* knapper */
+.btn{border:0;padding:10px 14px;border-radius:12px;font-weight:800;cursor:pointer}
+.btn-primary{background:var(--accent);color:#05261a}
+.btn-ghost{background:transparent;border:1px solid rgba(255,255,255,.06);color:var(--muted);padding:10px 14px;border-radius:12px}
+.btn-danger{background:var(--danger);color:#fff;border-radius:12px;padding:10px 14px}
+/* --------------------------------------------------------- */
+
 
     /* Card */
     .card{background:var(--panel);border-radius:12px;padding:12px;box-shadow:var(--card-shadow);margin-bottom:12px}
