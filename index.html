@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="da">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
@@ -96,6 +96,8 @@
     body:not(.light) select { -webkit-appearance: menulist-button; }
     body:not(.light) select:focus { outline: 2px solid rgba(255,255,255,0.06); outline-offset: 2px; }
 
+    /* preview image from share target */
+    #share-preview img{max-width:140px;border-radius:8px;display:block;margin-top:8px}
   </style>
 </head>
 
@@ -172,6 +174,8 @@
           <label id="label-tags" data-i18n="tagsLabel">Tags (comma separated)</label>
           <input id="tags" type="text" placeholder="e.g. Cross, Chiquita, Vibora" data-i18n-placeholder="tagsPlaceholder">
         </div>
+
+        <div id="share-preview" style="grid-column:1/-1;"></div>
 
         <div class="actions-row" style="grid-column:1/-1;margin-top:4px;">
           <div style="display:flex;gap:10px;flex-wrap:wrap">
@@ -337,6 +341,7 @@
 
       $("lang-select").addEventListener("change", (e)=>{ const lang = e.target.value || 'en'; localStorage.setItem(LANG_KEY, lang); applyTranslationsToDOM(); populateCategories(); populateLevels(); populateIntensity(); populatePlayers(); });
 
+      // Analyze button behaviour
       $("analyze-btn").addEventListener('click', async (ev)=>{ ev.preventDefault(); const link = $("link").value.trim(); if(!link){ alert(localStorage.getItem(LANG_KEY)==='da' ? "Indsæt et videolink først" : "Please paste a video link first"); return; } const btn = ev.currentTarget; const prev = btn.textContent; btn.textContent = localStorage.getItem(LANG_KEY)==='da' ? "Analyserer…" : "Analysing…"; btn.disabled = true; try{ const meta = await fetchVideoMetadata(link); if(meta){ if(meta.title) $("title").value = meta.title; if(meta.description) $("description").value = meta.description; const suggestions = analyzeTextToFields(meta.title || "", meta.description || "", localStorage.getItem(LANG_KEY) || 'en'); if(!$("category").value || $("category").value === "") { if(suggestions.category) { if(!categories.includes(suggestions.category)) { categories.push(suggestions.category); saveBase(); populateCategories(); } $("category").value = suggestions.category; } } if(!$("players").value || $("players").value==="") $("players").value = suggestions.players || $("players").options[0].value; if(!$("level").value || $("level").value==="") $("level").value = suggestions.level || $("level").options[0].value; if(!$("intensity").value || $("intensity").value==="") $("intensity").value = suggestions.intensity || $("intensity").options[0].value; if(!$("tags").value || $("tags").value==="") $("tags").value = suggestions.tags || ""; console.log("Analysis suggestions:", suggestions); } else { alert(localStorage.getItem(LANG_KEY)==='da' ? "Kunne ikke hente metadata for videoen. Prøv med et YouTube-link eller tjek CORS." : "Could not fetch video metadata. Try a YouTube link or check CORS."); } }catch(err){ console.error("Analyze error:", err); alert(localStorage.getItem(LANG_KEY)==='da' ? "Fejl under analyse" : "Error during analysis"); } finally{ btn.textContent = prev; btn.disabled = false; } });
     }
 
@@ -382,7 +387,6 @@
     /* ========== Simple video metadata helpers ========== */
     async function fetchVideoMetadata(link){
       try{
-        // attempt youtube id -> oembed -> noembed as fallback
         const yt = extractYouTubeId(link);
         if(yt){
           try{
@@ -422,6 +426,73 @@
     }
     function capitalize(s){ if(!s) return s; return s.charAt(0).toUpperCase() + s.slice(1); }
     function localize(key, lang){ if(!lang) lang='en'; const map = { en: {"Beginner":"Beginner","Intermediate":"Intermediate","Advanced":"Advanced","Low":"Low","Medium":"Medium","High":"High"}, da: {"Beginner":"Beginner","Intermediate":"Intermediate","Advanced":"Advanced","Low":"Low","Medium":"Medium","High":"High"} }; return (map[lang] && map[lang][key]) || key; }
+
+    /* ========== Share Target receiver (listens for SW messages) ========== */
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.addEventListener('message', ev => {
+        try {
+          const msg = ev.data;
+          if (!msg || msg.type !== 'share-target') return;
+          const payload = msg.payload || {};
+          console.log('Received shared payload:', payload);
+
+          if (payload.title && document.getElementById('title')) {
+            document.getElementById('title').value = payload.title;
+          }
+          if (payload.url && document.getElementById('link')) {
+            document.getElementById('link').value = payload.url;
+          }
+          if (payload.text && document.getElementById('description')) {
+            document.getElementById('description').value = payload.text;
+          }
+
+          if (Array.isArray(payload.files) && payload.files.length > 0) {
+            const f = payload.files[0];
+            try {
+              let preview = document.getElementById('share-preview');
+              preview.innerHTML = '';
+              const img = document.createElement('img');
+              img.src = f.data;
+              img.alt = f.name || 'shared';
+              preview.appendChild(img);
+              let hidden = document.getElementById('shared-file-data');
+              if(!hidden){
+                hidden = document.createElement('input');
+                hidden.type = 'hidden';
+                hidden.id = 'shared-file-data';
+                document.querySelector('form')?.appendChild(hidden);
+              }
+              hidden.value = f.data;
+            } catch(e){ console.warn('preview error', e); }
+          }
+
+          try {
+            const note = document.createElement('div');
+            note.textContent = (localStorage.getItem('lezgo_lang') === 'da') ? 'Indhold indsat fra Deling' : 'Content populated from Share';
+            note.style.color = 'var(--muted)';
+            note.style.marginTop = '6px';
+            document.querySelector('form')?.insertBefore(note, document.querySelector('form').firstChild);
+            setTimeout(()=>note.remove(), 5000);
+          } catch(e){}
+        } catch(err){
+          console.error('Error handling SW message', err);
+        }
+      });
+    }
+
+    // If redirected with ?shared=1, focus title and remove param
+    (function checkSharedFlag(){
+      try{
+        const p = new URLSearchParams(window.location.search);
+        if(p.get('shared') === '1'){
+          const url = new URL(window.location.href);
+          url.searchParams.delete('shared');
+          history.replaceState({}, '', url.toString());
+          const t = document.getElementById('title');
+          if(t){ t.focus(); }
+        }
+      }catch(e){}
+    })();
 
   </script>
 </body>
