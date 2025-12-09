@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
   <title>LezGo Padel — Training Bank</title>
-  <meta name="theme-color" content="#071226" />
+  <meta name="theme-color" content="#071226" id="meta-theme-color" />
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="icon-192.png" sizes="192x192">
 
@@ -12,21 +12,34 @@
     /* ---------------- GLOBAL RESET ---------------- */
     *, *::before, *::after { box-sizing: border-box; }
     html, body { margin: 0; padding: 0; height: 100%; overflow-x: hidden; }
+    body { font-family: Inter, system-ui, Arial, sans-serif; -webkit-font-smoothing:antialiased; transition: background 300ms, color 300ms; }
 
-    body {
-      font-family: Inter, system-ui, Arial;
-      background: linear-gradient(180deg, #071226 0%, #04111a 100%);
-      color: #e6eef6;
-      -webkit-font-smoothing: antialiased;
-    }
-
-    :root {
+    /* ---------------- THEME VARIABLES (dark default) ---------------- */
+    :root{
+      --bg-top: #071226;
+      --bg-bottom: #04111a;
       --panel: #0b1220;
       --muted: #9aa7b3;
+      --text: #e6eef6;
       --accent: #22c55e;
       --danger: #ef4444;
       --card-shadow: 0 8px 22px rgba(2,6,23,.6);
     }
+
+    /* Light theme overrides when body.light is present */
+    body.light{
+      --bg-top: #f6f8fa;
+      --bg-bottom: #ffffff;
+      --panel: #ffffff;
+      --muted: #64748b;
+      --text: #0b1220;
+      --accent: #16a34a;
+      --danger: #dc2626;
+      --card-shadow: 0 6px 18px rgba(9,10,11,.06);
+    }
+
+    /* Update theme-color meta when switching (JS does this too) */
+    .app-bg{ background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 100%); color:var(--text); min-height:100vh; }
 
     .container { max-width: 1100px; margin: 12px auto; padding: 12px; width: 94%; }
 
@@ -47,6 +60,8 @@
       display: block;
       margin: 0 auto;
       object-fit: contain;
+      filter: none;
+      transition: width 200ms, max-height 200ms;
     }
 
     .controls{
@@ -69,11 +84,15 @@
     }
 
     .btn{
-      border:0;padding:10px 14px;border-radius:12px;font-weight:800;cursor:pointer;
+      border:0;padding:10px 14px;border-radius:12px;font-weight:800;cursor:pointer;background:transparent;color:var(--text);
     }
     .btn-primary{background:var(--accent);color:#05261a}
     .btn-ghost{background:transparent;border:1px solid rgba(255,255,255,.06);color:var(--muted)}
     .btn-danger{background:var(--danger);color:#fff}
+
+    /* theme toggle small style */
+    .theme-toggle{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:10px;border:1px solid rgba(255,255,255,.06);background:transparent;cursor:pointer}
+    .theme-toggle svg{width:20px;height:20px}
 
     /* ---------------- CARD ---------------- */
     .card{
@@ -82,6 +101,7 @@
       padding:12px;
       margin-bottom:12px;
       box-shadow:var(--card-shadow);
+      transition: background 250ms, box-shadow 250ms;
     }
 
     label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
@@ -89,7 +109,8 @@
     input[type="text"], input[type="url"], input[type="number"], select, textarea {
       width:100%;padding:12px;border-radius:10px;
       border:1px solid rgba(255,255,255,.04);
-      background:#071226;color:inherit;font-size:15px;
+      background:transparent;color:var(--text);font-size:15px;
+      transition: background 200ms, color 200ms, border-color 200ms;
     }
 
     textarea{min-height:80px;resize:vertical}
@@ -104,6 +125,7 @@
       display:flex;gap:10px;padding:10px;
       border-radius:10px;border:1px solid rgba(255,255,255,.03);
       align-items:flex-start;
+      transition: background 150ms, border-color 150ms;
     }
 
     .tag{
@@ -121,10 +143,14 @@
       #logo{width: min(70vw, 360px); max-height:20vh;}
       .btn{font-weight:700;}
     }
+
+    /* smooth transitions */
+    .card, input, select, textarea, .exercise { transition: background 250ms, color 250ms, border-color 250ms; }
+
   </style>
 </head>
 
-<body>
+<body class="app-bg">
   <div class="container">
 
     <!-- HEADER --------------------------------------------------- -->
@@ -134,14 +160,22 @@
       <div class="controls">
         <div class="badges" id="badges"></div>
 
-        <div style="display:flex;gap:8px;align-items:center">
-          <select id="lang-select" style="padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,.06);background:transparent;color:inherit">
+        <div style="display:flex;gap:10px;align-items:center">
+          <select id="lang-select" style="padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,.06);background:transparent;color:var(--text)">
             <option value="en">English</option>
             <option value="da">Dansk</option>
           </select>
 
           <button id="btn-buy" class="btn btn-primary">Buy access</button>
           <button id="btn-admin" class="btn btn-ghost">Admin login</button>
+
+          <!-- THEME TOGGLE -->
+          <button id="theme-toggle" class="theme-toggle" title="Toggle theme" aria-label="Toggle theme">
+            <!-- icon replaced dynamically -->
+            <svg id="theme-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 3v2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
         </div>
       </div>
     </header>
@@ -215,9 +249,9 @@
 
       <!-- FILTERS -->
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
-        <input id="search" type="text" placeholder="Search..." style="flex:1">
-        <select id="filter-category"><option>ALL</option></select>
-        <select id="filter-level"><option>ALL</option></select>
+        <input id="search" type="text" placeholder="Search..." style="flex:1;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,.04);background:transparent;color:var(--text)">
+        <select id="filter-category" style="padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,.04);background:transparent;color:var(--text)"><option>ALL</option></select>
+        <select id="filter-level" style="padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,.04);background:transparent;color:var(--text)"><option>ALL</option></select>
         <button id="show-favorites" class="btn btn-ghost">Show favorites</button>
       </div>
 
@@ -319,6 +353,36 @@
     const isAdmin = () => localStorage.getItem("is_admin") === "1";
     const isPaid  = () => localStorage.getItem("is_paid") === "1";
 
+    /* THEME --------------------------- */
+    const THEME_KEY = 'lezgo_theme'; // 'dark' or 'light'
+    function applyTheme(theme){
+      if(theme === 'light'){
+        document.body.classList.add('light');
+        document.querySelector('#meta-theme-color').setAttribute('content', '#f6f8fa');
+        // icon = sun
+        setThemeIcon('light');
+      } else {
+        document.body.classList.remove('light');
+        document.querySelector('#meta-theme-color').setAttribute('content', '#071226');
+        setThemeIcon('dark');
+      }
+      localStorage.setItem(THEME_KEY, theme);
+    }
+    function toggleTheme(){
+      const current = localStorage.getItem(THEME_KEY) || 'dark';
+      const next = current === 'dark' ? 'light' : 'dark';
+      applyTheme(next);
+    }
+    function setThemeIcon(mode){
+      const svg = document.getElementById('theme-icon');
+      if(!svg) return;
+      if(mode === 'light'){
+        svg.innerHTML = '<path d=\"M12 3v2M12 19v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1 12h2M21 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4M12 7a5 5 0 100 10 5 5 0 000-10z\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" fill=\"none\"></path>';
+      } else {
+        svg.innerHTML = '<path d=\"M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" fill=\"none\"></path>';
+      }
+    }
+
     /* LOAD --------------------------- */
     function loadAll(){
       exercises   = JSON.parse(localStorage.getItem(EX_KEY) || "[]");
@@ -327,10 +391,10 @@
       intensities = JSON.parse(localStorage.getItem(INT_KEY) || "null") || DEFAULT_INT;
       players     = JSON.parse(localStorage.getItem(PLR_KEY) || "null") || DEFAULT_PLAYERS;
       sessions    = JSON.parse(localStorage.getItem(SES_KEY) || "[]");
-      saveAllBase();
+      saveBase();
     }
 
-    function saveAllBase(){
+    function saveBase(){
       localStorage.setItem(CAT_KEY, JSON.stringify(categories));
       localStorage.setItem(LVL_KEY, JSON.stringify(levels));
       localStorage.setItem(INT_KEY, JSON.stringify(intensities));
@@ -342,64 +406,41 @@
       const sel = $("category");
       const fil = $("filter-category");
       sel.innerHTML = ""; fil.innerHTML = "<option>ALL</option>";
-
       categories.forEach(c=>{
-        let o=document.createElement("option");
-        o.value=c; o.textContent=c; sel.appendChild(o);
-
-        let f=document.createElement("option");
-        f.value=c; f.textContent=c; fil.appendChild(f);
+        let o=document.createElement("option"); o.value=c; o.textContent=c; sel.appendChild(o);
+        let f=document.createElement("option"); f.value=c; f.textContent=c; fil.appendChild(f);
       });
-
-      let add = document.createElement("option");
-      add.value="__ADD__"; add.textContent="Add new category...";
-      sel.appendChild(add);
+      let add = document.createElement("option"); add.value="__ADD__"; add.textContent="Add new category..."; sel.appendChild(add);
     }
 
     function populateLevels(){
       const sel = $("level");
       const fil = $("filter-level");
       sel.innerHTML = ""; fil.innerHTML = "<option>ALL</option>";
-
       levels.forEach(c=>{
-        let o=document.createElement("option");
-        o.value=c; o.textContent=c; sel.appendChild(o);
-
-        let f=document.createElement("option");
-        f.value=c; f.textContent=c; fil.appendChild(f);
+        let o=document.createElement("option"); o.value=c; o.textContent=c; sel.appendChild(o);
+        let f=document.createElement("option"); f.value=c; f.textContent=c; fil.appendChild(f);
       });
-
-      let add=document.createElement("option");
-      add.value="__ADD__"; add.textContent="Add new level...";
-      sel.appendChild(add);
+      let add=document.createElement("option"); add.value="__ADD__"; add.textContent="Add new level..."; sel.appendChild(add);
     }
 
     function populateIntensity(){
-      const sel = $("intensity");
-      sel.innerHTML="";
-
-      intensities.forEach(c=>{
-        let o=document.createElement("option");
-        o.value=c; o.textContent=c; sel.appendChild(o);
-      });
-
-      let add=document.createElement("option");
-      add.value="__ADD__"; add.textContent="Add new intensity...";
-      sel.appendChild(add);
+      const sel = $("intensity"); sel.innerHTML="";
+      intensities.forEach(c=>{ let o=document.createElement("option"); o.value=c; o.textContent=c; sel.appendChild(o); });
+      let add=document.createElement("option"); add.value="__ADD__"; add.textContent="Add new intensity..."; sel.appendChild(add);
     }
 
     function populatePlayers(){
-      const sel = $("players");
-      sel.innerHTML="";
-
-      players.forEach(c=>{
-        let o=document.createElement("option");
-        o.value=c; o.textContent=c; sel.appendChild(o);
-      });
+      const sel = $("players"); sel.innerHTML="";
+      players.forEach(c=>{ let o=document.createElement("option"); o.value=c; o.textContent=c; sel.appendChild(o); });
     }
 
     /* INIT --------------------------- */
     function init(){
+      // theme init - apply saved or default
+      const savedTheme = localStorage.getItem(THEME_KEY) || 'dark';
+      applyTheme(savedTheme);
+
       loadAll();
       populateCategories();
       populateLevels();
@@ -414,8 +455,10 @@
 
     /* EVENTS --------------------------- */
     function bindEvents(){
+      /* Theme */
+      $("theme-toggle").addEventListener("click", toggleTheme);
 
-      /* Admin buttons */
+      /* Admin */
       $("btn-admin").addEventListener("click", ()=> $("admin-modal").style.display="flex");
       $("admin-cancel").addEventListener("click", ()=> $("admin-modal").style.display="none");
       $("admin-submit").addEventListener("click", ()=>{
@@ -423,6 +466,8 @@
           localStorage.setItem("is_admin","1");
           $("admin-modal").style.display="none";
           updateBadges();
+          updateSessionLock();
+          alert('Admin enabled');
         } else alert("Wrong password");
       });
 
@@ -430,15 +475,11 @@
       $("btn-buy").addEventListener("click", ()=>{
         if(isPaid()){
           if(confirm("Disable paid access?")){
-            localStorage.removeItem("is_paid");
-            updateBadges();
-            updateSessionLock();
+            localStorage.removeItem("is_paid"); updateBadges(); updateSessionLock();
           }
         } else {
           if(confirm("Simulate purchase?")){
-            localStorage.setItem("is_paid","1");
-            updateBadges();
-            updateSessionLock();
+            localStorage.setItem("is_paid","1"); updateBadges(); updateSessionLock();
           }
         }
       });
@@ -447,44 +488,28 @@
       $("category").addEventListener("change", e=>{
         if(e.target.value==="__ADD__"){
           let n=prompt("New category:");
-          if(n){
-            categories.push(n.trim());
-            localStorage.setItem(CAT_KEY, JSON.stringify(categories));
-            populateCategories();
-          }
+          if(n){ categories.push(n.trim()); saveBase(); populateCategories(); }
         }
       });
 
       $("level").addEventListener("change", e=>{
         if(e.target.value==="__ADD__"){
           let n=prompt("New level:");
-          if(n){
-            levels.push(n.trim());
-            localStorage.setItem(LVL_KEY, JSON.stringify(levels));
-            populateLevels();
-          }
+          if(n){ levels.push(n.trim()); saveBase(); populateLevels(); }
         }
       });
 
       $("intensity").addEventListener("change", e=>{
         if(e.target.value==="__ADD__"){
           let n=prompt("New intensity:");
-          if(n){
-            intensities.push(n.trim());
-            localStorage.setItem(INT_KEY, JSON.stringify(intensities));
-            populateIntensity();
-          }
+          if(n){ intensities.push(n.trim()); saveBase(); populateIntensity(); }
         }
       });
 
       $("players").addEventListener("change", e=>{
         if(e.target.value==="Add new..." || e.target.value==="__ADD__"){
           let n = prompt("Add new players range:");
-          if(n){
-            players.push(n.trim());
-            localStorage.setItem(PLR_KEY, JSON.stringify(players));
-            populatePlayers();
-          }
+          if(n){ players.push(n.trim()); saveBase(); populatePlayers(); }
         }
       });
 
@@ -493,8 +518,7 @@
       $("clear-btn").addEventListener("click", clearForm);
       $("delete-all-btn").addEventListener("click", ()=> {
         if(confirm("Delete ALL exercises?")){
-          exercises=[]; localStorage.setItem(EX_KEY,"[]");
-          renderList();
+          exercises=[]; localStorage.setItem(EX_KEY,"[]"); renderList();
         }
       });
 
@@ -563,6 +587,7 @@
       $("link").value="";
       $("description").value="";
       $("tags").value="";
+      $("save-btn").textContent = "➕ Save exercise";
     }
 
     /* RENDER LIST --------------------------- */
@@ -576,8 +601,8 @@
 
       let items = exercises.slice();
 
-      if(fc!=="ALL") items = items.filter(x=>x.category===fc);
-      if(fl!=="ALL") items = items.filter(x=>x.level===fl);
+      if(fc && fc!=="ALL") items = items.filter(x=>x.category===fc);
+      if(fl && fl!=="ALL") items = items.filter(x=>x.level===fl);
 
       if(q) items = items.filter(x =>
            x.title.toLowerCase().includes(q)
