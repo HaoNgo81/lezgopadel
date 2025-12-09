@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
-  <title>LezGo Padel — Training Bank</title>
+  <title>LezGo Padel — Training Bank (with Video Analyze)</title>
   <meta name="theme-color" content="#0f1720" id="meta-theme-color" />
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="ICON-192x192.png" sizes="192x192">
@@ -184,7 +184,11 @@
 
         <div style="grid-column:1/-1;">
           <label id="label-video" data-i18n="videoLabel">Video link (YouTube / Instagram / Facebook)</label>
-          <input id="link" type="url" placeholder="https://..." data-i18n-placeholder="videoPlaceholder">
+          <!-- ANALYZE: input + analyze button -->
+          <div style="display:flex;gap:8px;align-items:center">
+            <input id="link" type="url" placeholder="https://..." data-i18n-placeholder="videoPlaceholder" style="flex:1">
+            <button id="analyze-btn" class="btn btn-ghost" title="Analyze video">🔍 Analyze</button>
+          </div>
         </div>
 
         <div style="grid-column:1/-1;">
@@ -278,6 +282,14 @@
 
   <!-- SCRIPT -->
   <script>
+    /*
+      LezGo Training Bank — Video analysis (YouTube API option)
+      ------------------------------------------------------
+      * Dette file er din fulde single-file app, inkl. ny "Analyze"-knap.
+      * For at få bedste resultater med YouTube: udfyld YOUTUBE_API_KEY nedenfor.
+      * Sikkerheds-note: læg ikke din API-nøgle i klientkode hvis appen publiceres. Se node-proxy-eksempel i bunden af dette dokument for hvordan du kan proxye kald fra server.
+    */
+
     /* CONFIG */
     const ADMIN_PASSWORD = "admin123";
     const EX_KEY = "lezgo_exercises_v1";
@@ -288,6 +300,10 @@
     const SES_KEY = "lezgo_sessions_v1";
     const THEME_KEY = 'lezgo_theme';
     const LANG_KEY = 'lezgo_lang';
+
+    // ---- YouTube API key: set here for quick testing (NOT recommended for public builds) ----
+    // For production: use server-side proxy (se forslag længere nede i filen)
+    const YOUTUBE_API_KEY = ""; // <- indsæt din YouTube Data API v3 nøgle her for bedre metadata
 
     const DEFAULT_CATEGORIES = ["Back wall","Bandeja","Chiquita","Defense","Double wall","Groundstroke","Lob","Serve","Smash","Vibora","Volley"].sort();
     const DEFAULT_LEVELS = ["Beginner","Intermediate","Advanced"];
@@ -451,27 +467,19 @@
       return (translations[lang] && translations[lang][key]) || (translations.en[key] || '');
     }
     function applyTranslationsToDOM(){
-      // textContent translations
       document.querySelectorAll('[data-i18n]').forEach(el=>{
         const k = el.getAttribute('data-i18n');
         if(k) el.textContent = t(k);
       });
-      // placeholders (data-i18n-placeholder)
       document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{
         const k = el.getAttribute('data-i18n-placeholder');
         if(k) el.placeholder = t(k);
       });
-      // update static labeled elements that do not use data-i18n attributes
-      // filter dropdown default
       const fc = $("filter-category"); if(fc && fc.options.length>0) fc.options[0].text = t('filterAll');
       const fl = $("filter-level"); if(fl && fl.options.length>0) fl.options[0].text = t('filterAll');
-
-      // selected-count suffix adjust
       updateSelectedCount();
-      // re-render lists so dynamic buttons reflect language
       renderList();
       renderSessions();
-      // badges/buttons updated too
       updateBadges();
     }
 
@@ -552,6 +560,44 @@
         applyTranslationsToDOM();
         populateCategories(); populateLevels(); populateIntensity(); populatePlayers();
       });
+
+      // --- ANALYZE BUTTON BINDING ---
+      $("analyze-btn").addEventListener('click', async (ev)=>{
+        ev.preventDefault();
+        const link = $("link").value.trim();
+        if(!link){ alert(localStorage.getItem(LANG_KEY)==='da' ? "Indsæt et videolink først" : "Please paste a video link first"); return; }
+        const btn = ev.currentTarget;
+        const prev = btn.textContent;
+        btn.textContent = localStorage.getItem(LANG_KEY)==='da' ? "Analyserer…" : "Analysing…";
+        btn.disabled = true;
+        try{
+          const meta = await fetchVideoMetadata(link);
+          if(meta){
+            if(meta.title) $("title").value = meta.title;
+            if(meta.description) $("description").value = meta.description;
+            const suggestions = analyzeTextToFields(meta.title || "", meta.description || "", localStorage.getItem(LANG_KEY) || 'en');
+
+            if(!$("category").value || $("category").value === "") {
+              if(suggestions.category) {
+                if(!categories.includes(suggestions.category)) { categories.push(suggestions.category); saveBase(); populateCategories(); }
+                $("category").value = suggestions.category;
+              }
+            }
+
+            if(!$("players").value || $("players").value==="") $("players").value = suggestions.players || $("players").options[0].value;
+            if(!$("level").value || $("level").value==="") $("level").value = suggestions.level || $("level").options[0].value;
+            if(!$("intensity").value || $("intensity").value==="") $("intensity").value = suggestions.intensity || $("intensity").options[0].value;
+            if(!$("tags").value || $("tags").value==="") $("tags").value = suggestions.tags || "";
+
+            // Optional: show a small toast or console message with suggestion summary
+            console.log("Analysis suggestions:", suggestions);
+          } else {
+            alert(localStorage.getItem(LANG_KEY)==='da' ? "Kunne ikke hente metadata for videoen. Prøv med et YouTube-link eller tjek CORS." : "Could not fetch video metadata. Try a YouTube link or check CORS.");
+          }
+        }catch(err){ console.error(err); alert(localStorage.getItem(LANG_KEY)==='da' ? "Fejl under analyse" : "Error during analysis"); }
+        finally{ btn.textContent = prev; btn.disabled = false; }
+      });
+
     }
 
     /* SAVE EXERCISE */
@@ -562,7 +608,7 @@
       localStorage.setItem(EX_KEY, JSON.stringify(exercises));
       clearForm(); renderList();
     }
-    function normalizeTags(str){ if(!str) return ""; return str.split(",").map(t=>t.replace(/^#+/,"").trim()).filter(Boolean).join(", "); }
+    function normalizeTags(str){ if(!str) return ""; return str.split(",").map(t=>t.replace(/^#+/,"\").trim()).filter(Boolean).join(", "); }
     function clearForm(){ editingId=null; $("title").value=""; $("category").selectedIndex=0; $("players").selectedIndex=0; $("duration").value=""; $("level").selectedIndex=0; $("intensity").selectedIndex=0; $("link").value=""; $("description").value=""; $("tags").value=""; $("save-btn").textContent=t('saveBtn'); }
 
     /* RENDER LIST */
@@ -631,6 +677,151 @@
     if("serviceWorker" in navigator){
       navigator.serviceWorker.register("service-worker.js").catch(err=>console.warn("SW failed:",err));
     }
+
+    /* ================= VIDEO ANALYSIS SUPPORT FUNCTIONS ================= */
+    /* fetchVideoMetadata: prøv YouTube API (hvis nøgle), ellers oEmbed (noembed), ellers null */
+    async function fetchVideoMetadata(link){
+      const ytId = extractYouTubeId(link);
+      if(ytId){
+        // If YOUTUBE_API_KEY is set client-side (for dev/testing), use direct API call
+        if(YOUTUBE_API_KEY && YOUTUBE_API_KEY.trim()){
+          try{
+            const url = `https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${encodeURIComponent(ytId)}&key=${encodeURIComponent(YOUTUBE_API_KEY)}`;
+            const res = await fetch(url);
+            if(!res.ok) throw new Error('YT API returned ' + res.status);
+            const data = await res.json();
+            if(data.items && data.items.length){
+              const s = data.items[0].snippet;
+              return { title: s.title || "", description: s.description || "" };
+            }
+          }catch(err){
+            console.warn('YT API failed (client). Consider using server proxy. Error:', err);
+            // fallthrough to try proxy or oEmbed
+          }
+        }
+
+        // Try server-side proxy first (recommended) — expects endpoint /yt-proxy?videoId=ID
+        try{
+          const proxyUrl = `/yt-proxy?videoId=${encodeURIComponent(ytId)}`;
+          const r = await fetch(proxyUrl);
+          if(r.ok){
+            const j = await r.json();
+            // Expected shape: { title: "..", description: ".." }
+            if(j && (j.title || j.description)) return { title: j.title||"", description: j.description||"" };
+          }
+        }catch(e){ console.warn('yt-proxy failed or not available', e); }
+
+        // Try youtube oEmbed (may return only title)
+        try{
+          const oUrl = `https://www.youtube.com/oembed?url=${encodeURIComponent(link)}&format=json`;
+          const r = await fetch(oUrl);
+          if(r.ok){ const j = await r.json(); return { title: j.title || "", description: j.description || "" }; }
+        }catch(e){ console.warn('youtube oembed failed', e); }
+      }
+
+      // Generic oEmbed via noembed.com
+      try{
+        const noembedUrl = `https://noembed.com/embed?url=${encodeURIComponent(link)}`;
+        const r = await fetch(noembedUrl);
+        if(r.ok){ const j = await r.json(); return { title: j.title || j.author_name || "", description: j.description || "" }; }
+      }catch(e){ console.warn('noembed failed', e); }
+
+      return null;
+    }
+
+    function extractYouTubeId(url){
+      try{ const u = new URL(url);
+        if(u.hostname.includes('youtu.be')) return u.pathname.slice(1);
+        if(u.hostname.includes('youtube.com')){
+          const p = u.searchParams.get('v'); if(p) return p;
+          const parts = u.pathname.split('/'); const idx = parts.indexOf('embed'); if(idx>-1 && parts[idx+1]) return parts[idx+1];
+        }
+      }catch(e){}
+      return null;
+    }
+
+    function analyzeTextToFields(title, description, lang){
+      const text = (title + ' ' + description).toLowerCase();
+      const suggestions = {};
+      const categoryMap = {
+        "Bandeja": ["bandeja","bandejá"],
+        "Chiquita": ["chiquita","chiquitas"],
+        "Vibora": ["vibora","víbora"],
+        "Serve": ["serve","serving"],
+        "Smash": ["smash","smashes"],
+        "Lob": ["lob","lobbed"],
+        "Defense": ["defend","defense","defensive"],
+        "Volley": ["volley","volleys"],
+        "Groundstroke": ["forehand","backhand","groundstroke"],
+        "Double wall": ["double wall","doble muralla"]
+      };
+
+      for(const [cat, keys] of Object.entries(categoryMap)){
+        for(const k of keys) if(text.includes(k)){ suggestions.category = cat; break; }
+        if(suggestions.category) break;
+      }
+
+      if(text.match(/\bbeginner|beginners|beginner-level|nybegynder|begynder\b/)) suggestions.level = localize('Beginner', lang);
+      else if(text.match(/\bintermediate|intermediate-level|øvet|mellem\b/)) suggestions.level = localize('Intermediate', lang);
+      else if(text.match(/\badvanced|advanced-level|avanceret|pro\b/)) suggestions.level = localize('Advanced', lang);
+
+      const playersMatch = text.match(/\b(1|2|3|4|1\-2|1\-3|1\-4|2\-4)\b/);
+      if(playersMatch) suggestions.players = playersMatch[0];
+
+      if(text.match(/\b(high|intense|intensity|hard|hardcore|intensiv|hård)\b/)) suggestions.intensity = localize('High', lang);
+      else if(text.match(/\b(medium|moderate|moderat|midt)\b/)) suggestions.intensity = localize('Medium', lang);
+      else suggestions.intensity = localize('Low', lang);
+
+      const words = text.replace(/[^\wæøåÆØÅ]/g,' ').split(/\s+/).filter(w=>w.length>3);
+      const stop = new Set(['video','padel','drill','exercise','exercises','howto','tutorial','padelvideo','learn']);
+      const tagCandidates = [];
+      for(const w of words){ if(!stop.has(w) && !tagCandidates.includes(w)) tagCandidates.push(w); if(tagCandidates.length>=6) break; }
+      suggestions.tags = tagCandidates.slice(0,6).join(', ');
+      if(!suggestions.category && tagCandidates.length) suggestions.category = capitalize(tagCandidates[0]);
+      return suggestions;
+    }
+
+    function capitalize(s){ if(!s) return s; return s.charAt(0).toUpperCase() + s.slice(1); }
+    function localize(key, lang){ if(!lang) lang='en'; const map = { en: { 'Beginner':'Beginner','Intermediate':'Intermediate','Advanced':'Advanced','Low':'Low','Medium':'Medium','High':'High' }, da: { 'Beginner':'Beginner','Intermediate':'Intermediate','Advanced':'Advanced','Low':'Low','Medium':'Medium','High':'High' } }; return (map[lang] && map[lang][key]) || key; }
+
   </script>
+
+  <!--
+    -----------------------------
+    OPTIONAL: Server-side proxy (recommended)
+    -----------------------------
+    Eksempel på en lille Node.js/Express proxy som returnerer YouTube snippet metadata
+    (så du ikke lægger YOUTUBE_API_KEY i klientkode):
+
+    // server.js
+    const express = require('express');
+    const fetch = require('node-fetch'); // eller indbygget fetch i nyere node
+    const app = express();
+    const PORT = process.env.PORT || 3000;
+    const YT_KEY = process.env.YOUTUBE_API_KEY; // Sæt i miljøvariabler på serveren
+
+    app.get('/yt-proxy', async (req, res) => {
+      const videoId = req.query.videoId;
+      if(!videoId) return res.status(400).json({ error: 'missing videoId' });
+      try{
+        const url = `https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${encodeURIComponent(videoId)}&key=${encodeURIComponent(YT_KEY)}`;
+        const r = await fetch(url);
+        if(!r.ok) return res.status(r.status).json({ error: 'yt api error' });
+        const j = await r.json();
+        if(j.items && j.items.length){
+          const s = j.items[0].snippet;
+          return res.json({ title: s.title || '', description: s.description || '' });
+        }
+        return res.json({ title: '', description: '' });
+      }catch(e){ console.error(e); return res.status(500).json({ error: 'server error' }); }
+    });
+
+    app.listen(PORT, ()=> console.log('yt-proxy listening on', PORT));
+
+    Brug: sæt miljøvariablen YOUTUBE_API_KEY på din server (fx i Heroku/Render/Vercel/ligende), deploy server.js, og klientkoden i HTML vil forsøge at ringe til /yt-proxy. Dette holder din nøgle sikker.
+
+    -----------------------------------------------------------------
+  -->
+
 </body>
 </html>
