@@ -239,7 +239,8 @@
             <button id="save-btn" class="btn btn-primary" data-i18n="saveBtn">➕ Save exercise</button>
             <button id="clear-btn" class="btn btn-ghost" data-i18n="clearBtn">Clear form</button>
           </div>
-          <button id="delete-all-btn" class="btn btn-danger" data-i18n="deleteAllBtn">🗑️ Delete all</button>
+          <!-- delete all is hidden for guests; will be rendered only for admins via JS -->
+          <button id="delete-all-btn" class="btn btn-danger" data-i18n="deleteAllBtn" style="display:none">🗑️ Delete all</button>
         </div>
       </form>
     </section>
@@ -281,8 +282,9 @@
           </div>
 
           <div style="display:flex;gap:10px;margin-top:10px;flex-wrap:wrap">
-            <button id="save-session" class="btn btn-primary" data-i18n="saveSession">Save session</button>
-            <button id="clear-session" class="btn btn-ghost" data-i18n="clearSession">Clear</button>
+            <!-- Save & Clear session buttons: hidden/disabled for guests via JS -->
+            <button id="save-session" class="btn btn-primary" data-i18n="saveSession" style="display:none">Save session</button>
+            <button id="clear-session" class="btn btn-ghost" data-i18n="clearSession" style="display:none">Clear</button>
           </div>
 
           <div id="session-lock-info" style="margin-top:14px;color:var(--muted);display:none;" data-i18n="freeInfo">
@@ -387,11 +389,10 @@
     /* INIT */
     function init(){
       // Ensure guest mode start: don't set is_admin by default
-      if(localStorage.getItem("is_admin") !== "1") localStorage.removeItem("is_admin");
-
+      // (we still allow admin if previously logged in)
       const savedTheme = localStorage.getItem(THEME_KEY) || 'dark'; applyTheme(savedTheme);
       const savedLang = localStorage.getItem(LANG_KEY) || 'en'; $("lang-select").value = savedLang;
-      loadAll(); populateCategories(); populateLevels(); populateIntensity(); populatePlayers(); bindEvents(); applyTranslationsToDOM(); renderList(); renderSessions(); updateBadges(); updateSessionLock();
+      loadAll(); populateCategories(); populateLevels(); populateIntensity(); populatePlayers(); bindEvents(); applyTranslationsToDOM(); renderList(); renderSessions(); updateBadges(); enforcePermissions();
     }
 
     /* EVENTS */
@@ -399,11 +400,11 @@
       $("theme-toggle").addEventListener("click", toggleTheme);
       $("btn-admin").addEventListener("click", ()=> $("admin-modal").style.display="flex");
       $("admin-cancel").addEventListener("click", ()=> $("admin-modal").style.display="none");
-      $("admin-submit").addEventListener("click", ()=>{ if($("admin-password").value===ADMIN_PASSWORD){ localStorage.setItem("is_admin","1"); $("admin-modal").style.display="none"; updateBadges(); updateSessionLock(); $("btn-logout-header").style.display="inline-flex"; alert('Admin enabled'); } else alert("Wrong password"); });
+      $("admin-submit").addEventListener("click", ()=>{ if($("admin-password").value===ADMIN_PASSWORD){ localStorage.setItem("is_admin","1"); $("admin-modal").style.display="none"; updateBadges(); updateSessionLock(); enforcePermissions(); alert('Admin enabled'); } else alert("Wrong password"); });
 
-      $("btn-buy").addEventListener("click", ()=>{ if(isPaid()){ if(confirm(localStorage.getItem(LANG_KEY)==='da'?"Deaktiver betalt adgang?":"Disable paid access?")){ localStorage.removeItem("is_paid"); updateBadges(); updateSessionLock(); } } else { if(confirm(localStorage.getItem(LANG_KEY)==='da'?"Simuler køb?":"Simulate purchase?")){ localStorage.setItem("is_paid","1"); updateBadges(); updateSessionLock(); } } });
+      $("btn-buy").addEventListener("click", ()=>{ if(isPaid()){ if(confirm(localStorage.getItem(LANG_KEY)==='da'?"Deaktiver betalt adgang?":"Disable paid access?")){ localStorage.removeItem("is_paid"); updateBadges(); updateSessionLock(); enforcePermissions(); } } else { if(confirm(localStorage.getItem(LANG_KEY)==='da'?"Simuler køb?":"Simulate purchase?")){ localStorage.setItem("is_paid","1"); updateBadges(); updateSessionLock(); enforcePermissions(); } } });
 
-      $("btn-logout-header").addEventListener("click", ()=>{ localStorage.removeItem("is_admin"); updateBadges(); updateSessionLock(); $("btn-logout-header").style.display="none"; alert('Logged out'); });
+      $("btn-logout-header").addEventListener("click", ()=>{ localStorage.removeItem("is_admin"); updateBadges(); updateSessionLock(); enforcePermissions(); $("btn-logout-header").style.display="none"; alert('Logged out'); });
 
       $("category").addEventListener("change", e=>{ if(e.target.value==="__ADD__"){ let n=prompt(localStorage.getItem(LANG_KEY)==='da'?"Ny kategori:":"New category:"); if(n){ categories.push(n.trim()); saveBase(); populateCategories(); } }});
       $("level").addEventListener("change", e=>{ if(e.target.value==="__ADD__"){ let n=prompt(localStorage.getItem(LANG_KEY)==='da'?"Nyt niveau:":"New level:"); if(n){ levels.push(n.trim()); saveBase(); populateLevels(); } }});
@@ -412,7 +413,7 @@
 
       $("save-btn").addEventListener("click", onSave);
       $("clear-btn").addEventListener("click", clearForm);
-      $("delete-all-btn").addEventListener("click", ()=>{ if(confirm(localStorage.getItem(LANG_KEY)==='da'?"Slet ALLE øvelser?":"Delete ALL exercises?")){ exercises=[]; localStorage.setItem(EX_KEY,"[]"); renderList(); }});
+      $("delete-all-btn").addEventListener("click", ()=>{ if(!isAdmin()){ alert('Admin access required'); return; } if(confirm(localStorage.getItem(LANG_KEY)==='da'?"Slet ALLE øvelser?":"Delete ALL exercises?")){ exercises=[]; localStorage.setItem(EX_KEY,"[]"); renderList(); }});
 
       $("search").addEventListener("input", renderList);
       $("filter-category").addEventListener("change", renderList);
@@ -421,9 +422,9 @@
       $("show-favorites").addEventListener("click", ()=>{ let b=$("show-favorites"); b.textContent = b.textContent===t('showFavorites') ? ((localStorage.getItem(LANG_KEY)==='da')?"Vis alle":"Show all") : t('showFavorites'); renderList(); });
 
       $("select-all").addEventListener("click", ()=>{ document.querySelectorAll(".select-item").forEach(ch=>ch.checked=true); updateSelectedSet(); });
-      $("add-selected").addEventListener("click", addSelectedToSession);
-      $("save-session").addEventListener("click", saveSession);
-      $("clear-session").addEventListener("click", clearSessionBuilder);
+      $("add-selected").addEventListener("click", ()=>{ if(!isAdmin() && !isPaid()){ alert(localStorage.getItem(LANG_KEY)==='da'?"Betalt adgang kræves.":"Paid access required."); return; } addSelectedToSession(); });
+      $("save-session").addEventListener("click", ()=>{ if(!isAdmin() && !isPaid()){ alert(localStorage.getItem(LANG_KEY)==='da'?"Betalt adgang kræves.":"Paid access required."); return; } saveSession(); });
+      $("clear-session").addEventListener("click", ()=>{ if(!isAdmin() && !isPaid()){ alert(localStorage.getItem(LANG_KEY)==='da'?"Betalt adgang kræves.":"Paid access required."); return; } clearSessionBuilder(); });
 
       $("lang-select").addEventListener("change", (e)=>{ const lang = e.target.value || 'en'; localStorage.setItem(LANG_KEY, lang); applyTranslationsToDOM(); populateCategories(); populateLevels(); populateIntensity(); populatePlayers(); });
 
@@ -441,7 +442,14 @@
     function clearForm(){ editingId=null; $("title").value=""; if($("category")) $("category").selectedIndex=0; if($("players")) $("players").selectedIndex=0; $("duration").value=""; if($("level")) $("level").selectedIndex=0; if($("intensity")) $("intensity").selectedIndex=0; $("link").value=""; $("description").value=""; $("tags").value=""; $("save-btn").textContent=t('saveBtn'); }
 
     /* RENDER LIST */
-    function renderList(){ let q = ($("search") && $("search").value.trim().toLowerCase()) || ""; let fc = ($("filter-category") && $("filter-category").value) || ""; let fl = ($("filter-level") && $("filter-level").value) || ""; let list = $("list"); if(!list) return; list.innerHTML=""; let items = exercises.slice(); if(fc && fc!=="") items = items.filter(x=>x.category===fc); if(fl && fl!=="") items = items.filter(x=>x.level===fl); if(q) items = items.filter(x => x.title.toLowerCase().includes(q) || (x.description||"").toLowerCase().includes(q) || (x.tags||"").toLowerCase().includes(q) ); if($("show-favorites") && $("show-favorites").textContent!==t('showFavorites')) items = items.filter(x=>x.favorite); if(items.length===0){ list.innerHTML = `<div style="color:var(--muted)">${t('noMatches')}</div>`; return; } items.forEach(ex=>{ let row=document.createElement("div"); row.className="exercise"; row.dataset.id=ex.id; let cb=document.createElement("input"); cb.type="checkbox"; cb.className="select-item"; cb.addEventListener("change", updateSelectedSet); row.appendChild(cb); let left=document.createElement("div"); left.style.flex="1"; let ttitle=document.createElement("div"); ttitle.style.fontWeight="800"; ttitle.style.fontSize="15px"; ttitle.textContent=ex.title; left.appendChild(ttitle); let meta=document.createElement("div"); meta.style.color="var(--muted)"; meta.style.marginTop="6px"; meta.textContent = `${ex.category} • ${ex.level} • ${ex.players} • ${ex.duration}m`; left.appendChild(meta); if(ex.link){ let a=document.createElement("a"); a.href=ex.link; a.target="_blank"; a.textContent=ex.link; a.style.color="var(--muted)"; a.style.display="block"; a.style.marginTop="6px"; left.appendChild(a); } if(ex.tags){ let tags=document.createElement("div"); tags.style.marginTop="8px"; ex.tags.split(",").forEach(tg=>{ let s=document.createElement("span"); s.className="tag"; s.textContent=tg.trim(); tags.appendChild(s); }); left.appendChild(tags); } row.appendChild(left); let right=document.createElement("div"); right.className="actions-small"; let edit=document.createElement("button"); edit.className="btn btn-ghost"; edit.textContent=(localStorage.getItem(LANG_KEY)==='da'?"Rediger":"Edit"); edit.addEventListener("click", ()=>editItem(ex.id)); let del=document.createElement("button"); del.className="btn btn-ghost"; del.style.color="var(--danger)"; del.textContent=(localStorage.getItem(LANG_KEY)==='da'?"Slet":"Delete"); del.addEventListener("click", ()=>{ if(confirm(t('deleteConfirm'))){ exercises = exercises.filter(x=>x.id!==ex.id); localStorage.setItem(EX_KEY, JSON.stringify(exercises)); renderList(); }}); right.appendChild(edit); right.appendChild(del); row.appendChild(right); list.appendChild(row); }); updateSelectedSet(); }
+    function renderList(){ let q = ($("search") && $("search").value.trim().toLowerCase()) || ""; let fc = ($("filter-category") && $("filter-category").value) || ""; let fl = ($("filter-level") && $("filter-level").value) || ""; let list = $("list"); if(!list) return; list.innerHTML=""; let items = exercises.slice(); if(fc && fc!=="") items = items.filter(x=>x.category===fc); if(fl && fl!=="") items = items.filter(x=>x.level===fl); if(q) items = items.filter(x => x.title.toLowerCase().includes(q) || (x.description||"").toLowerCase().includes(q) || (x.tags||"").toLowerCase().includes(q) ); if($("show-favorites") && $("show-favorites").textContent!==t('showFavorites')) items = items.filter(x=>x.favorite); if(items.length===0){ list.innerHTML = `<div style="color:var(--muted)">${t('noMatches')}</div>`; return; } items.forEach(ex=>{ let row=document.createElement("div"); row.className="exercise"; row.dataset.id=ex.id; let cb=document.createElement("input"); cb.type="checkbox"; cb.className="select-item"; cb.addEventListener("change", updateSelectedSet); row.appendChild(cb); let left=document.createElement("div"); left.style.flex="1"; let ttitle=document.createElement("div"); ttitle.style.fontWeight="800"; ttitle.style.fontSize="15px"; ttitle.textContent=ex.title; left.appendChild(ttitle); let meta=document.createElement("div"); meta.style.color="var(--muted)"; meta.style.marginTop="6px"; meta.textContent = `${ex.category} • ${ex.level} • ${ex.players} • ${ex.duration}m`; left.appendChild(meta); if(ex.link){ let a=document.createElement("a"); a.href=ex.link; a.target="_blank"; a.textContent=ex.link; a.style.color="var(--muted)"; a.style.display="block"; a.style.marginTop="6px"; left.appendChild(a); } if(ex.tags){ let tags=document.createElement("div"); tags.style.marginTop="8px"; ex.tags.split(",").forEach(tg=>{ let s=document.createElement("span"); s.className="tag"; s.textContent=tg.trim(); tags.appendChild(s); }); left.appendChild(tags); } row.appendChild(left); let right=document.createElement("div"); right.className="actions-small"; let edit=document.createElement("button"); edit.className="btn btn-ghost"; edit.textContent=(localStorage.getItem(LANG_KEY)==='da'?"Rediger":"Edit"); edit.addEventListener("click", ()=>editItem(ex.id)); right.appendChild(edit);
+
+      // Only show delete button if admin
+      if(isAdmin()){
+        let del=document.createElement("button"); del.className="btn btn-ghost"; del.style.color="var(--danger)"; del.textContent=(localStorage.getItem(LANG_KEY)==='da'?"Slet":"Delete"); del.addEventListener("click", ()=>{ if(!isAdmin()){ alert('Admin access required'); return; } if(confirm(t('deleteConfirm'))){ exercises = exercises.filter(x=>x.id!==ex.id); localStorage.setItem(EX_KEY, JSON.stringify(exercises)); renderList(); }}); right.appendChild(del);
+      }
+
+      row.appendChild(right); list.appendChild(row); }); updateSelectedSet(); }
 
     function editItem(id){ let ex = exercises.find(x=>x.id===id); if(!ex) return; editingId=id; $("title").value=ex.title; $("category").value=ex.category; $("players").value=ex.players; $("duration").value=ex.duration; $("level").value=ex.level; $("intensity").value=ex.intensity; $("link").value=ex.link; $("description").value=ex.description; $("tags").value=ex.tags; $("save-btn").textContent = t('saveBtn'); window.scrollTo({top:0,behavior:"smooth"}); }
 
@@ -449,11 +457,37 @@
     function updateSelectedSet(){ selectedIds.clear(); document.querySelectorAll(".select-item").forEach(cb=>{ if(cb.checked) selectedIds.add(cb.closest(".exercise").dataset.id); }); updateSelectedCount(); }
     function updateSelectedCount(){ const suffix = t('selectedCountSuffix') || ' selected'; if($("selected-count")) $("selected-count").textContent = (selectedIds.size || 0) + suffix; }
 
-    function addSelectedToSession(){ if(!isPaid() && !isAdmin()){ alert(localStorage.getItem(LANG_KEY)==='da'?"Betalt adgang kræves.":"Paid access required."); return; } let box=$("session-items"); selectedIds.forEach(id=>{ if(box.querySelector(`[data-id="${id}"]`)) return; let ex=exercises.find(x=>x.id===id); if(!ex) return; let row=document.createElement("div"); row.className="exercise"; row.dataset.id=id; row.innerHTML=`<div style="flex:1"><div style="font-weight:700">${ex.title}</div><div style="color:var(--muted)">${ex.duration}m • ${ex.category}</div></div><button class="btn btn-ghost remove-from-session" style="color:var(--danger)">${localStorage.getItem(LANG_KEY)==='da'?"Fjern":"Remove"}</button>`; row.querySelector("button").addEventListener("click", ()=>{ row.remove(); recalcSession(); }); box.appendChild(row); }); recalcSession(); }
+    function addSelectedToSession(){ if(!isAdmin() && !isPaid()){ alert(localStorage.getItem(LANG_KEY)==='da'?"Betalt adgang kræves.":"Paid access required."); return; } let box=$("session-items"); selectedIds.forEach(id=>{ if(box.querySelector(`[data-id="${id}"]`)) return; let ex=exercises.find(x=>x.id===id); if(!ex) return; let row=document.createElement("div"); row.className="exercise"; row.dataset.id=id; row.innerHTML=`<div style="flex:1"><div style="font-weight:700">${ex.title}</div><div style="color:var(--muted)">${ex.duration}m • ${ex.category}</div></div><button class="btn btn-ghost remove-from-session" style="color:var(--danger)">${localStorage.getItem(LANG_KEY)==='da'?"Fjern":"Remove"}</button>`; row.querySelector("button").addEventListener("click", ()=>{ row.remove(); recalcSession(); }); box.appendChild(row); }); recalcSession(); }
     function recalcSession(){ let total=0,count=0; document.querySelectorAll("#session-items .exercise").forEach(row=>{ let ex=exercises.find(x=>x.id===row.dataset.id); if(ex){ total+=Number(ex.duration||0); count++; }}); if($("session-total")) $("session-total").textContent=total+" m"; if($("session-count")) $("session-count").textContent=count+" exercises"; }
-    function clearSessionBuilder(){ if($("session-items")) $("session-items").innerHTML=""; if($("session-name")) $("session-name").value=""; if($("session-desc")) $("session-desc").value=""; recalcSession(); }
-    function saveSession(){ if(!isPaid() && !isAdmin()){ alert(localStorage.getItem(LANG_KEY)==='da'?"Betalt adgang kræves.":"Paid access required."); return; } let name=$("session-name").value.trim(); if(!name){ alert(localStorage.getItem(LANG_KEY)==='da'?"Tilføj et sessionsnavn":"Add a session name"); return; } let ids=[]; document.querySelectorAll("#session-items .exercise").forEach(r=>ids.push(r.dataset.id)); let total = ids.reduce((a,id)=>{ let ex=exercises.find(x=>x.id===id); return a+(ex?Number(ex.duration||0):0); },0); let ses={id:uid(),name,description:$("session-desc").value,items:ids,total,createdAt:new Date().toISOString()}; sessions.unshift(ses); localStorage.setItem(SES_KEY, JSON.stringify(sessions)); renderSessions(); clearSessionBuilder(); }
-    function renderSessions(){ let box=$("sessions-list"); if(!box) return; box.innerHTML=""; if(sessions.length===0){ box.innerHTML=`<div style="color:var(--muted)">${t('noSessions')}</div>`; return; } sessions.forEach(s=>{ let div=document.createElement("div"); div.className="exercise"; div.innerHTML=`<div style="flex:1"><div style="font-weight:800">${s.name}</div><div style="color:var(--muted)">${(s.items||[]).length} exercises • ${s.total||0} m</div></div><button class="btn btn-ghost open-session">${t('openBtn')}</button><button class="btn btn-ghost delete-session" style="color:var(--danger)">${t('deleteBtn')}</button>`; let btns=div.querySelectorAll("button"); btns[0].addEventListener("click", ()=> openSavedSession(s.id)); btns[1].addEventListener("click", ()=>{ if(confirm(t('deleteSessionConfirm'))){ sessions = sessions.filter(x=>x.id!==s.id); localStorage.setItem(SES_KEY, JSON.stringify(sessions)); renderSessions(); } }); box.appendChild(div); }); }
+    function clearSessionBuilder(){ if(!isAdmin() && !isPaid()){ alert(localStorage.getItem(LANG_KEY)==='da'?"Betalt adgang kræves.":"Paid access required."); return; } if($("session-items")) $("session-items").innerHTML=""; if($("session-name")) $("session-name").value=""; if($("session-desc")) $("session-desc").value=""; recalcSession(); }
+    function saveSession(){ if(!isAdmin() && !isPaid()){ alert(localStorage.getItem(LANG_KEY)==='da'?"Betalt adgang kræves.":"Paid access required."); return; } let name=$("session-name").value.trim(); if(!name){ alert(localStorage.getItem(LANG_KEY)==='da'?"Tilføj et sessionsnavn":"Add a session name"); return; } let ids=[]; document.querySelectorAll("#session-items .exercise").forEach(r=>ids.push(r.dataset.id)); let total = ids.reduce((a,id)=>{ let ex=exercises.find(x=>x.id===id); return a+(ex?Number(ex.duration||0):0); },0); let ses={id:uid(),name,description:$("session-desc").value,items:ids,total,createdAt:new Date().toISOString()}; sessions.unshift(ses); localStorage.setItem(SES_KEY, JSON.stringify(sessions)); renderSessions(); clearSessionBuilder(); }
+
+    function renderSessions(){ let box=$("sessions-list"); if(!box) return; box.innerHTML=""; if(sessions.length===0){ box.innerHTML=`<div style="color:var(--muted)">${t('noSessions')}</div>`; return; } sessions.forEach(s=>{ let div=document.createElement("div"); div.className="exercise"; div.innerHTML=`<div style="flex:1"><div style="font-weight:800">${s.name}</div><div style="color:var(--muted)">${(s.items||[]).length} exercises • ${s.total||0} m</div></div>`; // buttons container
+      const btnOpen = document.createElement('button'); btnOpen.className='btn btn-ghost open-session'; btnOpen.textContent = t('openBtn');
+      const btnDelete = document.createElement('button'); btnDelete.className='btn btn-ghost delete-session'; btnDelete.style.color='var(--danger)'; btnDelete.textContent = t('deleteBtn');
+
+      // Open: if user has permission to view sessions (admin or paid) -> show modal; otherwise show restricted message
+      btnOpen.addEventListener('click', ()=> {
+        if(!isAdmin() && !isPaid()){
+          alert(localStorage.getItem(LANG_KEY)==='da' ? "Du skal være admin eller have betalt adgang for at åbne sessions." : "You need admin or paid access to open sessions.");
+          return;
+        }
+        openSavedSession(s.id);
+      });
+
+      // Delete: only for admin
+      btnDelete.addEventListener('click', ()=> {
+        if(!isAdmin()){
+          alert('Admin access required');
+          return;
+        }
+        if(confirm(t('deleteSessionConfirm'))){ sessions = sessions.filter(x=>x.id!==s.id); localStorage.setItem(SES_KEY, JSON.stringify(sessions)); renderSessions(); }
+      });
+
+      div.appendChild(btnOpen);
+      if(isAdmin()) div.appendChild(btnDelete);
+      box.appendChild(div);
+    }); }
 
     /* Full-screen session viewer (used by openSavedSession) */
     function showDetailedSessionViewFullScreen(session){
@@ -542,14 +576,6 @@
       }
     }
 
-    /* BADGES + LOCK */
-    function updateBadges(){ if($("badges")) $("badges").innerHTML=""; if(isAdmin()){ let d=document.createElement("div"); d.className="badge"; d.textContent="ADMIN"; $("badges").appendChild(d); $("btn-logout-header").style.display="inline-flex"; } else { $("btn-logout-header").style.display="none"; } if(isPaid()){ let d=document.createElement("div"); d.className="badge"; d.textContent="PAID"; $("badges").appendChild(d); } }
-    function updateSessionLock(){ let locked = (!isPaid() && !isAdmin()); if($("save-session")) $("save-session").disabled=locked; if($("add-selected")) $("add-selected").disabled=locked; if($("session-lock-info")) $("session-lock-info").style.display = locked ? "block":"none"; }
-
-    /* START */
-    function robustInitWrapper(){ try{ init(); console.log("init() executed."); }catch(err){ console.error("init() failed:", err); /* minimal fallbacks */ } }
-    if(document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', robustInitWrapper); } else { robustInitWrapper(); }
-
     /* BACKUP & RESTORE (exports exercises + sessions + metadata) */
     function onBackup(){
       try {
@@ -628,7 +654,7 @@
         saveMeta();
 
         // Re-render
-        populateCategories(); populateLevels(); populateIntensity(); populatePlayers(); renderList(); renderSessions(); updateBadges(); updateSessionLock();
+        populateCategories(); populateLevels(); populateIntensity(); populatePlayers(); renderList(); renderSessions(); updateBadges(); updateSessionLock(); enforcePermissions();
 
         alert('Restore completed. Data merged.');
       } catch(err){
@@ -638,6 +664,45 @@
         ev.target.value = '';
       }
     }
+
+    /* BADGES + LOCK */
+    function updateBadges(){ if($("badges")) $("badges").innerHTML=""; if(isAdmin()){ let d=document.createElement("div"); d.className="badge"; d.textContent="ADMIN"; $("badges").appendChild(d); $("btn-logout-header").style.display="inline-flex"; } else { $("btn-logout-header").style.display="none"; } if(isPaid()){ let d=document.createElement("div"); d.className="badge"; d.textContent="PAID"; $("badges").appendChild(d); } }
+    function updateSessionLock(){ let locked = (!isPaid() && !isAdmin()); if($("save-session")) $("save-session").disabled=locked; if($("add-selected")) $("add-selected").disabled=locked; if($("session-lock-info")) $("session-lock-info").style.display = locked ? "block":"none"; }
+
+    /* ENFORCE PERMISSIONS UI */
+    function enforcePermissions(){
+      // Exercises: show/hide Delete All
+      if(isAdmin()){
+        $("delete-all-btn").style.display='inline-block';
+      } else {
+        $("delete-all-btn").style.display='none';
+      }
+
+      // Session builder controls
+      if(isAdmin() || isPaid()){
+        $("save-session").style.display='inline-block';
+        $("clear-session").style.display='inline-block';
+        $("add-selected").style.display='inline-block';
+        $("save-session").disabled=false;
+        $("add-selected").disabled=false;
+        $("clear-session").disabled=false;
+        $("session-lock-info").style.display='none';
+      } else {
+        $("save-session").style.display='none';
+        $("clear-session").style.display='none';
+        $("add-selected").style.display='inline-block'; // allow checkbox selection but block action
+        $("add-selected").disabled=false;
+        $("session-lock-info").style.display='block';
+      }
+
+      // Render lists again so delete buttons are inserted/removed
+      renderList();
+      renderSessions();
+    }
+
+    /* START */
+    function robustInitWrapper(){ try{ init(); console.log("init() executed."); }catch(err){ console.error("init() failed:", err); /* minimal fallbacks */ } }
+    if(document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', robustInitWrapper); } else { robustInitWrapper(); }
 
     /* SERVICE WORKER registration (kept) */
     if ('serviceWorker' in navigator) {
