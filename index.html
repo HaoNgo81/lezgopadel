@@ -105,6 +105,24 @@
       #logo{width:min(74vw,420px);max-height:18vh}
       .theme-toggle{height:44px;min-width:44px}
     }
+
+    /* ===== Fix for select/option contrast in dark theme ===== */
+    body:not(.light) select,
+    body:not(.light) select option,
+    body:not(.light) select optgroup {
+      color: var(--text) !important;
+      background: var(--panel) !important;
+    }
+    body:not(.light) select::-ms-expand {
+      filter: none;
+    }
+    body:not(.light) select {
+      -webkit-appearance: menulist-button;
+    }
+    body:not(.light) select:focus {
+      outline: 2px solid rgba(255,255,255,0.06);
+      outline-offset: 2px;
+    }
   </style>
 </head>
 
@@ -269,7 +287,7 @@
     const THEME_KEY = 'lezgo_theme';
     const LANG_KEY = 'lezgo_lang';
 
-    // YouTube API key (optional). For production: use server-side proxy.
+    // Optional: YouTube API key for client-side testing (not recommended for production)
     const YOUTUBE_API_KEY = "";
 
     const DEFAULT_CATEGORIES = ["Back wall","Bandeja","Chiquita","Defense","Double wall","Groundstroke","Lob","Serve","Smash","Vibora","Volley"].sort();
@@ -635,8 +653,6 @@
     function updateSessionLock(){ let locked = (!isPaid() && !isAdmin()); $("save-session").disabled=locked; $("add-selected").disabled=locked; $("session-lock-info").style.display = locked ? "block":"none"; }
 
     /* START -> Robust wrapper below will call init() safely */
-    // init(); // removed direct call; robust wrapper runs init safely
-
     /* REGISTER SERVICE WORKER (safe) */
     if("serviceWorker" in navigator){
       try {
@@ -790,7 +806,7 @@
       robustInitWrapper();
     }
 
-    // Ensure interactive elements aren't blocked by overlays (small safety)
+    // Small CSS safety: ensure pointer-events not blocked
     (function addPointerSafety(){
       const style = document.createElement('style');
       style.innerHTML = `
