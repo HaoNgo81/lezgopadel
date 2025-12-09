@@ -1,427 +1,412 @@
 <!doctype html>
-<html lang="en">
+<html lang="da">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
-  <title>LezGo Padel — Training Bank</title>
-  <meta name="theme-color" content="#0f1720" id="meta-theme-color" />
-  <link rel="manifest" href="./manifest.json">
-  <link rel="icon" href="ICON-192x192.png" sizes="192x192">
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>LezGo App v3 — Backup & Restore (demo)</title>
   <style>
-    /* ---------- RESET ---------- */
-    *,*::before,*::after{box-sizing:border-box}
-    html,body{height:100%;margin:0;padding:0;overflow-x:hidden}
-    body{font-family:Inter,system-ui,Arial,sans-serif;-webkit-font-smoothing:antialiased;transition:background .25s,color .25s}
-    a{color:inherit}
-
-    /* ---------- THEME VARIABLES (dark default = antracit) ---------- */
     :root{
-      --bg-top: #0f1720;
-      --bg-bottom: #071226;
-      --panel: #0b1a25;
-      --muted: #9aa7b3;
-      --text: #e6eef6;
-      --accent: #22c55e;
-      --accent-dark: #0b4428;
-      --danger: #ef4444;
-      --card-shadow: 0 10px 28px rgba(2,6,23,.6);
-      --border-soft: rgba(255,255,255,.04);
+      --accent:#0561d2;
+      --accent2:#0b8f5a;
+      --card-bg:#fff;
+      --muted:#666;
+      --max-w:980px;
+    }
+    body{
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      margin:0;
+      padding:24px 16px 120px; /* plads til bottom bar */
+      background:#f4f6f9;
+      color:#111;
+    }
+    header{ max-width:var(--max-w); margin:0 auto 18px; }
+    h1{ margin:0 0 6px; font-size:20px }
+    p.lead{ margin:0 0 14px; color:var(--muted) }
+
+    .container{ max-width:var(--max-w); margin:0 auto; display:grid; gap:12px; }
+
+    .card{ background:var(--card-bg); padding:14px; border-radius:10px; box-shadow:0 6px 18px rgba(0,0,0,0.06); }
+    .row{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+
+    .small{ font-size:13px; color:var(--muted); }
+    .btn{ padding:.6rem .9rem; border-radius:8px; border:0; cursor:pointer; font-weight:600; background:var(--accent); color:#fff; box-shadow:0 6px 14px rgba(5,97,210,0.12); }
+    .btn.alt{ background:var(--accent2); box-shadow:0 6px 14px rgba(11,143,90,0.12); }
+    .btn.ghost{ background:transparent; border:1px solid #ddd; color:#222; box-shadow:none; font-weight:600; padding:.45rem .75rem; }
+
+    ul.list{ list-style:none; padding:0; margin:0; display:grid; gap:8px; }
+    li.item{ display:flex; justify-content:space-between; gap:12px; padding:10px; border-radius:8px; background:#fafafa; border:1px solid #eee; align-items:center; }
+    .meta{ color:var(--muted); font-size:13px; }
+    .actions{ display:flex; gap:8px; }
+
+    /* BUND BAR (fast) */
+    #lezgo-bottom-bar{
+      position: fixed;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 32px);
+      max-width: var(--max-w);
+      display:flex;
+      gap:12px;
+      justify-content: center;
+      align-items: center;
+      padding: 10px;
+      background: rgba(255,255,255,0.98);
+      box-shadow: 0 12px 34px rgba(0,0,0,0.12);
+      border-radius: 12px;
+      z-index: 9999;
+    }
+    #lezgo-bottom-bar .lezgo-btn {
+      padding: .6rem 1rem;
+      border-radius: 10px;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+      background: var(--accent);
+      color: white;
+    }
+    #lezgo-bottom-bar .lezgo-btn.file { background: var(--accent2); }
+    #lezgo-bottom-bar input[type=file]{ display:none; }
+
+    /* Dark theme */
+    @media (prefers-color-scheme: dark){
+      body{ background:#0f1113; color:#e6eefb; }
+      .card{ background:#0b0c0d; box-shadow:none; border:1px solid rgba(255,255,255,0.03); }
+      #lezgo-bottom-bar{ background: rgba(8,8,8,0.92); }
     }
 
-    /* ---------- LIGHT MODE (soft grey) ---------- */
-    body.light {
-      --bg-top: #caced5;
-      --bg-bottom: #bfc3cb;
-      --panel: #d8dce3;
-      --muted: #3c4652;
-      --text: #0b1220;
-      --accent: #16a34a;
-      --accent-dark: #106b37;
-      --danger: #dc2626;
-      --card-shadow: 0 6px 14px rgba(0,0,0,.12);
-      --border-soft: rgba(0,0,0,.14);
-    }
-
-    .app-bg{
-      background: linear-gradient(180deg,var(--bg-top) 0%,var(--bg-bottom) 100%);
-      color:var(--text);min-height:100vh;
-    }
-
-    .container{max-width:1100px;margin:14px auto;padding:12px;width:94%}
-
-    header{display:flex;flex-direction:column;align-items:center;gap:12px;margin-bottom:12px;padding-top:8px}
-    #logo{width:min(62vw,520px);max-height:26vh;height:auto;display:block;margin:0 auto;object-fit:contain;transition:filter .18s,opacity .18s}
-    body.light #logo{filter:brightness(0.65) saturate(1.1) contrast(1.08);opacity:0.98}
-
-    .controls{display:flex;gap:12px;align-items:center;width:100%;justify-content:space-between;flex-wrap:wrap;padding:0 6px}
-    .badges{display:flex;gap:8px;align-items:center}
-    .badge{background:rgba(255,255,255,.04);padding:6px 10px;border-radius:8px;font-weight:700;color:var(--muted)}
-
-    .btn{border:0;padding:10px 14px;border-radius:12px;font-weight:800;cursor:pointer;background:transparent;color:var(--text);display:inline-flex;align-items:center;gap:8px}
-    .btn-primary{background:var(--accent);color:#05261a;box-shadow:0 6px 14px rgba(0,0,0,.08)}
-    .btn-primary:active{transform:translateY(1px)}
-    .btn-ghost{background:transparent;border:1px solid var(--border-soft);color:var(--muted);padding:10px 12px}
-    .btn-danger{background:var(--danger);color:#fff}
-
-    .theme-toggle{
-      height:48px; min-width:48px; display:inline-grid;place-items:center;
-      border-radius:12px; border:1px solid var(--border-soft); background:transparent; cursor:pointer; padding:6px;
-      transition:background .18s, border-color .18s, box-shadow .18s, transform .06s;
-    }
-    .theme-toggle:active{transform:translateY(1px)}
-    .theme-toggle svg{width:22px;height:22px;display:block}
-    body:not(.light) .theme-toggle{ background:#facc15!important;border-color:#facc15!important;color:#000!important;box-shadow:0 10px 26px rgba(250,204,21,.16) }
-    body.light .theme-toggle{ background:#ffffff!important;border-color:rgba(0,0,0,.08)!important;color:#000!important;box-shadow:0 6px 18px rgba(2,6,23,.06) }
-    .theme-toggle svg path,.theme-toggle svg circle{stroke:currentColor;fill:none}
-
-    .card{background:var(--panel);border-radius:12px;padding:14px;margin-bottom:14px;box-shadow:var(--card-shadow);transition:background .2s,box-shadow .2s}
-    label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
-    input[type=text],input[type=url],input[type=number],select,textarea{
-      width:100%;padding:12px;border-radius:10px;border:1px solid var(--border-soft);background:transparent;color:var(--text);font-size:15px;transition:border-color .15s,background .15s
-    }
-    textarea{min-height:84px;resize:vertical}
-    .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    @media(max-width:680px){.grid{grid-template-columns:1fr}}
-    .actions-row{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
-    .two-column{display:grid;grid-template-columns:1fr 380px;gap:12px}
-    @media(max-width:980px){.two-column{grid-template-columns:1fr}}
-    .exercise{display:flex;gap:10px;padding:10px;border-radius:10px;border:1px solid var(--border-soft);align-items:flex-start}
-    .tag{background:rgba(255,255,255,.03);padding:6px 8px;border-radius:8px;margin-right:8px;font-size:13px;display:inline-block}
-    .actions-small{display:flex;flex-direction:column;gap:6px}
-    @media(max-width:520px){ #logo{width:min(74vw,420px);max-height:18vh} .theme-toggle{height:44px;min-width:44px} }
-
-    /* dark select fix */
-    body:not(.light) select, body:not(.light) select option, body:not(.light) select optgroup { color: var(--text) !important; background: var(--panel) !important; }
-    body:not(.light) select::-ms-expand { filter: none; }
-    body:not(.light) select { -webkit-appearance: menulist-button; }
-    body:not(.light) select:focus { outline: 2px solid rgba(255,255,255,0.06); outline-offset: 2px; }
-
+    footer.smallnote{ max-width:var(--max-w); margin:18px auto 100px; color:var(--muted); font-size:13px; }
   </style>
 </head>
+<body>
+  <header>
+    <h1>LezGo App v3 — Backup & Restore</h1>
+    <p class="lead">Demo: gemte sessions & video-links. App starter i <strong>guest mode</strong>. Admin kan logge ind og få <em>Log ud</em>-knap i bundbaren.</p>
+  </header>
 
-<body class="app-bg">
-  <div class="container">
-    <header>
-      <img id="logo" src="lezgo-logo.svg" alt="LezGo logo">
-      <div class="controls">
-        <div class="badges" id="badges"></div>
-        <div style="display:flex;gap:10px;align-items:center">
-          <select id="lang-select" style="padding:8px;border-radius:8px;border:1px solid var(--border-soft);background:transparent;color:var(--text)" aria-label="Language select">
-            <option value="en">English</option>
-            <option value="da">Dansk</option>
-          </select>
-
-          <button id="btn-buy" class="btn btn-primary" data-i18n="buyAccess">Buy access</button>
-          <button id="btn-admin" class="btn btn-ghost" data-i18n="adminLogin">Admin login</button>
-
-          <button id="theme-toggle" class="theme-toggle" title="Toggle theme" aria-label="Toggle theme">
-            <svg id="theme-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>
-          </button>
-        </div>
-      </div>
-    </header>
-
-    <section class="card">
-      <h3 data-i18n="addEditTitle" style="margin:0 0 10px 0;color:var(--muted)">Add / Edit exercise (Padel)</h3>
-
-      <form id="exercise-form" class="grid" onsubmit="return false;">
-        <div style="grid-column:1/-1;">
-          <label id="label-title" data-i18n="titleLabel">Title</label>
-          <input id="title" type="text" placeholder="e.g. Forehand topspin drill" data-i18n-placeholder="titlePlaceholder">
-        </div>
-
+  <main class="container">
+    <!-- STATUS CARD -->
+    <section class="card" id="statusCard">
+      <div class="row" style="justify-content:space-between;">
         <div>
-          <label id="label-category" data-i18n="categoryLabel">Category</label>
-          <select id="category"></select>
+          <div class="small">Mode:</div>
+          <strong id="modeLabel">Guest</strong>
+          <div class="small" style="margin-top:6px;">Gemte sessions: <span id="countSessions">0</span> · Gemte videoer: <span id="countVideos">0</span></div>
         </div>
-
-        <div>
-          <label id="label-players" data-i18n="playersLabel">Players</label>
-          <select id="players"></select>
+        <div class="row">
+          <button class="btn ghost" id="btn-sim-admin">Simuler admin login</button>
+          <button class="btn" id="btn-sample-data">Indsæt sample data</button>
+          <button class="btn alt" id="btn-clear-storage">Slet lokal data</button>
         </div>
-
-        <div>
-          <label id="label-duration" data-i18n="durationLabel">Duration (minutes)</label>
-          <input id="duration" type="number" min="0" placeholder="20">
-        </div>
-
-        <div>
-          <label id="label-level" data-i18n="levelLabel">Level</label>
-          <select id="level"></select>
-        </div>
-
-        <div>
-          <label id="label-intensity" data-i18n="intensityLabel">Intensity</label>
-          <select id="intensity"></select>
-        </div>
-
-        <div style="grid-column:1/-1;">
-          <label id="label-video" data-i18n="videoLabel">Video link (YouTube / Instagram / Facebook)</label>
-          <div style="display:flex;gap:8px;align-items:center">
-            <input id="link" type="url" placeholder="https://..." data-i18n-placeholder="videoPlaceholder" style="flex:1">
-            <button id="analyze-btn" class="btn btn-ghost" title="Analyze video">🔍 Analyze</button>
-          </div>
-        </div>
-
-        <div style="grid-column:1/-1;">
-          <label id="label-description" data-i18n="descriptionLabel">Description</label>
-          <textarea id="description" placeholder="Short description"></textarea>
-        </div>
-
-        <div style="grid-column:1/-1;">
-          <label id="label-tags" data-i18n="tagsLabel">Tags (comma separated)</label>
-          <input id="tags" type="text" placeholder="e.g. Cross, Chiquita, Vibora" data-i18n-placeholder="tagsPlaceholder">
-        </div>
-
-        <div class="actions-row" style="grid-column:1/-1;margin-top:4px;">
-          <div style="display:flex;gap:10px;flex-wrap:wrap">
-            <button id="save-btn" class="btn btn-primary" data-i18n="saveBtn">➕ Save exercise</button>
-            <button id="clear-btn" class="btn btn-ghost" data-i18n="clearBtn">Clear form</button>
-          </div>
-          <button id="delete-all-btn" class="btn btn-danger" data-i18n="deleteAllBtn">🗑️ Delete all</button>
-        </div>
-      </form>
-    </section>
-
-    <section class="card">
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
-        <input id="search" type="text" placeholder="Search..." style="flex:1;padding:10px;border-radius:10px;border:1px solid var(--border-soft);background:transparent;color:var(--text)" data-i18n-placeholder="searchPlaceholder">
-        <select id="filter-category" style="padding:10px;border-radius:10px;border:1px solid var(--border-soft);background:transparent;color:var(--text)"><option>ALL</option></select>
-        <select id="filter-level" style="padding:10px;border-radius:10px;border:1px solid var(--border-soft);background:transparent;color:var(--text)"><option>ALL</option></select>
-        <button id="show-favorites" class="btn btn-ghost" data-i18n="showFavorites">Show favorites</button>
-      </div>
-
-      <div class="two-column">
-        <div>
-          <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap">
-            <button id="select-all" class="btn btn-ghost" data-i18n="selectAll">Select all</button>
-            <button id="add-selected" class="btn btn-primary" data-i18n="addToSession">Add to session</button>
-            <div style="margin-left:auto" id="selected-count">0 selected</div>
-          </div>
-          <div id="list"></div>
-        </div>
-
-        <aside class="card">
-          <h4 style="margin:0" data-i18n="sessionBuilderTitle">Training Session Builder</h4>
-
-          <label data-i18n="sessionNameLabel">Session name</label>
-          <input id="session-name" type="text">
-
-          <label style="margin-top:8px" data-i18n="sessionDescLabel">Session description</label>
-          <input id="session-desc" type="text">
-
-          <label style="margin-top:8px" data-i18n="exercisesLabel">Exercises</label>
-          <div id="session-items" style="max-height:240px;overflow:auto"></div>
-
-          <div style="display:flex;gap:10px;align-items:center;margin-top:10px;">
-            <div data-i18n="totalLabel">Total:</div>
-            <div id="session-total" style="font-weight:700">0 m</div>
-            <div style="margin-left:auto" id="session-count">0 exercises</div>
-          </div>
-
-          <div style="display:flex;gap:10px;margin-top:10px;flex-wrap:wrap">
-            <button id="save-session" class="btn btn-primary" data-i18n="saveSession">Save session</button>
-            <button id="clear-session" class="btn btn-ghost" data-i18n="clearSession">Clear</button>
-          </div>
-
-          <div id="session-lock-info" style="margin-top:14px;color:var(--muted);display:none;" data-i18n="freeInfo">
-            Free users cannot save or build sessions. Buy access to unlock.
-          </div>
-
-          <hr style="border:none;border-top:1px solid var(--border-soft);margin:14px 0">
-          <h4 style="margin:0 0 6px 0;" data-i18n="savedSessionsTitle">Saved sessions</h4>
-          <div id="sessions-list" style="max-height:200px;overflow:auto"></div>
-        </aside>
       </div>
     </section>
-  </div><!-- container end -->
 
-  <div id="admin-modal" style="position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:999">
-    <div style="background:var(--panel);padding:14px;border-radius:10px;max-width:420px;width:92%">
-      <h3 style="margin-top:0" data-i18n="adminLogin">Admin login</h3>
-      <input id="admin-password" type="password" placeholder="Password" style="width:100%;padding:10px;border-radius:8px;border:1px solid var(--border-soft);margin-bottom:12px">
-      <div style="display:flex;gap:12px;justify-content:flex-end">
-        <button id="admin-cancel" class="btn btn-ghost" data-i18n="cancelBtn">Cancel</button>
-        <button id="admin-submit" class="btn btn-primary" data-i18n="loginBtn">Login</button>
-      </div>
-    </div>
+    <!-- SESSIONS -->
+    <section class="card">
+      <h3 style="margin:0 0 8px;">Gemt sessions</h3>
+      <ul id="sessionsList" class="list"></ul>
+    </section>
+
+    <!-- VIDEOS -->
+    <section class="card">
+      <h3 style="margin:0 0 8px;">Gemte video-links</h3>
+      <ul id="videosList" class="list"></ul>
+    </section>
+
+    <footer class="smallnote">
+      Tip: Brug <strong>Backup</strong> i bundbaren for at downloade .json. Brug <strong>Restore</strong> for at uploade en tidligere backup. Restore vil merge uden duplikater (sessions efter id, videoer efter url).
+    </footer>
+  </main>
+
+  <!-- BUNDT BAR -->
+  <div id="lezgo-bottom-bar" aria-hidden="false">
+    <button id="btn-backup" class="lezgo-btn">Backup</button>
+    <label for="file-restore" class="lezgo-btn file" id="btn-restore-label" style="cursor:pointer">Restore</label>
+    <input id="file-restore" type="file" accept="application/json" />
+    <button id="btn-open-session-log" class="lezgo-btn">Ses. log</button>
+    <button id="btn-logout" class="lezgo-btn" style="display:none">Log ud</button>
   </div>
 
   <script>
-    /* CONFIG */
-    const ADMIN_PASSWORD = "admin123";
-    const EX_KEY = "lezgo_exercises_v1";
-    const CAT_KEY = "lezgo_categories_v1";
-    const LVL_KEY = "lezgo_levels_v1";
-    const INT_KEY = "lezgo_intensities_v1";
-    const PLR_KEY = "lezgo_players_v1";
-    const SES_KEY = "lezgo_sessions_v1";
-    const THEME_KEY = 'lezgo_theme';
-    const LANG_KEY = 'lezgo_lang';
+    /************************************************************************
+     * LezGo App v3 - Complete in-file demo
+     * - Backup / Restore
+     * - Admin login simulation & logout
+     * - Robust openSavedSession with fallback
+     *
+     * Tilpas STORAGE_* nøgler til din app hvis nødvendigt.
+     **************************************************************************/
 
-    const DEFAULT_CATEGORIES = ["Back wall","Bandeja","Chiquita","Defense","Double wall","Groundstroke","Lob","Serve","Smash","Vibora","Volley"].sort();
-    const DEFAULT_LEVELS = ["Beginner","Intermediate","Advanced"];
-    const DEFAULT_INT = ["Low","Medium","High"];
-    const DEFAULT_PLAYERS = ["1","2","3","4","1-2","1-3","1-4","2-4","Any","Add new..."];
+    // KONSTANTER / STORAGE NØGLER
+    const STORAGE_SESSIONS_KEY = 'lezgo_savedSessions';
+    const STORAGE_VIDEOS_KEY = 'lezgo_savedVideoLinks';
+    const STORAGE_ADMIN_TOKEN = 'lezgo_admin_token'; // simpel sim
+    let isAdmin = false; // app starter i guest mode
 
-    const translations = {
-      en: { addEditTitle:"Add / Edit exercise (Padel)", titleLabel:"Title", titlePlaceholder:"e.g. Forehand topspin drill", categoryLabel:"Category", playersLabel:"Players", durationLabel:"Duration (minutes)", levelLabel:"Level", intensityLabel:"Intensity", videoLabel:"Video link (YouTube / Instagram / Facebook)", videoPlaceholder:"https://...", descriptionLabel:"Description", tagsLabel:"Tags (comma separated)", tagsPlaceholder:"e.g. Cross, Chiquita, Vibora", saveBtn:"➕ Save exercise", clearBtn:"Clear form", deleteAllBtn:"🗑️ Delete all", searchPlaceholder:"Search...", filterAll:"ALL", showFavorites:"Show favorites", selectAll:"Select all", addToSession:"Add to session", selectedCountSuffix:" selected", sessionBuilderTitle:"Training Session Builder", sessionNameLabel:"Session name", sessionDescLabel:"Session description", exercisesLabel:"Exercises", totalLabel:"Total:", saveSession:"Save session", clearSession:"Clear", freeInfo:"Free users cannot save or build sessions. Buy access to unlock.", noMatches:"No matches", noSessions:"No sessions saved", buyAccess:"Buy access", adminLogin:"Admin login", cancelBtn:"Cancel", loginBtn:"Login", savedSessionsTitle:"Saved sessions", openBtn:"Open", deleteBtn:"Delete", deleteConfirm:"Delete item?", deleteSessionConfirm:"Delete session?" },
-      da: { addEditTitle:"Tilføj / Rediger øvelse (Padel)", titleLabel:"Titel", titlePlaceholder:"f.eks. Forehand topspin drill", categoryLabel:"Kategori", playersLabel:"Spillere", durationLabel:"Varighed (minutter)", levelLabel:"Niveau", intensityLabel:"Intensitet", videoLabel:"Videolink (YouTube / Instagram / Facebook)", videoPlaceholder:"https://...", descriptionLabel:"Beskrivelse", tagsLabel:"Tags (kommasepareret)", tagsPlaceholder:"f.eks. Cross, Chiquita, Vibora", saveBtn:"➕ Gem øvelse", clearBtn:"Ryd formular", deleteAllBtn:"🗑️ Slet alle", searchPlaceholder:"Søg...", filterAll:"ALLE", showFavorites:"Vis favoritter", selectAll:"Vælg alle", addToSession:"Tilføj til session", selectedCountSuffix:" valgt", sessionBuilderTitle:"Byg træningssession", sessionNameLabel:"Sessionsnavn", sessionDescLabel:"Sessionsbeskrivelse", exercisesLabel:"Øvelser", totalLabel:"Total:", saveSession:"Gem session", clearSession:"Ryd", freeInfo:"Gratis brugere kan ikke gemme eller bygge sessioner. Køb adgang for at låse op.", noMatches:"Ingen resultater", noSessions:"Ingen gemte sessioner", buyAccess:"Køb adgang", adminLogin:"Admin login", cancelBtn:"Annuller", loginBtn:"Login", savedSessionsTitle:"Gemte sessioner", openBtn:"Åbn", deleteBtn:"Slet", deleteConfirm:"Slet vare?", deleteSessionConfirm:"Slet session?" }
-    };
-
-    /* STATE */
-    let exercises = []; let categories = []; let levels = []; let intensities = []; let players = []; let sessions = []; let editingId = null; let selectedIds = new Set();
-    const $ = id => document.getElementById(id);
-    const uid = () => "id_" + Math.random().toString(36).slice(2,10);
-    const isAdmin = () => localStorage.getItem("is_admin") === "1";
-    const isPaid  = () => localStorage.getItem("is_paid") === "1";
-
-    /* THEME */
-    function applyTheme(theme){
-      if(theme === 'light'){ document.body.classList.add('light'); document.querySelector('#meta-theme-color').setAttribute('content','#eceff1'); setThemeIcon('light'); }
-      else { document.body.classList.remove('light'); document.querySelector('#meta-theme-color').setAttribute('content','#0f1720'); setThemeIcon('dark'); }
-      localStorage.setItem(THEME_KEY, theme);
-    }
-    function toggleTheme(){ const current = localStorage.getItem(THEME_KEY) || 'dark'; const next = current === 'dark' ? 'light' : 'dark'; applyTheme(next); }
-    function setThemeIcon(mode){ const svg = document.getElementById('theme-icon'); if(!svg) return; if(mode === 'light'){ svg.innerHTML = '<path d="M12 3v2M12 19v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1 12h2M21 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4M12 7a5 5 0 100 10 5 5 0 000-10z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>'; } else { svg.innerHTML = '<path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>'; } }
-
-    /* STORAGE LOAD */
-    function loadAll(){ exercises = JSON.parse(localStorage.getItem(EX_KEY) || "[]"); categories = JSON.parse(localStorage.getItem(CAT_KEY) || "null") || DEFAULT_CATEGORIES; levels = JSON.parse(localStorage.getItem(LVL_KEY) || "null") || DEFAULT_LEVELS; intensities = JSON.parse(localStorage.getItem(INT_KEY) || "null") || DEFAULT_INT; players = JSON.parse(localStorage.getItem(PLR_KEY) || "null") || DEFAULT_PLAYERS; sessions = JSON.parse(localStorage.getItem(SES_KEY) || "[]"); saveBase(); }
-    function saveBase(){ localStorage.setItem(CAT_KEY, JSON.stringify(categories)); localStorage.setItem(LVL_KEY, JSON.stringify(levels)); localStorage.setItem(INT_KEY, JSON.stringify(intensities)); localStorage.setItem(PLR_KEY, JSON.stringify(players)); }
-
-    /* I18N */
-    function t(key){ const lang = localStorage.getItem(LANG_KEY) || 'en'; return (translations[lang] && translations[lang][key]) || (translations.en[key] || ''); }
-    function applyTranslationsToDOM(){ document.querySelectorAll('[data-i18n]').forEach(el=>{ const k = el.getAttribute('data-i18n'); if(k) el.textContent = t(k); }); document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{ const k = el.getAttribute('data-i18n-placeholder'); if(k) el.placeholder = t(k); }); const fc = $("filter-category"); if(fc && fc.options.length>0) fc.options[0].text = t('filterAll'); const fl = $("filter-level"); if(fl && fl.options.length>0) fl.options[0].text = t('filterAll'); updateSelectedCount(); renderList(); renderSessions(); updateBadges(); }
-
-    /* UI population */
-    function populateCategories(){ const sel = $("category"); const fil = $("filter-category"); sel.innerHTML=""; fil.innerHTML=""; let optAll = document.createElement("option"); optAll.textContent = t('filterAll'); optAll.value = ""; fil.appendChild(optAll); categories.forEach(c=>{ let o=document.createElement("option"); o.value=c; o.textContent=c; sel.appendChild(o); let f=document.createElement("option"); f.value=c; f.textContent=c; fil.appendChild(f); }); let add=document.createElement("option"); add.value="__ADD__"; add.textContent = (localStorage.getItem(LANG_KEY) === 'da') ? "Tilføj ny kategori..." : "Add new category..."; sel.appendChild(add); }
-    function populateLevels(){ const sel = $("level"); const fil = $("filter-level"); sel.innerHTML=""; fil.innerHTML=""; let optAll = document.createElement("option"); optAll.textContent = t('filterAll'); optAll.value = ""; fil.appendChild(optAll); levels.forEach(c=>{ let o=document.createElement("option"); o.value=c; o.textContent=c; sel.appendChild(o); let f=document.createElement("option"); f.value=c; f.textContent=c; fil.appendChild(f); }); let add=document.createElement("option"); add.value="__ADD__"; add.textContent = (localStorage.getItem(LANG_KEY) === 'da') ? "Tilføj nyt niveau..." : "Add new level..."; sel.appendChild(add); }
-    function populateIntensity(){ const sel=$("intensity"); sel.innerHTML=""; intensities.forEach(c=>{ let o=document.createElement("option"); o.value=c; o.textContent=c; sel.appendChild(o); }); let add=document.createElement("option"); add.value="__ADD__"; add.textContent = (localStorage.getItem(LANG_KEY) === 'da') ? "Tilføj ny intensitet..." : "Add new intensity..."; sel.appendChild(add); }
-    function populatePlayers(){ const sel=$("players"); sel.innerHTML=""; players.forEach(c=>{ let o=document.createElement("option"); o.value=c; o.textContent=c; sel.appendChild(o); }); }
-
-    /* INIT */
-    function init(){
-      const savedTheme = localStorage.getItem(THEME_KEY) || 'dark'; applyTheme(savedTheme);
-      const savedLang = localStorage.getItem(LANG_KEY) || 'en'; $("lang-select").value = savedLang;
-      loadAll(); populateCategories(); populateLevels(); populateIntensity(); populatePlayers(); bindEvents(); applyTranslationsToDOM(); renderList(); renderSessions(); updateBadges(); updateSessionLock();
+    // ---------- sample CRUD for localStorage ----------
+    function loadLocalData() {
+      try {
+        const sessions = JSON.parse(localStorage.getItem(STORAGE_SESSIONS_KEY) || '[]');
+        const videos = JSON.parse(localStorage.getItem(STORAGE_VIDEOS_KEY) || '[]');
+        return { sessions, videos };
+      } catch (err) {
+        console.error('Fejl ved læsning af localStorage:', err);
+        return { sessions: [], videos: [] };
+      }
     }
 
-    /* EVENTS */
-    function bindEvents(){
-      $("theme-toggle").addEventListener("click", toggleTheme);
-      $("btn-admin").addEventListener("click", ()=> $("admin-modal").style.display="flex");
-      $("admin-cancel").addEventListener("click", ()=> $("admin-modal").style.display="none");
-      $("admin-submit").addEventListener("click", ()=>{ if($("admin-password").value===ADMIN_PASSWORD){ localStorage.setItem("is_admin","1"); $("admin-modal").style.display="none"; updateBadges(); updateSessionLock(); alert('Admin enabled'); } else alert("Wrong password"); });
-
-      $("btn-buy").addEventListener("click", ()=>{ if(isPaid()){ if(confirm(localStorage.getItem(LANG_KEY)==='da'?"Deaktiver betalt adgang?":"Disable paid access?")){ localStorage.removeItem("is_paid"); updateBadges(); updateSessionLock(); } } else { if(confirm(localStorage.getItem(LANG_KEY)==='da'?"Simuler køb?":"Simulate purchase?")){ localStorage.setItem("is_paid","1"); updateBadges(); updateSessionLock(); } } });
-
-      $("category").addEventListener("change", e=>{ if(e.target.value==="__ADD__"){ let n=prompt(localStorage.getItem(LANG_KEY)==='da'?"Ny kategori:":"New category:"); if(n){ categories.push(n.trim()); saveBase(); populateCategories(); } }});
-      $("level").addEventListener("change", e=>{ if(e.target.value==="__ADD__"){ let n=prompt(localStorage.getItem(LANG_KEY)==='da'?"Nyt niveau:":"New level:"); if(n){ levels.push(n.trim()); saveBase(); populateLevels(); } }});
-      $("intensity").addEventListener("change", e=>{ if(e.target.value==="__ADD__"){ let n=prompt(localStorage.getItem(LANG_KEY)==='da'?"Ny intensitet:":"New intensity:"); if(n){ intensities.push(n.trim()); saveBase(); populateIntensity(); } }});
-      $("players").addEventListener("change", e=>{ if(e.target.value==="Add new..."||e.target.value==="__ADD__"){ let n=prompt(localStorage.getItem(LANG_KEY)==='da'?"Tilføj ny spiller-range:":"Add new players range:"); if(n){ players.push(n.trim()); saveBase(); populatePlayers(); } }});
-
-      $("save-btn").addEventListener("click", onSave);
-      $("clear-btn").addEventListener("click", clearForm);
-      $("delete-all-btn").addEventListener("click", ()=>{ if(confirm(localStorage.getItem(LANG_KEY)==='da'?"Slet ALLE øvelser?":"Delete ALL exercises?")){ exercises=[]; localStorage.setItem(EX_KEY,"[]"); renderList(); }});
-
-      $("search").addEventListener("input", renderList);
-      $("filter-category").addEventListener("change", renderList);
-      $("filter-level").addEventListener("change", renderList);
-
-      $("show-favorites").addEventListener("click", ()=>{ let b=$("show-favorites"); b.textContent = b.textContent===t('showFavorites') ? ((localStorage.getItem(LANG_KEY)==='da')?"Vis alle":"Show all") : t('showFavorites'); renderList(); });
-
-      $("select-all").addEventListener("click", ()=>{ document.querySelectorAll(".select-item").forEach(ch=>ch.checked=true); updateSelectedSet(); });
-      $("add-selected").addEventListener("click", addSelectedToSession);
-      $("save-session").addEventListener("click", saveSession);
-      $("clear-session").addEventListener("click", clearSessionBuilder);
-
-      $("lang-select").addEventListener("change", (e)=>{ const lang = e.target.value || 'en'; localStorage.setItem(LANG_KEY, lang); applyTranslationsToDOM(); populateCategories(); populateLevels(); populateIntensity(); populatePlayers(); });
-
-      $("analyze-btn").addEventListener('click', async (ev)=>{ ev.preventDefault(); const link = $("link").value.trim(); if(!link){ alert(localStorage.getItem(LANG_KEY)==='da' ? "Indsæt et videolink først" : "Please paste a video link first"); return; } const btn = ev.currentTarget; const prev = btn.textContent; btn.textContent = localStorage.getItem(LANG_KEY)==='da' ? "Analyserer…" : "Analysing…"; btn.disabled = true; try{ const meta = await fetchVideoMetadata(link); if(meta){ if(meta.title) $("title").value = meta.title; if(meta.description) $("description").value = meta.description; const suggestions = analyzeTextToFields(meta.title || "", meta.description || "", localStorage.getItem(LANG_KEY) || 'en'); if(!$("category").value || $("category").value === "") { if(suggestions.category) { if(!categories.includes(suggestions.category)) { categories.push(suggestions.category); saveBase(); populateCategories(); } $("category").value = suggestions.category; } } if(!$("players").value || $("players").value==="") $("players").value = suggestions.players || $("players").options[0].value; if(!$("level").value || $("level").value==="") $("level").value = suggestions.level || $("level").options[0].value; if(!$("intensity").value || $("intensity").value==="") $("intensity").value = suggestions.intensity || $("intensity").options[0].value; if(!$("tags").value || $("tags").value==="") $("tags").value = suggestions.tags || ""; console.log("Analysis suggestions:", suggestions); } else { alert(localStorage.getItem(LANG_KEY)==='da' ? "Kunne ikke hente metadata for videoen. Prøv med et YouTube-link eller tjek CORS." : "Could not fetch video metadata. Try a YouTube link or check CORS."); } }catch(err){ console.error("Analyze error:", err); alert(localStorage.getItem(LANG_KEY)==='da' ? "Fejl under analyse" : "Error during analysis"); } finally{ btn.textContent = prev; btn.disabled = false; } });
+    function saveLocalData({ sessions, videos }) {
+      localStorage.setItem(STORAGE_SESSIONS_KEY, JSON.stringify(sessions));
+      localStorage.setItem(STORAGE_VIDEOS_KEY, JSON.stringify(videos));
+      renderUi();
     }
 
-    /* SAVE EXERCISE */
-    function onSave(){ let title = $("title").value.trim(); if(!title){ alert(localStorage.getItem(LANG_KEY)==='da'?"Indtast titel":"Enter title"); return; } let ex = { id: editingId || uid(), title, category: $("category").value, players: $("players").value, duration: Number($("duration").value||0), level: $("level").value, intensity: $("intensity").value, link: $("link").value.trim(), description: $("description").value.trim(), tags: normalizeTags($("tags").value.trim()), favorite:false }; if(editingId){ let idx = exercises.findIndex(x=>x.id===editingId); if(idx>-1) exercises[idx]=ex; } else exercises.unshift(ex); localStorage.setItem(EX_KEY, JSON.stringify(exercises)); clearForm(); renderList(); }
+    // ---------- UI rendering ----------
+    const sessionsList = document.getElementById('sessionsList');
+    const videosList = document.getElementById('videosList');
+    const countSessionsEl = document.getElementById('countSessions');
+    const countVideosEl = document.getElementById('countVideos');
+    const modeLabel = document.getElementById('modeLabel');
+    const logoutBtn = document.getElementById('btn-logout');
 
-    function normalizeTags(str){ if(!str) return ""; return str.split(",").map(t=>t.replace(/^#+/,"").trim()).filter(Boolean).join(", "); }
-    function clearForm(){ editingId=null; $("title").value=""; $("category").selectedIndex=0; $("players").selectedIndex=0; $("duration").value=""; $("level").selectedIndex=0; $("intensity").selectedIndex=0; $("link").value=""; $("description").value=""; $("tags").value=""; $("save-btn").textContent=t('saveBtn'); }
+    function renderUi() {
+      const { sessions, videos } = loadLocalData();
+      sessionsList.innerHTML = '';
+      videosList.innerHTML = '';
+      countSessionsEl.textContent = sessions.length;
+      countVideosEl.textContent = videos.length;
+      modeLabel.textContent = isAdmin ? 'Admin' : 'Guest';
+      logoutBtn.style.display = isAdmin ? 'inline-block' : 'none';
 
-    /* RENDER LIST */
-    function renderList(){ let q = ($("search") && $("search").value.trim().toLowerCase()) || ""; let fc = ($("filter-category") && $("filter-category").value) || ""; let fl = ($("filter-level") && $("filter-level").value) || ""; let list = $("list"); if(!list) return; list.innerHTML=""; let items = exercises.slice(); if(fc && fc!=="") items = items.filter(x=>x.category===fc); if(fl && fl!=="") items = items.filter(x=>x.level===fl); if(q) items = items.filter(x => x.title.toLowerCase().includes(q) || (x.description||"").toLowerCase().includes(q) || (x.tags||"").toLowerCase().includes(q) ); if($("show-favorites") && $("show-favorites").textContent!==t('showFavorites')) items = items.filter(x=>x.favorite); if(items.length===0){ list.innerHTML = `<div style="color:var(--muted)">${t('noMatches')}</div>`; return; } items.forEach(ex=>{ let row=document.createElement("div"); row.className="exercise"; row.dataset.id=ex.id; let cb=document.createElement("input"); cb.type="checkbox"; cb.className="select-item"; cb.addEventListener("change", updateSelectedSet); row.appendChild(cb); let left=document.createElement("div"); left.style.flex="1"; let ttitle=document.createElement("div"); ttitle.style.fontWeight="800"; ttitle.style.fontSize="15px"; ttitle.textContent=ex.title; left.appendChild(ttitle); let meta=document.createElement("div"); meta.style.color="var(--muted)"; meta.style.marginTop="6px"; meta.textContent = `${ex.category} • ${ex.level} • ${ex.players} • ${ex.duration}m`; left.appendChild(meta); if(ex.link){ let a=document.createElement("a"); a.href=ex.link; a.target="_blank"; a.textContent=ex.link; a.style.color="var(--muted)"; a.style.display="block"; a.style.marginTop="6px"; left.appendChild(a); } if(ex.tags){ let tags=document.createElement("div"); tags.style.marginTop="8px"; ex.tags.split(",").forEach(tg=>{ let s=document.createElement("span"); s.className="tag"; s.textContent=tg.trim(); tags.appendChild(s); }); left.appendChild(tags); } row.appendChild(left); let right=document.createElement("div"); right.className="actions-small"; let edit=document.createElement("button"); edit.className="btn btn-ghost"; edit.textContent=(localStorage.getItem(LANG_KEY)==='da'?"Rediger":"Edit"); edit.addEventListener("click", ()=>editItem(ex.id)); let del=document.createElement("button"); del.className="btn btn-ghost"; del.style.color="var(--danger)"; del.textContent=(localStorage.getItem(LANG_KEY)==='da'?"Slet":"Delete"); del.addEventListener("click", ()=>{ if(confirm(t('deleteConfirm'))){ exercises = exercises.filter(x=>x.id!==ex.id); localStorage.setItem(EX_KEY, JSON.stringify(exercises)); renderList(); }}); right.appendChild(edit); right.appendChild(del); row.appendChild(right); list.appendChild(row); }); updateSelectedSet(); }
+      // sessions
+      if (sessions.length === 0) {
+        sessionsList.innerHTML = '<li class="item"><div class="meta">Ingen gemte sessions</div></li>';
+      } else {
+        sessions.forEach(s => {
+          const li = document.createElement('li'); li.className = 'item';
+          const left = document.createElement('div'); left.innerHTML = `<div><strong>${escapeHtml(s.title || 'Uden titel')}</strong></div><div class="meta">id: ${escapeHtml(s.id || '(ingen id)')}</div>`;
+          const actions = document.createElement('div'); actions.className = 'actions';
+          const openBtn = document.createElement('button'); openBtn.className='btn ghost'; openBtn.textContent='Åbn';
+          openBtn.onclick = () => openSavedSession(s.id);
+          const delBtn = document.createElement('button'); delBtn.className='btn'; delBtn.textContent='Slet';
+          delBtn.onclick = () => {
+            if (!confirm('Slet session?')) return;
+            const cur = loadLocalData();
+            saveLocalData({ sessions: cur.sessions.filter(x => x.id !== s.id), videos: cur.videos });
+          };
+          actions.appendChild(openBtn); actions.appendChild(delBtn);
+          li.appendChild(left); li.appendChild(actions);
+          sessionsList.appendChild(li);
+        });
+      }
 
-    function editItem(id){ let ex = exercises.find(x=>x.id===id); if(!ex) return; editingId=id; $("title").value=ex.title; $("category").value=ex.category; $("players").value=ex.players; $("duration").value=ex.duration; $("level").value=ex.level; $("intensity").value=ex.intensity; $("link").value=ex.link; $("description").value=ex.description; $("tags").value=ex.tags; $("save-btn").textContent = t('saveBtn'); window.scrollTo({top:0,behavior:"smooth"}); }
-
-    /* SESSION BUILDER */
-    function updateSelectedSet(){ selectedIds.clear(); document.querySelectorAll(".select-item").forEach(cb=>{ if(cb.checked) selectedIds.add(cb.closest(".exercise").dataset.id); }); updateSelectedCount(); }
-    function updateSelectedCount(){ const suffix = t('selectedCountSuffix') || ' selected'; if($("selected-count")) $("selected-count").textContent = (selectedIds.size || 0) + suffix; }
-
-    function addSelectedToSession(){ if(!isPaid() && !isAdmin()){ alert(localStorage.getItem(LANG_KEY)==='da'?"Betalt adgang kræves.":"Paid access required."); return; } let box=$("session-items"); selectedIds.forEach(id=>{ if(box.querySelector(`[data-id="${id}"]`)) return; let ex=exercises.find(x=>x.id===id); if(!ex) return; let row=document.createElement("div"); row.className="exercise"; row.dataset.id=id; row.innerHTML=`<div style="flex:1"><div style="font-weight:700">${ex.title}</div><div style="color:var(--muted)">${ex.duration}m • ${ex.category}</div></div><button class="btn btn-ghost remove-from-session" style="color:var(--danger)">${localStorage.getItem(LANG_KEY)==='da'?"Fjern":"Remove"}</button>`; row.querySelector("button").addEventListener("click", ()=>{ row.remove(); recalcSession(); }); box.appendChild(row); }); recalcSession(); }
-    function recalcSession(){ let total=0,count=0; document.querySelectorAll("#session-items .exercise").forEach(row=>{ let ex=exercises.find(x=>x.id===row.dataset.id); if(ex){ total+=Number(ex.duration||0); count++; }}); if($("session-total")) $("session-total").textContent=total+" m"; if($("session-count")) $("session-count").textContent=count+" exercises"; }
-    function clearSessionBuilder(){ if($("session-items")) $("session-items").innerHTML=""; if($("session-name")) $("session-name").value=""; if($("session-desc")) $("session-desc").value=""; recalcSession(); }
-    function saveSession(){ if(!isPaid() && !isAdmin()){ alert(localStorage.getItem(LANG_KEY)==='da'?"Betalt adgang kræves.":"Paid access required."); return; } let name=$("session-name").value.trim(); if(!name){ alert(localStorage.getItem(LANG_KEY)==='da'?"Tilføj et sessionsnavn":"Add a session name"); return; } let ids=[]; document.querySelectorAll("#session-items .exercise").forEach(r=>ids.push(r.dataset.id)); let total = ids.reduce((a,id)=>{ let ex=exercises.find(x=>x.id===id); return a+(ex?Number(ex.duration||0):0); },0); let ses={id:uid(),name,description:$("session-desc").value,items:ids,total}; sessions.unshift(ses); localStorage.setItem(SES_KEY, JSON.stringify(sessions)); renderSessions(); clearSessionBuilder(); }
-    function renderSessions(){ let box=$("sessions-list"); if(!box) return; box.innerHTML=""; if(sessions.length===0){ box.innerHTML=`<div style="color:var(--muted)">${t('noSessions')}</div>`; return; } sessions.forEach(s=>{ let div=document.createElement("div"); div.className="exercise"; div.innerHTML=`<div style="flex:1"><div style="font-weight:800">${s.name}</div><div style="color:var(--muted)">${s.items.length} exercises • ${s.total} m</div></div><button class="btn btn-ghost open-session">${t('openBtn')}</button><button class="btn btn-ghost delete-session" style="color:var(--danger)">${t('deleteBtn')}</button>`; let btns=div.querySelectorAll("button"); btns[0].addEventListener("click", ()=>alert(localStorage.getItem(LANG_KEY)==='da'?"Kommer snart: detaljeret visning":"Coming soon: detailed view")); btns[1].addEventListener("click", ()=>{ if(confirm(t('deleteSessionConfirm'))){ sessions = sessions.filter(x=>x.id!==s.id); localStorage.setItem(SES_KEY, JSON.stringify(sessions)); renderSessions(); } }); box.appendChild(div); }); }
-
-    /* BADGES + LOCK */
-    function updateBadges(){ if($("badges")) $("badges").innerHTML=""; if(isAdmin()){ let d=document.createElement("div"); d.className="badge"; d.textContent="ADMIN"; $("badges").appendChild(d); } if(isPaid()){ let d=document.createElement("div"); d.className="badge"; d.textContent="PAID"; $("badges").appendChild(d); } }
-    function updateSessionLock(){ let locked = (!isPaid() && !isAdmin()); if($("save-session")) $("save-session").disabled=locked; if($("add-selected")) $("add-selected").disabled=locked; if($("session-lock-info")) $("session-lock-info").style.display = locked ? "block":"none"; }
-
-    /* START */
-    function robustInitWrapper(){ try{ init(); console.log("init() executed."); }catch(err){ console.error("init() failed:", err); /* minimal fallbacks */ try{ const analyzeBtn = document.getElementById('analyze-btn'); if(analyzeBtn){ analyzeBtn.disabled=false; analyzeBtn.style.pointerEvents='auto'; analyzeBtn.addEventListener('click', (ev)=>{ ev.preventDefault(); alert('Fallback analyze'); }); } const langSel=document.getElementById('lang-select'); if(langSel) langSel.addEventListener('change', (e)=>{ localStorage.setItem(LANG_KEY,e.target.value); applyTranslationsToDOM(); }); const themeBtn=document.getElementById('theme-toggle'); if(themeBtn) themeBtn.addEventListener('click', toggleTheme); }catch(e){console.error('fallback failed',e);} } }
-
-    if(document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', robustInitWrapper); } else { robustInitWrapper(); }
-
-    /* REGISTER SERVICE WORKER (IMPORTANT: relative path to keep scope in repo folder) */
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./service-worker.js')
-          .then(reg => console.log('ServiceWorker registered with scope:', reg.scope))
-          .catch(err => console.warn('SW register failed:', err));
-      });
+      // videos
+      if (videos.length === 0) {
+        videosList.innerHTML = '<li class="item"><div class="meta">Ingen gemte videoer</div></li>';
+      } else {
+        videos.forEach(v => {
+          const li = document.createElement('li'); li.className = 'item';
+          const left = document.createElement('div'); left.innerHTML = `<div><strong>${escapeHtml(v.title || v.url)}</strong></div><div class="meta">${escapeHtml(v.url)}</div>`;
+          const actions = document.createElement('div'); actions.className = 'actions';
+          const openBtn = document.createElement('button'); openBtn.className='btn ghost'; openBtn.textContent='Åbn link';
+          openBtn.onclick = () => { window.open(v.url, '_blank'); };
+          const delBtn = document.createElement('button'); delBtn.className='btn'; delBtn.textContent='Slet';
+          delBtn.onclick = () => {
+            if (!confirm('Slet video-link?')) return;
+            const cur = loadLocalData();
+            saveLocalData({ sessions: cur.sessions, videos: cur.videos.filter(x => x.url !== v.url) });
+          };
+          actions.appendChild(openBtn); actions.appendChild(delBtn);
+          li.appendChild(left); li.appendChild(actions);
+          videosList.appendChild(li);
+        });
+      }
     }
 
-    /* ========== Simple video metadata helpers ========== */
-    async function fetchVideoMetadata(link){
-      try{
-        // attempt youtube id -> oembed -> noembed as fallback
-        const yt = extractYouTubeId(link);
-        if(yt){
-          try{
-            const oUrl = `https://www.youtube.com/oembed?url=${encodeURIComponent(link)}&format=json`;
-            const r = await fetch(oUrl);
-            if(r.ok){ const j = await r.json(); return { title: j.title||'', description: j.author_name||'' }; }
-          }catch(e){ console.warn('oembed fail', e); }
+    function escapeHtml(text) {
+      if (!text && text !== 0) return '';
+      return String(text).replace(/[&<>"']/g, function(m){ return ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' })[m]; });
+    }
+
+    // ---------- Toolbar: Backup ----------
+    document.getElementById('btn-backup').addEventListener('click', () => {
+      const data = loadLocalData();
+      const meta = {
+        createdAt: new Date().toISOString(),
+        lezgoVersion: 'v3',
+      };
+      const payload = { meta, data };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `lezgo-backup-${new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')}.json`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    });
+
+    // ---------- Toolbar: Restore ----------
+    document.getElementById('file-restore').addEventListener('change', async (ev) => {
+      const file = ev.target.files && ev.target.files[0];
+      if (!file) return;
+      try {
+        const text = await file.text();
+        const parsed = JSON.parse(text);
+        if (!parsed || !parsed.data) throw new Error('Ugyldigt backup-format (mangler data).');
+
+        const incomingSessions = Array.isArray(parsed.data.sessions) ? parsed.data.sessions : [];
+        const incomingVideos = Array.isArray(parsed.data.videos) ? parsed.data.videos : [];
+
+        const current = loadLocalData();
+
+        // merge sessions by id
+        const sessionsById = new Map(current.sessions.map(s => [s.id, s]));
+        incomingSessions.forEach(s => {
+          if (!s || !s.id) {
+            s = Object.assign({}, s, { id: s.id || `restored-${Date.now()}-${Math.random().toString(36).slice(2,8)}` });
+          }
+          sessionsById.set(s.id, s);
+        });
+        const mergedSessions = Array.from(sessionsById.values());
+
+        // merge videos by url
+        const videoSet = new Map(current.videos.map(v => [v.url, v]));
+        incomingVideos.forEach(v => {
+          if (v && v.url) videoSet.set(v.url, v);
+        });
+        const mergedVideos = Array.from(videoSet.values());
+
+        saveLocalData({ sessions: mergedSessions, videos: mergedVideos });
+        alert('Restore gennemført. Gemte sessions og videoer er opdateret.');
+      } catch (err) {
+        console.error('Restore-fejl:', err);
+        alert('Fejl ved restore: ' + (err.message || err));
+      } finally {
+        ev.target.value = ''; // reset input
+      }
+    });
+
+    // ---------- Toolbar: Session log (viser hele localData i console) ----------
+    document.getElementById('btn-open-session-log').addEventListener('click', () => {
+      const data = loadLocalData();
+      console.log('LezGo localData:', data);
+      alert('Session log skrevet til konsollen (F12).');
+    });
+
+    // ---------- Logout ----------
+    document.getElementById('btn-logout').addEventListener('click', () => {
+      try { localStorage.removeItem(STORAGE_ADMIN_TOKEN); } catch(e) {}
+      isAdmin = false; renderUi();
+      document.dispatchEvent(new CustomEvent('lezgo:mode-change', { detail: { isAdmin } }));
+      alert('Du er logget ud. Appen kører nu i guest mode.');
+    });
+
+    // ---------- Simuler admin login (kun demo) ----------
+    document.getElementById('btn-sim-admin').addEventListener('click', () => {
+      // Simuler en login: sæt token i localStorage
+      localStorage.setItem(STORAGE_ADMIN_TOKEN, 'demo-token-' + Date.now());
+      isAdmin = true;
+      renderUi();
+      alert('Admin login simuleret. Log ud-knappen er synlig i bundbaren.');
+    });
+
+    // ---------- Clear storage / Sample data ----------
+    document.getElementById('btn-clear-storage').addEventListener('click', () => {
+      if (!confirm('Slet AL lokal data? Dette kan ikke fortrydes.')) return;
+      localStorage.removeItem(STORAGE_SESSIONS_KEY);
+      localStorage.removeItem(STORAGE_VIDEOS_KEY);
+      renderUi();
+      alert('Lokal data slettet.');
+    });
+
+    document.getElementById('btn-sample-data').addEventListener('click', () => {
+      const samples = {
+        sessions: [
+          { id: 'sess-1', title: 'Træning - fokus på serve', payload: { links: ['https://youtu.be/example1'] }, createdAt: new Date().toISOString() },
+          { id: 'sess-2', title: 'Kampoptagelse - dbl', payload: { links: ['https://youtu.be/example2', 'https://youtu.be/example3'] }, createdAt: new Date().toISOString() },
+          // ældre format (ingen payload) for migrations-test
+          { id: 'sess-old', title: 'Ældre session (legacy)', links: ['https://youtu.be/legacy1'], createdAt: new Date().toISOString() }
+        ],
+        videos: [
+          { url: 'https://youtu.be/example1', title: 'Opvarmning - Drills' },
+          { url: 'https://youtu.be/example2', title: 'Match highlights' }
+        ]
+      };
+      saveLocalData(samples);
+      alert('Sample data indsat.');
+    });
+
+    // ---------- Åbne gemt session (robust) ----------
+    function openSavedSession(sessionId) {
+      try {
+        const { sessions } = loadLocalData();
+        const session = sessions.find(s => s.id === sessionId);
+        if (!session) {
+          console.warn('Session ikke fundet:', sessionId);
+          alert('Session ikke fundet eller er slettet.');
+          return;
         }
-        const noembed = `https://noembed.com/embed?url=${encodeURIComponent(link)}`;
-        const r2 = await fetch(noembed);
-        if(r2.ok){ const j2 = await r2.json(); return { title: j2.title||'', description: j2.author_name||'' }; }
-      }catch(e){ console.warn('fetchVideoMetadata error', e); }
-      return null;
-    }
-    function extractYouTubeId(url){ try{ const u = new URL(url); if(u.hostname.includes('youtu.be')) return u.pathname.slice(1); if(u.hostname.includes('youtube.com')){ const p = u.searchParams.get('v'); if(p) return p; const parts = u.pathname.split('/'); const idx = parts.indexOf('embed'); if(idx>-1 && parts[idx+1]) return parts[idx+1]; } }catch(e){} return null; }
 
-    function analyzeTextToFields(title, description, lang){
-      const text = (title + " " + description).toLowerCase();
-      const suggestions = {};
-      const categoryMap = { "Bandeja":["bandeja"], "Chiquita":["chiquita"], "Vibora":["vibora"], "Serve":["serve"], "Smash":["smash"], "Lob":["lob"], "Defense":["defend","defense"], "Volley":["volley"], "Groundstroke":["forehand","backhand"], "Double wall":["double wall"] };
-      for(const [cat, keys] of Object.entries(categoryMap)){ for(const k of keys) if(text.includes(k)){ suggestions.category = cat; break; } if(suggestions.category) break; }
-      if(text.match(/\bbeginner|beginners|begynder|nybegynder\b/)) suggestions.level = localize("Beginner", lang);
-      else if(text.match(/\bintermediate|mellem|øvet\b/)) suggestions.level = localize("Intermediate", lang);
-      else if(text.match(/\badvanced|avanceret|pro\b/)) suggestions.level = localize("Advanced", lang);
-      const playersMatch = text.match(/\b(1|2|3|4|1\-2|1\-3|1\-4|2\-4)\b/);
-      if(playersMatch) suggestions.players = playersMatch[0];
-      if(text.match(/\b(high|intense|intensiv|hård)\b/)) suggestions.intensity = localize("High", lang);
-      else if(text.match(/\b(medium|moderat)\b/)) suggestions.intensity = localize("Medium", lang);
-      else suggestions.intensity = localize("Low", lang);
-      const words = text.replace(/[^\wæøåÆØÅ]/g," ").split(/\s+/).filter(w=>w.length>3);
-      const stop = new Set(["video","padel","drill","exercise","exercises","howto","tutorial","padelvideo","learn"]);
-      const tagCandidates = [];
-      for(const w of words){ if(!stop.has(w) && !tagCandidates.includes(w)) tagCandidates.push(w); if(tagCandidates.length>=6) break; }
-      suggestions.tags = tagCandidates.slice(0,6).join(", ");
-      if(!suggestions.category && tagCandidates.length) suggestions.category = capitalize(tagCandidates[0]);
-      return suggestions;
+        // Konverter ældre format hvis nødvendigt
+        if (!session.payload && session.links && Array.isArray(session.links)) {
+          session.payload = { links: session.links };
+        }
+
+        if (!session.payload || !Array.isArray(session.payload.links)) {
+          console.error('Uventet session-format', session);
+          alert('Session-formatet er ugyldigt. Prøv at restore fra backup eller kontakt support.');
+          return;
+        }
+
+        // Active session flow: prøv at vise detaljeret view, ellers fallback
+        setActiveSession(session);
+      } catch (err) {
+        console.error('Fejl ved åbning af session:', err);
+        alert('Kunne ikke åbne sessionen. Se konsol for detaljer.');
+      }
     }
-    function capitalize(s){ if(!s) return s; return s.charAt(0).toUpperCase() + s.slice(1); }
-    function localize(key, lang){ if(!lang) lang='en'; const map = { en: {"Beginner":"Beginner","Intermediate":"Intermediate","Advanced":"Advanced","Low":"Low","Medium":"Medium","High":"High"}, da: {"Beginner":"Beginner","Intermediate":"Intermediate","Advanced":"Advanced","Low":"Low","Medium":"Medium","High":"High"} }; return (map[lang] && map[lang][key]) || key; }
+
+    // Dummy setActiveSession — i din app skal du erstatte denne med faktisk navigation/state update
+    function setActiveSession(session) {
+      console.log('Aktiverer session:', session);
+      if (!window.showDetailedSessionView) {
+        // fallback modal / alert i stedet for "Coming soon"
+        showFallbackDetail(session);
+      } else {
+        window.showDetailedSessionView(session);
+      }
+    }
+
+    function showFallbackDetail(session) {
+      const title = session.title || 'Gemt session';
+      const links = (session.payload && session.payload.links) || [];
+      const summary = `Session: ${title}\nLinks: ${links.length}\n\nLink-eksempel:\n${links[0] || 'Ingen links'}`;
+      // Vis et mere detaljeret fallback (kan bygges ud til modal)
+      alert(summary + '\n\n(Detaljeret visning er ikke tilgængelig i denne demo.)');
+    }
+
+    // ---------- INIT: hvis admin token i localStorage -> sæt admin ----------
+    (function init(){
+      try {
+        const tok = localStorage.getItem(STORAGE_ADMIN_TOKEN);
+        if (tok) isAdmin = true;
+      } catch(e){}
+      renderUi();
+    })();
+
+    // ---------- Ekstra: lyt på mode-change hvis andre dele af appen vil reagere ----------
+    document.addEventListener('lezgo:mode-change', (ev) => {
+      console.log('Mode changed:', ev.detail);
+      // her kan du opdatere UI, router, tilladelser etc.
+    });
+
+    // ---------- sikkerhed: undgå læk af tokens i backup ----------
+    // Hvis du har tokens i sessions eller videos, fjerner vi dem ved backup
+    // (Eksempel: anonymiser fields 'token' eller 'auth')
+    // Denne demo laver det ikke automatisk, men du bør fjerne følsomme data inden eksport i produktion.
 
   </script>
 </body>
