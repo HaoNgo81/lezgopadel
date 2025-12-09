@@ -3,11 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
-  <title>LezGo Padel — Training Bank (with Video Analyze)</title>
+  <title>LezGo Padel — Training Bank (fixed)</title>
   <meta name="theme-color" content="#0f1720" id="meta-theme-color" />
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="ICON-192x192.png" sizes="192x192">
-
   <style>
     /* ---------- RESET ---------- */
     *,*::before,*::after{box-sizing:border-box}
@@ -17,9 +16,9 @@
 
     /* ---------- THEME VARIABLES (dark default = antracit) ---------- */
     :root{
-      --bg-top: #0f1720;        /* antracit top */
-      --bg-bottom: #071226;     /* antracit bottom */
-      --panel: #0b1a25;         /* cards */
+      --bg-top: #0f1720;
+      --bg-bottom: #071226;
+      --panel: #0b1a25;
       --muted: #9aa7b3;
       --text: #e6eef6;
       --accent: #22c55e;
@@ -52,13 +51,10 @@
 
     /* ---------- HEADER / LOGO ---------- */
     header{display:flex;flex-direction:column;align-items:center;gap:12px;margin-bottom:12px;padding-top:8px}
-
-    /* logo responsive + more visible in light mode but not too bright */
     #logo{width:min(62vw,520px);max-height:26vh;height:auto;display:block;margin:0 auto;object-fit:contain;transition:filter .18s,opacity .18s}
     body.light #logo{filter:brightness(0.65) saturate(1.1) contrast(1.08);opacity:0.98}
 
     .controls{display:flex;gap:12px;align-items:center;width:100%;justify-content:space-between;flex-wrap:wrap;padding:0 6px}
-
     .badges{display:flex;gap:8px;align-items:center}
     .badge{background:rgba(255,255,255,.04);padding:6px 10px;border-radius:8px;font-weight:700;color:var(--muted)}
 
@@ -69,7 +65,7 @@
     .btn-ghost{background:transparent;border:1px solid var(--border-soft);color:var(--muted);padding:10px 12px}
     .btn-danger{background:var(--danger);color:#fff}
 
-    /* ---------- THEME TOGGLE (fix icons + sizing) ---------- */
+    /* THEME TOGGLE */
     .theme-toggle{
       height:48px; min-width:48px; display:inline-grid;place-items:center;
       border-radius:12px; border:1px solid var(--border-soft); background:transparent; cursor:pointer; padding:6px;
@@ -78,20 +74,15 @@
     .theme-toggle:active{transform:translateY(1px)}
     .theme-toggle svg{width:22px;height:22px;display:block}
 
-    /* Dark mode: yellow pill (visible) */
     body:not(.light) .theme-toggle{
       background:#facc15!important;border-color:#facc15!important;color:#000!important;box-shadow:0 10px 26px rgba(250,204,21,.16)
     }
-
-    /* Light mode: white rounded tile with subtle border so icon fits nicely */
     body.light .theme-toggle{
       background:#ffffff!important;border-color:rgba(0,0,0,.08)!important;color:#000!important;box-shadow:0 6px 18px rgba(2,6,23,.06)
     }
-
-    /* center icon color control */
     .theme-toggle svg path,.theme-toggle svg circle{stroke:currentColor;fill:none}
 
-    /* ---------- CARD / FORM ---------- */
+    /* CARD / FORM */
     .card{background:var(--panel);border-radius:12px;padding:14px;margin-bottom:14px;box-shadow:var(--card-shadow);transition:background .2s,box-shadow .2s}
     label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
     input[type=text],input[type=url],input[type=number],select,textarea{
@@ -103,8 +94,6 @@
     @media(max-width:680px){.grid{grid-template-columns:1fr}}
 
     .actions-row{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
-
-    /* ---------- LIST / SESSION ---------- */
     .two-column{display:grid;grid-template-columns:1fr 380px;gap:12px}
     @media(max-width:980px){.two-column{grid-template-columns:1fr}}
 
@@ -112,7 +101,6 @@
     .tag{background:rgba(255,255,255,.03);padding:6px 8px;border-radius:8px;margin-right:8px;font-size:13px;display:inline-block}
     .actions-small{display:flex;flex-direction:column;gap:6px}
 
-    /* ---------- MOBILE ---------- */
     @media(max-width:520px){
       #logo{width:min(74vw,420px);max-height:18vh}
       .theme-toggle{height:44px;min-width:44px}
@@ -123,13 +111,10 @@
 <body class="app-bg">
   <div class="container">
 
-    <!-- HEADER -->
     <header>
       <img id="logo" src="lezgo-logo.svg" alt="LezGo logo">
-
       <div class="controls">
         <div class="badges" id="badges"></div>
-
         <div style="display:flex;gap:10px;align-items:center">
           <select id="lang-select" style="padding:8px;border-radius:8px;border:1px solid var(--border-soft);background:transparent;color:var(--text)" aria-label="Language select">
             <option value="en">English</option>
@@ -139,7 +124,6 @@
           <button id="btn-buy" class="btn btn-primary" data-i18n="buyAccess">Buy access</button>
           <button id="btn-admin" class="btn btn-ghost" data-i18n="adminLogin">Admin login</button>
 
-          <!-- THEME TOGGLE -->
           <button id="theme-toggle" class="theme-toggle" title="Toggle theme" aria-label="Toggle theme">
             <svg id="theme-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>
           </button>
@@ -147,7 +131,6 @@
       </div>
     </header>
 
-    <!-- FORM -->
     <section class="card">
       <h3 data-i18n="addEditTitle" style="margin:0 0 10px 0;color:var(--muted)">Add / Edit exercise (Padel)</h3>
 
@@ -184,7 +167,6 @@
 
         <div style="grid-column:1/-1;">
           <label id="label-video" data-i18n="videoLabel">Video link (YouTube / Instagram / Facebook)</label>
-          <!-- ANALYZE: input + analyze button -->
           <div style="display:flex;gap:8px;align-items:center">
             <input id="link" type="url" placeholder="https://..." data-i18n-placeholder="videoPlaceholder" style="flex:1">
             <button id="analyze-btn" class="btn btn-ghost" title="Analyze video">🔍 Analyze</button>
@@ -206,13 +188,11 @@
             <button id="save-btn" class="btn btn-primary" data-i18n="saveBtn">➕ Save exercise</button>
             <button id="clear-btn" class="btn btn-ghost" data-i18n="clearBtn">Clear form</button>
           </div>
-
           <button id="delete-all-btn" class="btn btn-danger" data-i18n="deleteAllBtn">🗑️ Delete all</button>
         </div>
       </form>
     </section>
 
-    <!-- LIST + SESSION -->
     <section class="card">
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
         <input id="search" type="text" placeholder="Search..." style="flex:1;padding:10px;border-radius:10px;border:1px solid var(--border-soft);background:transparent;color:var(--text)" data-i18n-placeholder="searchPlaceholder">
@@ -228,7 +208,6 @@
             <button id="add-selected" class="btn btn-primary" data-i18n="addToSession">Add to session</button>
             <div style="margin-left:auto" id="selected-count">0 selected</div>
           </div>
-
           <div id="list"></div>
         </div>
 
@@ -260,7 +239,6 @@
           </div>
 
           <hr style="border:none;border-top:1px solid var(--border-soft);margin:14px 0">
-
           <h4 style="margin:0 0 6px 0;" data-i18n="savedSessionsTitle">Saved sessions</h4>
           <div id="sessions-list" style="max-height:200px;overflow:auto"></div>
         </aside>
@@ -268,7 +246,6 @@
     </section>
   </div><!-- container end -->
 
-  <!-- ADMIN MODAL -->
   <div id="admin-modal" style="position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:999">
     <div style="background:var(--panel);padding:14px;border-radius:10px;max-width:420px;width:92%">
       <h3 style="margin-top:0" data-i18n="adminLogin">Admin login</h3>
@@ -280,16 +257,7 @@
     </div>
   </div>
 
-  <!-- SCRIPT -->
   <script>
-    /*
-      LezGo Training Bank — Video analysis (YouTube API option)
-      ------------------------------------------------------
-      * Dette file er din fulde single-file app, inkl. ny "Analyze"-knap.
-      * For at få bedste resultater med YouTube: udfyld YOUTUBE_API_KEY nedenfor.
-      * Sikkerheds-note: læg ikke din API-nøgle i klientkode hvis appen publiceres. Se node-proxy-eksempel i bunden af dette dokument for hvordan du kan proxye kald fra server.
-    */
-
     /* CONFIG */
     const ADMIN_PASSWORD = "admin123";
     const EX_KEY = "lezgo_exercises_v1";
@@ -301,16 +269,14 @@
     const THEME_KEY = 'lezgo_theme';
     const LANG_KEY = 'lezgo_lang';
 
-    // ---- YouTube API key: set here for quick testing (NOT recommended for public builds) ----
-    // For production: use server-side proxy (se forslag længere nede i filen)
-    const YOUTUBE_API_KEY = ""; // <- indsæt din YouTube Data API v3 nøgle her for bedre metadata
+    // YouTube API key (optional). For production: use server-side proxy.
+    const YOUTUBE_API_KEY = "";
 
     const DEFAULT_CATEGORIES = ["Back wall","Bandeja","Chiquita","Defense","Double wall","Groundstroke","Lob","Serve","Smash","Vibora","Volley"].sort();
     const DEFAULT_LEVELS = ["Beginner","Intermediate","Advanced"];
     const DEFAULT_INT = ["Low","Medium","High"];
     const DEFAULT_PLAYERS = ["1","2","3","4","1-2","1-3","1-4","2-4","Any","Add new..."];
 
-    /* TRANSLATIONS */
     const translations = {
       en: {
         addEditTitle: "Add / Edit exercise (Padel)",
@@ -412,7 +378,6 @@
 
     const $ = id => document.getElementById(id);
     const uid = () => "id_" + Math.random().toString(36).slice(2,10);
-
     const isAdmin = () => localStorage.getItem("is_admin") === "1";
     const isPaid  = () => localStorage.getItem("is_paid") === "1";
 
@@ -508,10 +473,8 @@
     function init(){
       const savedTheme = localStorage.getItem(THEME_KEY) || 'dark';
       applyTheme(savedTheme);
-
       const savedLang = localStorage.getItem(LANG_KEY) || 'en';
       $("lang-select").value = savedLang;
-
       loadAll();
       populateCategories();
       populateLevels();
@@ -561,7 +524,7 @@
         populateCategories(); populateLevels(); populateIntensity(); populatePlayers();
       });
 
-      // --- ANALYZE BUTTON BINDING ---
+      // analyze button binding
       $("analyze-btn").addEventListener('click', async (ev)=>{
         ev.preventDefault();
         const link = $("link").value.trim();
@@ -576,28 +539,23 @@
             if(meta.title) $("title").value = meta.title;
             if(meta.description) $("description").value = meta.description;
             const suggestions = analyzeTextToFields(meta.title || "", meta.description || "", localStorage.getItem(LANG_KEY) || 'en');
-
             if(!$("category").value || $("category").value === "") {
               if(suggestions.category) {
                 if(!categories.includes(suggestions.category)) { categories.push(suggestions.category); saveBase(); populateCategories(); }
                 $("category").value = suggestions.category;
               }
             }
-
             if(!$("players").value || $("players").value==="") $("players").value = suggestions.players || $("players").options[0].value;
             if(!$("level").value || $("level").value==="") $("level").value = suggestions.level || $("level").options[0].value;
             if(!$("intensity").value || $("intensity").value==="") $("intensity").value = suggestions.intensity || $("intensity").options[0].value;
             if(!$("tags").value || $("tags").value==="") $("tags").value = suggestions.tags || "";
-
-            // Optional: show a small toast or console message with suggestion summary
             console.log("Analysis suggestions:", suggestions);
           } else {
             alert(localStorage.getItem(LANG_KEY)==='da' ? "Kunne ikke hente metadata for videoen. Prøv med et YouTube-link eller tjek CORS." : "Could not fetch video metadata. Try a YouTube link or check CORS.");
           }
-        }catch(err){ console.error(err); alert(localStorage.getItem(LANG_KEY)==='da' ? "Fejl under analyse" : "Error during analysis"); }
+        }catch(err){ console.error("Analyze error:", err); alert(localStorage.getItem(LANG_KEY)==='da' ? "Fejl under analyse" : "Error during analysis"); }
         finally{ btn.textContent = prev; btn.disabled = false; }
       });
-
     }
 
     /* SAVE EXERCISE */
@@ -608,7 +566,13 @@
       localStorage.setItem(EX_KEY, JSON.stringify(exercises));
       clearForm(); renderList();
     }
-    function normalizeTags(str){ if(!str) return ""; return str.split(",").map(t=>t.replace(/^#+/,"\").trim()).filter(Boolean).join(", "); }
+
+    // FIXED normalizeTags (no stray escape chars)
+    function normalizeTags(str){
+      if(!str) return "";
+      return str.split(",").map(t=>t.replace(/^#+/,"").trim()).filter(Boolean).join(", ");
+    }
+
     function clearForm(){ editingId=null; $("title").value=""; $("category").selectedIndex=0; $("players").selectedIndex=0; $("duration").value=""; $("level").selectedIndex=0; $("intensity").selectedIndex=0; $("link").value=""; $("description").value=""; $("tags").value=""; $("save-btn").textContent=t('saveBtn'); }
 
     /* RENDER LIST */
@@ -670,20 +634,22 @@
     function updateBadges(){ $("badges").innerHTML=""; if(isAdmin()){ let d=document.createElement("div"); d.className="badge"; d.textContent="ADMIN"; $("badges").appendChild(d); } if(isPaid()){ let d=document.createElement("div"); d.className="badge"; d.textContent="PAID"; $("badges").appendChild(d); } }
     function updateSessionLock(){ let locked = (!isPaid() && !isAdmin()); $("save-session").disabled=locked; $("add-selected").disabled=locked; $("session-lock-info").style.display = locked ? "block":"none"; }
 
-    /* START */
-    init();
+    /* START -> Robust wrapper below will call init() safely */
+    // init(); // removed direct call; robust wrapper runs init safely
 
-    /* REGISTER SERVICE WORKER */
+    /* REGISTER SERVICE WORKER (safe) */
     if("serviceWorker" in navigator){
-      navigator.serviceWorker.register("service-worker.js").catch(err=>console.warn("SW failed:",err));
+      try {
+        navigator.serviceWorker.register("service-worker.js").catch(err=>console.warn("SW failed:",err));
+      } catch(e){
+        console.warn("SW register error:", e);
+      }
     }
 
     /* ================= VIDEO ANALYSIS SUPPORT FUNCTIONS ================= */
-    /* fetchVideoMetadata: prøv YouTube API (hvis nøgle), ellers oEmbed (noembed), ellers null */
     async function fetchVideoMetadata(link){
       const ytId = extractYouTubeId(link);
       if(ytId){
-        // If YOUTUBE_API_KEY is set client-side (for dev/testing), use direct API call
         if(YOUTUBE_API_KEY && YOUTUBE_API_KEY.trim()){
           try{
             const url = `https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${encodeURIComponent(ytId)}&key=${encodeURIComponent(YOUTUBE_API_KEY)}`;
@@ -696,52 +662,50 @@
             }
           }catch(err){
             console.warn('YT API failed (client). Consider using server proxy. Error:', err);
-            // fallthrough to try proxy or oEmbed
           }
         }
-
-        // Try server-side proxy first (recommended) — expects endpoint /yt-proxy?videoId=ID
+        // try server proxy /yt-proxy
         try{
           const proxyUrl = `/yt-proxy?videoId=${encodeURIComponent(ytId)}`;
           const r = await fetch(proxyUrl);
           if(r.ok){
             const j = await r.json();
-            // Expected shape: { title: "..", description: ".." }
             if(j && (j.title || j.description)) return { title: j.title||"", description: j.description||"" };
           }
         }catch(e){ console.warn('yt-proxy failed or not available', e); }
-
-        // Try youtube oEmbed (may return only title)
+        // fallback to oEmbed
         try{
           const oUrl = `https://www.youtube.com/oembed?url=${encodeURIComponent(link)}&format=json`;
           const r = await fetch(oUrl);
           if(r.ok){ const j = await r.json(); return { title: j.title || "", description: j.description || "" }; }
         }catch(e){ console.warn('youtube oembed failed', e); }
       }
-
-      // Generic oEmbed via noembed.com
+      // generic noembed
       try{
         const noembedUrl = `https://noembed.com/embed?url=${encodeURIComponent(link)}`;
         const r = await fetch(noembedUrl);
         if(r.ok){ const j = await r.json(); return { title: j.title || j.author_name || "", description: j.description || "" }; }
       }catch(e){ console.warn('noembed failed', e); }
-
       return null;
     }
 
     function extractYouTubeId(url){
-      try{ const u = new URL(url);
-        if(u.hostname.includes('youtu.be')) return u.pathname.slice(1);
-        if(u.hostname.includes('youtube.com')){
-          const p = u.searchParams.get('v'); if(p) return p;
-          const parts = u.pathname.split('/'); const idx = parts.indexOf('embed'); if(idx>-1 && parts[idx+1]) return parts[idx+1];
+      try{
+        const u = new URL(url);
+        if(u.hostname.includes("youtu.be")) return u.pathname.slice(1);
+        if(u.hostname.includes("youtube.com")){
+          const p = u.searchParams.get("v");
+          if(p) return p;
+          const parts = u.pathname.split("/");
+          const idx = parts.indexOf("embed");
+          if(idx>-1 && parts[idx+1]) return parts[idx+1];
         }
       }catch(e){}
       return null;
     }
 
     function analyzeTextToFields(title, description, lang){
-      const text = (title + ' ' + description).toLowerCase();
+      const text = (title + " " + description).toLowerCase();
       const suggestions = {};
       const categoryMap = {
         "Bandeja": ["bandeja","bandejá"],
@@ -755,73 +719,87 @@
         "Groundstroke": ["forehand","backhand","groundstroke"],
         "Double wall": ["double wall","doble muralla"]
       };
-
       for(const [cat, keys] of Object.entries(categoryMap)){
         for(const k of keys) if(text.includes(k)){ suggestions.category = cat; break; }
         if(suggestions.category) break;
       }
-
-      if(text.match(/\bbeginner|beginners|beginner-level|nybegynder|begynder\b/)) suggestions.level = localize('Beginner', lang);
-      else if(text.match(/\bintermediate|intermediate-level|øvet|mellem\b/)) suggestions.level = localize('Intermediate', lang);
-      else if(text.match(/\badvanced|advanced-level|avanceret|pro\b/)) suggestions.level = localize('Advanced', lang);
-
+      if(text.match(/\bbeginner|beginners|beginner-level|nybegynder|begynder\b/)) suggestions.level = localize("Beginner", lang);
+      else if(text.match(/\bintermediate|intermediate-level|øvet|mellem\b/)) suggestions.level = localize("Intermediate", lang);
+      else if(text.match(/\badvanced|advanced-level|avanceret|pro\b/)) suggestions.level = localize("Advanced", lang);
       const playersMatch = text.match(/\b(1|2|3|4|1\-2|1\-3|1\-4|2\-4)\b/);
       if(playersMatch) suggestions.players = playersMatch[0];
-
-      if(text.match(/\b(high|intense|intensity|hard|hardcore|intensiv|hård)\b/)) suggestions.intensity = localize('High', lang);
-      else if(text.match(/\b(medium|moderate|moderat|midt)\b/)) suggestions.intensity = localize('Medium', lang);
-      else suggestions.intensity = localize('Low', lang);
-
-      const words = text.replace(/[^\wæøåÆØÅ]/g,' ').split(/\s+/).filter(w=>w.length>3);
-      const stop = new Set(['video','padel','drill','exercise','exercises','howto','tutorial','padelvideo','learn']);
+      if(text.match(/\b(high|intense|intensity|hard|hardcore|intensiv|hård)\b/)) suggestions.intensity = localize("High", lang);
+      else if(text.match(/\b(medium|moderate|moderat|midt)\b/)) suggestions.intensity = localize("Medium", lang);
+      else suggestions.intensity = localize("Low", lang);
+      const words = text.replace(/[^\wæøåÆØÅ]/g," ").split(/\s+/).filter(w=>w.length>3);
+      const stop = new Set(["video","padel","drill","exercise","exercises","howto","tutorial","padelvideo","learn"]);
       const tagCandidates = [];
-      for(const w of words){ if(!stop.has(w) && !tagCandidates.includes(w)) tagCandidates.push(w); if(tagCandidates.length>=6) break; }
-      suggestions.tags = tagCandidates.slice(0,6).join(', ');
+      for(const w of words){
+        if(!stop.has(w) && !tagCandidates.includes(w)) tagCandidates.push(w);
+        if(tagCandidates.length>=6) break;
+      }
+      suggestions.tags = tagCandidates.slice(0,6).join(", ");
       if(!suggestions.category && tagCandidates.length) suggestions.category = capitalize(tagCandidates[0]);
       return suggestions;
     }
 
     function capitalize(s){ if(!s) return s; return s.charAt(0).toUpperCase() + s.slice(1); }
-    function localize(key, lang){ if(!lang) lang='en'; const map = { en: { 'Beginner':'Beginner','Intermediate':'Intermediate','Advanced':'Advanced','Low':'Low','Medium':'Medium','High':'High' }, da: { 'Beginner':'Beginner','Intermediate':'Intermediate','Advanced':'Advanced','Low':'Low','Medium':'Medium','High':'High' } }; return (map[lang] && map[lang][key]) || key; }
+    function localize(key, lang){ if(!lang) lang='en'; const map = { en: { "Beginner":"Beginner","Intermediate":"Intermediate","Advanced":"Advanced","Low":"Low","Medium":"Medium","High":"High" }, da: { "Beginner":"Beginner","Intermediate":"Intermediate","Advanced":"Advanced","Low":"Low","Medium":"Medium","High":"High" } }; return (map[lang] && map[lang][key]) || key; }
+
+    /* Robust init wrapper: call init() safely and bind fallbacks on error */
+    function robustInitWrapper(){
+      try{
+        init();
+        console.log("init() executed successfully.");
+      } catch(err){
+        console.error("init() failed:", err);
+        try{
+          // fallback bindings to keep UI usable
+          const analyzeBtn = document.getElementById('analyze-btn');
+          if(analyzeBtn){
+            analyzeBtn.disabled = false;
+            analyzeBtn.style.pointerEvents = 'auto';
+            analyzeBtn.addEventListener('click', (ev)=>{
+              ev.preventDefault();
+              const link = document.getElementById('link').value.trim();
+              if(!link){ alert(localStorage.getItem(LANG_KEY)==='da' ? "Indsæt et videolink først" : "Please paste a video link first"); return; }
+              alert(localStorage.getItem(LANG_KEY)==='da' ? "Analyse (fallback) — se console for detaljer" : "Analyse (fallback) — check console");
+              console.log("Fallback analyze called with link:", link);
+            });
+            console.log("Fallback analyze handler attached.");
+          }
+          const langSel = document.getElementById('lang-select');
+          if(langSel){
+            langSel.addEventListener('change', (e)=>{ localStorage.setItem(LANG_KEY, e.target.value); applyTranslationsToDOM(); console.log('Fallback lang change to', e.target.value); });
+            console.log("Fallback lang handler attached.");
+          }
+          const themeBtn = document.getElementById('theme-toggle');
+          if(themeBtn){
+            themeBtn.addEventListener('click', ()=>{ toggleTheme(); console.log('Fallback theme toggled'); });
+            console.log("Fallback theme handler attached.");
+          }
+        } catch(innerErr){
+          console.error("Recovery failed:", innerErr);
+        }
+      }
+    }
+
+    if(document.readyState === 'loading'){
+      document.addEventListener('DOMContentLoaded', robustInitWrapper);
+    } else {
+      robustInitWrapper();
+    }
+
+    // Ensure interactive elements aren't blocked by overlays (small safety)
+    (function addPointerSafety(){
+      const style = document.createElement('style');
+      style.innerHTML = `
+        .container, header, .card { position: relative; z-index: 1; }
+        button, select, input, .theme-toggle { pointer-events: auto !important; }
+      `;
+      document.head.appendChild(style);
+    })();
 
   </script>
-
-  <!--
-    -----------------------------
-    OPTIONAL: Server-side proxy (recommended)
-    -----------------------------
-    Eksempel på en lille Node.js/Express proxy som returnerer YouTube snippet metadata
-    (så du ikke lægger YOUTUBE_API_KEY i klientkode):
-
-    // server.js
-    const express = require('express');
-    const fetch = require('node-fetch'); // eller indbygget fetch i nyere node
-    const app = express();
-    const PORT = process.env.PORT || 3000;
-    const YT_KEY = process.env.YOUTUBE_API_KEY; // Sæt i miljøvariabler på serveren
-
-    app.get('/yt-proxy', async (req, res) => {
-      const videoId = req.query.videoId;
-      if(!videoId) return res.status(400).json({ error: 'missing videoId' });
-      try{
-        const url = `https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${encodeURIComponent(videoId)}&key=${encodeURIComponent(YT_KEY)}`;
-        const r = await fetch(url);
-        if(!r.ok) return res.status(r.status).json({ error: 'yt api error' });
-        const j = await r.json();
-        if(j.items && j.items.length){
-          const s = j.items[0].snippet;
-          return res.json({ title: s.title || '', description: s.description || '' });
-        }
-        return res.json({ title: '', description: '' });
-      }catch(e){ console.error(e); return res.status(500).json({ error: 'server error' }); }
-    });
-
-    app.listen(PORT, ()=> console.log('yt-proxy listening on', PORT));
-
-    Brug: sæt miljøvariablen YOUTUBE_API_KEY på din server (fx i Heroku/Render/Vercel/ligende), deploy server.js, og klientkoden i HTML vil forsøge at ringe til /yt-proxy. Dette holder din nøgle sikker.
-
-    -----------------------------------------------------------------
-  -->
-
 </body>
 </html>
