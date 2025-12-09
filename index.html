@@ -30,25 +30,9 @@
       --max-w:1100px;
     }
 
-    /* ---------- LIGHT MODE (soft grey) ---------- */
-    body.light {
-      --bg-top: #caced5;
-      --bg-bottom: #bfc3cb;
-      --panel: #d8dce3;
-      --muted: #3c4652;
-      --text: #0b1220;
-      --accent: #16a34a;
-      --accent-dark: #106b37;
-      --danger: #dc2626;
-      --card-shadow: 0 6px 14px rgba(0,0,0,.12);
-      --border-soft: rgba(0,0,0,.14);
-    }
+    body.light { --bg-top:#caced5; --bg-bottom:#bfc3cb; --panel:#d8dce3; --muted:#3c4652; --text:#0b1220; --accent:#16a34a; --accent-dark:#106b37; --danger:#dc2626; --card-shadow:0 6px 14px rgba(0,0,0,.12); --border-soft: rgba(0,0,0,.14); }
 
-    .app-bg{
-      background: linear-gradient(180deg,var(--bg-top) 0%,var(--bg-bottom) 100%);
-      color:var(--text);min-height:100vh;
-      padding-bottom:170px; /* ensure space for bottom bar on mobile */
-    }
+    .app-bg{ background: linear-gradient(180deg,var(--bg-top) 0%,var(--bg-bottom) 100%); color:var(--text);min-height:100vh; padding-bottom:170px; }
 
     .container{max-width:var(--max-w);margin:14px auto;padding:12px;width:94%}
 
@@ -62,27 +46,16 @@
 
     .btn{border:0;padding:10px 14px;border-radius:12px;font-weight:800;cursor:pointer;background:transparent;color:var(--text);display:inline-flex;align-items:center;gap:8px}
     .btn-primary{background:var(--accent);color:#05261a;box-shadow:0 6px 14px rgba(0,0,0,.08)}
-    .btn-primary:active{transform:translateY(1px)}
     .btn-ghost{background:transparent;border:1px solid var(--border-soft);color:var(--muted);padding:10px 12px}
     .btn-danger{background:var(--danger);color:#fff}
     .btn-small{padding:6px 8px;border-radius:8px;font-weight:700}
 
-    .theme-toggle{
-      height:48px; min-width:48px; display:inline-grid;place-items:center;
-      border-radius:12px; border:1px solid var(--border-soft); background:transparent; cursor:pointer; padding:6px;
-      transition:background .18s, border-color .18s, box-shadow .18s, transform .06s;
-    }
-    .theme-toggle:active{transform:translateY(1px)}
+    .theme-toggle{height:48px; min-width:48px; display:inline-grid;place-items:center;border-radius:12px; border:1px solid var(--border-soft); background:transparent; cursor:pointer; padding:6px;transition:background .18s, border-color .18s, box-shadow .18s, transform .06s;}
     .theme-toggle svg{width:22px;height:22px;display:block}
-    body:not(.light) .theme-toggle{ background:#facc15!important;border-color:#facc15!important;color:#000!important;box-shadow:0 10px 26px rgba(250,204,21,.16) }
-    body.light .theme-toggle{ background:#ffffff!important;border-color:rgba(0,0,0,.08)!important;color:#000!important;box-shadow:0 6px 18px rgba(2,6,23,.06) }
-    .theme-toggle svg path,.theme-toggle svg circle{stroke:currentColor;fill:none}
 
     .card{background:var(--panel);border-radius:12px;padding:14px;margin-bottom:14px;box-shadow:var(--card-shadow);transition:background .2s,box-shadow .2s}
     label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
-    input[type=text],input[type=url],input[type=number],select,textarea{
-      width:100%;padding:12px;border-radius:10px;border:1px solid var(--border-soft);background:transparent;color:var(--text);font-size:15px;transition:border-color .15s,background .15s
-    }
+    input[type=text],input[type=url],input[type=number],select,textarea{width:100%;padding:12px;border-radius:10px;border:1px solid var(--border-soft);background:transparent;color:var(--text);font-size:15px;transition:border-color .15s,background .15s}
     textarea{min-height:84px;resize:vertical}
     .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
     @media(max-width:680px){.grid{grid-template-columns:1fr}}
@@ -93,72 +66,30 @@
     .tag{background:rgba(255,255,255,.03);padding:6px 8px;border-radius:8px;margin-right:8px;font-size:13px;display:inline-block}
     .actions-small{display:flex;flex-direction:column;gap:6px}
 
-    /* bottom bar - mobile friendly (always visible) */
-    #lezgo-bottom-bar{
-      position: fixed !important;
-      bottom: 12px !important;
-      left: 12px !important;
-      right: 12px !important;
-      width: auto !important;
-      max-width: calc(var(--max-w) - 16px) !important;
-      margin: 0 auto !important;
-      display:flex !important;
-      gap:10px;
-      justify-content: center;
-      align-items: center;
-      padding: 10px;
-      background: linear-gradient(180deg, rgba(0,0,0,0.06), rgba(0,0,0,0.02));
-      border-radius: 12px;
-      z-index: 99999 !important;
-      box-shadow: 0 10px 28px rgba(0,0,0,0.16);
-      -webkit-backdrop-filter: blur(6px);
-      backdrop-filter: blur(6px);
-      transform: none !important;
-      pointer-events: auto !important;
+    /* duplicate highlight */
+    .duplicate {
+      border: 2px solid var(--danger) !important;
+      background: rgba(239,68,68,0.06) !important;
     }
-    #lezgo-bottom-bar .lezgo-btn {
-      padding: .6rem .9rem;
-      border-radius: 10px;
-      border: none;
-      font-weight: 700;
-      cursor: pointer;
-      background: var(--accent);
-      color: white;
-      min-width:110px;
-      text-align:center;
-      display:inline-block !important;
-      visibility:visible !important;
-    }
+
+    /* bottom bar - admin only (visibility controlled via JS) */
+    #lezgo-bottom-bar{ position: fixed !important; bottom: 12px !important; left: 12px !important; right: 12px !important; width: auto !important; max-width: calc(var(--max-w) - 16px) !important; margin: 0 auto !important; display:flex !important; gap:10px; justify-content: center; align-items: center; padding: 10px; background: linear-gradient(180deg, rgba(0,0,0,0.06), rgba(0,0,0,0.02)); border-radius: 12px; z-index: 99999 !important; box-shadow: 0 10px 28px rgba(0,0,0,0.16); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); transform: none !important; pointer-events: auto !important; }
+    #lezgo-bottom-bar .lezgo-btn { padding: .6rem .9rem; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; background: var(--accent); color: white; min-width:110px; text-align:center; display:inline-block !important; visibility:visible !important; }
     #lezgo-bottom-bar .lezgo-btn.restore { background:transparent; color:var(--text); border:1px solid var(--border-soft) }
     #lezgo-bottom-bar input[type=file]{ display:none }
 
-    /* session detail full-screen modal */
-    #session-detail-modal{
-      position: fixed; inset:0; z-index:100000; display:none; align-items:center; justify-content:center;
-      background: linear-gradient(180deg, rgba(2,6,23,0.8), rgba(2,6,23,0.9));
-      padding:20px;
-    }
-    #session-detail-modal .modal-card{
-      width:100%; max-width:900px; max-height:96vh; overflow:auto; border-radius:12px; padding:18px; background:var(--panel);
-      box-shadow:0 20px 60px rgba(0,0,0,0.6);
-    }
-    #session-detail-modal .modal-header{display:flex;align-items:center;gap:12px}
-    #session-detail-modal h2{margin:0;font-size:18px}
-    #session-detail-modal .modal-close{margin-left:auto}
+    /* SoMe filter pills */
+    .platform-filters{display:flex;gap:6px;align-items:center}
+    .platform-filters button{padding:6px 10px;border-radius:999px;border:1px solid var(--border-soft);background:transparent;color:var(--muted);cursor:pointer}
+    .platform-filters button.active{background:var(--accent);color:#05261a;border-color:transparent}
 
-    /* small screens tweaks */
-    @media(max-width:520px){
-      #lezgo-bottom-bar { padding:8px; gap:8px; }
-      #lezgo-bottom-bar .lezgo-btn { min-width:100px; padding:.5rem .6rem; font-size:14px }
-      .container { padding:10px 10px 200px } /* extra bottom space for phones */
-      #session-detail-modal .modal-card{ padding:12px; border-radius:10px; max-width:calc(100% - 24px) }
-    }
+    /* session detail */
+    #session-detail-modal{ position: fixed; inset:0; z-index:100000; display:none; align-items:center; justify-content:center; background: linear-gradient(180deg, rgba(2,6,23,0.8), rgba(2,6,23,0.9)); padding:20px; }
+    #session-detail-modal .modal-card{ width:100%; max-width:900px; max-height:96vh; overflow:auto; border-radius:12px; padding:18px; background:var(--panel); box-shadow:0 20px 60px rgba(0,0,0,0.6); }
+    @media(max-width:520px){ .container { padding:10px 10px 200px } }
 
     /* dark select fix */
     body:not(.light) select, body:not(.light) select option, body:not(.light) select optgroup { color: var(--text) !important; background: var(--panel) !important; }
-    body:not(.light) select::-ms-expand { filter: none; }
-    body:not(.light) select { -webkit-appearance: menulist-button; }
-    body:not(.light) select:focus { outline: 2px solid rgba(255,255,255,0.06); outline-offset: 2px; }
   </style>
 </head>
 
@@ -193,7 +124,7 @@
       <form id="exercise-form" class="grid" onsubmit="return false;">
         <div style="grid-column:1/-1;">
           <label id="label-title" data-i18n="titleLabel">Title</label>
-          <input id="title" type="text" placeholder="e.g. Forehand topspin drill" data-i18n-placeholder="titlePlaceholder">
+          <input id="title" type="text" placeholder="e.g. Forehand topspin drill" data-i18n-placeholder="titlePlaceholder" autocomplete="off">
         </div>
 
         <div>
@@ -224,7 +155,7 @@
         <div style="grid-column:1/-1;">
           <label id="label-video" data-i18n="videoLabel">Video link (YouTube / Instagram / Facebook)</label>
           <div style="display:flex;gap:8px;align-items:center">
-            <input id="link" type="url" placeholder="https://..." data-i18n-placeholder="videoPlaceholder" style="flex:1">
+            <input id="link" type="url" placeholder="https://..." data-i18n-placeholder="videoPlaceholder" style="flex:1" autocomplete="off">
             <button id="analyze-btn" class="btn btn-ghost" title="Analyze video">🔍 Analyze</button>
           </div>
         </div>
@@ -250,8 +181,13 @@
     </section>
 
     <section class="card">
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;align-items:center">
         <input id="search" type="text" placeholder="Search..." style="flex:1;padding:10px;border-radius:10px;border:1px solid var(--border-soft);background:transparent;color:var(--text)" data-i18n-placeholder="searchPlaceholder">
+        <div class="platform-filters" aria-hidden="false" title="Filter by platform">
+          <button data-platform="youtube" class="platform-btn" id="pf-y">YouTube</button>
+          <button data-platform="instagram" class="platform-btn" id="pf-i">Instagram</button>
+          <button data-platform="facebook" class="platform-btn" id="pf-f">Facebook</button>
+        </div>
         <select id="filter-category" style="padding:10px;border-radius:10px;border:1px solid var(--border-soft);background:transparent;color:var(--text)"><option>ALL</option></select>
         <select id="filter-level" style="padding:10px;border-radius:10px;border:1px solid var(--border-soft);background:transparent;color:var(--text)"><option>ALL</option></select>
         <button id="show-favorites" class="btn btn-ghost" data-i18n="showFavorites">Show favorites</button>
@@ -302,7 +238,7 @@
     </section>
   </div><!-- container end -->
 
-  <!-- Full-screen session detail modal (used when opening saved session) -->
+  <!-- Full-screen session detail modal -->
   <div id="session-detail-modal" role="dialog" aria-modal="true" tabindex="-1">
     <div class="modal-card" role="document">
       <div class="modal-header">
@@ -316,8 +252,8 @@
     </div>
   </div>
 
-  <!-- Bottom bar: Backup + Restore (always visible). Restore uses hidden file input -->
-  <div id="lezgo-bottom-bar" aria-hidden="false">
+  <!-- Bottom bar: Backup + Restore (admin only) -->
+  <div id="lezgo-bottom-bar" aria-hidden="true" style="display:none">
     <button id="btn-backup" class="lezgo-btn">Backup</button>
     <label for="file-restore" class="lezgo-btn restore" style="cursor:pointer">Restore</label>
     <input id="file-restore" type="file" accept="application/json" />
@@ -366,11 +302,7 @@
     const isPaid  = () => localStorage.getItem("is_paid") === "1";
 
     /* THEME */
-    function applyTheme(theme){
-      if(theme === 'light'){ document.body.classList.add('light'); document.querySelector('#meta-theme-color').setAttribute('content','#eceff1'); setThemeIcon('light'); }
-      else { document.body.classList.remove('light'); document.querySelector('#meta-theme-color').setAttribute('content','#0f1720'); setThemeIcon('dark'); }
-      localStorage.setItem(THEME_KEY, theme);
-    }
+    function applyTheme(theme){ if(theme === 'light'){ document.body.classList.add('light'); document.querySelector('#meta-theme-color').setAttribute('content','#eceff1'); setThemeIcon('light'); } else { document.body.classList.remove('light'); document.querySelector('#meta-theme-color').setAttribute('content','#0f1720'); setThemeIcon('dark'); } localStorage.setItem(THEME_KEY, theme); }
     function toggleTheme(){ const current = localStorage.getItem(THEME_KEY) || 'dark'; const next = current === 'dark' ? 'light' : 'dark'; applyTheme(next); }
     function setThemeIcon(mode){ const svg = document.getElementById('theme-icon'); if(!svg) return; if(mode === 'light'){ svg.innerHTML = '<path d="M12 3v2M12 19v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1 12h2M21 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4M12 7a5 5 0 100 10 5 5 0 000-10z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>'; } else { svg.innerHTML = '<path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>'; } }
 
@@ -388,6 +320,9 @@
     function populateLevels(){ const sel = $("level"); const fil = $("filter-level"); if(!sel||!fil) return; sel.innerHTML=""; fil.innerHTML=""; let optAll = document.createElement("option"); optAll.textContent = t('filterAll'); optAll.value = ""; fil.appendChild(optAll); levels.forEach(c=>{ let o=document.createElement("option"); o.value=c; o.textContent=c; sel.appendChild(o); let f=document.createElement("option"); f.value=c; f.textContent=c; fil.appendChild(f); }); let add=document.createElement("option"); add.value="__ADD__"; add.textContent = (localStorage.getItem(LANG_KEY) === 'da') ? "Tilføj nyt niveau..." : "Add new level..."; sel.appendChild(add); }
     function populateIntensity(){ const sel=$("intensity"); if(!sel) return; sel.innerHTML=""; intensities.forEach(c=>{ let o=document.createElement("option"); o.value=c; o.textContent=c; sel.appendChild(o); }); let add=document.createElement("option"); add.value="__ADD__"; add.textContent = (localStorage.getItem(LANG_KEY) === 'da') ? "Tilføj ny intensitet..." : "Add new intensity..."; sel.appendChild(add); }
     function populatePlayers(){ const sel=$("players"); if(!sel) return; sel.innerHTML=""; players.forEach(c=>{ let o=document.createElement("option"); o.value=c; o.textContent=c; sel.appendChild(o); }); }
+
+    /* PLATFORM FILTER STATE (set of selected platforms) */
+    const platformState = new Set(); // possible values: 'youtube','instagram','facebook'
 
     /* INIT */
     function init(){
@@ -414,7 +349,7 @@
 
       $("save-btn").addEventListener("click", onSave);
       $("clear-btn").addEventListener("click", clearForm);
-      $("delete-all-btn").addEventListener("click", ()=>{ if(!isAdmin() && !isPaid()){ alert('Admin or Paid access required'); return; } if(confirm(localStorage.getItem(LANG_KEY)==='da'?"Slet ALLE øvelser?":"Delete ALL exercises?")){ exercises=[]; localStorage.setItem(EX_KEY,"[]"); renderList(); }});
+      $("delete-all-btn").addEventListener("click", ()=>{ if(!isAdmin()){ alert('Admin access required'); return; } const pass = prompt('Enter admin password to confirm Delete ALL:'); if(pass !== ADMIN_PASSWORD){ alert('Wrong admin code'); return; } if(confirm(localStorage.getItem(LANG_KEY)==='da'?"Slet ALLE øvelser?":"Delete ALL exercises?")){ exercises=[]; localStorage.setItem(EX_KEY,"[]"); renderList(); }});
 
       $("search").addEventListener("input", renderList);
       $("filter-category").addEventListener("change", renderList);
@@ -434,30 +369,138 @@
       // Bottom bar backup/restore
       $("btn-backup").addEventListener("click", onBackup);
       $("file-restore").addEventListener("change", onRestoreFile);
+
+      // Platform filter buttons
+      document.querySelectorAll('.platform-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const p = btn.getAttribute('data-platform');
+          if (platformState.has(p)) { platformState.delete(p); btn.classList.remove('active'); }
+          else { platformState.add(p); btn.classList.add('active'); }
+          renderList();
+        });
+      });
     }
 
-    /* SAVE EXERCISE */
-    function onSave(){ let title = $("title").value.trim(); if(!title){ alert(localStorage.getItem(LANG_KEY)==='da'?"Indtast titel":"Enter title"); return; } let ex = { id: editingId || uid(), title, category: $("category").value, players: $("players").value, duration: Number($("duration").value||0), level: $("level").value, intensity: $("intensity").value, link: $("link").value.trim(), description: $("description").value.trim(), tags: normalizeTags($("tags").value.trim()), favorite:false, createdAt: new Date().toISOString() }; if(editingId){ let idx = exercises.findIndex(x=>x.id===editingId); if(idx>-1) exercises[idx]=ex; } else exercises.unshift(ex); localStorage.setItem(EX_KEY, JSON.stringify(exercises)); clearForm(); renderList(); }
+    /* Helpers for platform detection */
+    function linkPlatform(link){
+      if(!link) return null;
+      try{
+        const u = new URL(link);
+        const h = u.hostname.toLowerCase();
+        if(h.includes('youtube') || h.includes('youtu.be')) return 'youtube';
+        if(h.includes('instagram')) return 'instagram';
+        if(h.includes('facebook')) return 'facebook';
+      }catch(e){}
+      return null;
+    }
+
+    /* SAVE EXERCISE with duplicate checks (title OR link) */
+    function onSave(){
+      let title = $("title").value.trim();
+      let link = $("link").value.trim();
+      if(!title){ alert(localStorage.getItem(LANG_KEY)==='da'?"Indtast titel":"Enter title"); return; }
+
+      // duplicate checks (case-insensitive title, exact link)
+      const titleLC = title.toLowerCase();
+      const dupByTitle = exercises.filter(e => (e.title||'').toLowerCase() === titleLC && e.id !== editingId);
+      const dupByLink = link ? exercises.filter(e => (e.link||'') === link && e.id !== editingId) : [];
+
+      // clear previous duplicate highlights
+      document.querySelectorAll('.duplicate').forEach(el => el.classList.remove('duplicate'));
+
+      if(dupByTitle.length || dupByLink.length){
+        // highlight matching saved items
+        const idsToHighlight = new Set([...dupByTitle.map(d=>d.id), ...dupByLink.map(d=>d.id)]);
+        idsToHighlight.forEach(id => {
+          const node = document.querySelector(`.exercise[data-id="${id}"]`);
+          if(node) {
+            node.classList.add('duplicate');
+            node.scrollIntoView({behavior:'smooth', block:'center'});
+          }
+        });
+        alert(localStorage.getItem(LANG_KEY)==='da' ? "Duplikat fundet: titel eller link findes allerede. Tjek de markerede øvelser." : "Duplicate found: same title or link already exists. The matching saved items are highlighted.");
+        return; // do not save duplicates
+      }
+
+      let ex = { id: editingId || uid(), title, category: $("category").value, players: $("players").value, duration: Number($("duration").value||0), level: $("level").value, intensity: $("intensity").value, link: link, description: $("description").value.trim(), tags: normalizeTags($("tags").value.trim()), favorite:false, createdAt: new Date().toISOString() };
+      if(editingId){ let idx = exercises.findIndex(x=>x.id===editingId); if(idx>-1) exercises[idx]=ex; } else exercises.unshift(ex);
+      localStorage.setItem(EX_KEY, JSON.stringify(exercises));
+      clearForm(); renderList();
+    }
 
     function normalizeTags(str){ if(!str) return ""; return str.split(",").map(t=>t.replace(/^#+/,"").trim()).filter(Boolean).join(", "); }
     function clearForm(){ editingId=null; $("title").value=""; if($("category")) $("category").selectedIndex=0; if($("players")) $("players").selectedIndex=0; $("duration").value=""; if($("level")) $("level").selectedIndex=0; if($("intensity")) $("intensity").selectedIndex=0; $("link").value=""; $("description").value=""; $("tags").value=""; $("save-btn").textContent=t('saveBtn'); }
 
-    /* RENDER LIST */
-    function renderList(){ let q = ($("search") && $("search").value.trim().toLowerCase()) || ""; let fc = ($("filter-category") && $("filter-category").value) || ""; let fl = ($("filter-level") && $("filter-level").value) || ""; let list = $("list"); if(!list) return; list.innerHTML=""; let items = exercises.slice(); if(fc && fc!=="") items = items.filter(x=>x.category===fc); if(fl && fl!=="") items = items.filter(x=>x.level===fl); if(q) items = items.filter(x => x.title.toLowerCase().includes(q) || (x.description||"").toLowerCase().includes(q) || (x.tags||"").toLowerCase().includes(q) ); if($("show-favorites") && $("show-favorites").textContent!==t('showFavorites')) items = items.filter(x=>x.favorite); if(items.length===0){ list.innerHTML = `<div style="color:var(--muted)">${t('noMatches')}</div>`; return; } items.forEach(ex=>{ let row=document.createElement("div"); row.className="exercise"; row.dataset.id=ex.id; let cb=document.createElement("input"); cb.type="checkbox"; cb.className="select-item"; cb.addEventListener("change", updateSelectedSet); row.appendChild(cb); let left=document.createElement("div"); left.style.flex="1"; let ttitle=document.createElement("div"); ttitle.style.fontWeight="800"; ttitle.style.fontSize="15px"; ttitle.textContent=ex.title; left.appendChild(ttitle); let meta=document.createElement("div"); meta.style.color="var(--muted)"; meta.style.marginTop="6px"; meta.textContent = `${ex.category} • ${ex.level} • ${ex.players} • ${ex.duration}m`; left.appendChild(meta); if(ex.link){ let a=document.createElement("a"); a.href=ex.link; a.target="_blank"; a.textContent=ex.link; a.style.color="var(--muted)"; a.style.display="block"; a.style.marginTop="6px"; left.appendChild(a); } if(ex.tags){ let tags=document.createElement("div"); tags.style.marginTop="8px"; ex.tags.split(",").forEach(tg=>{ let s=document.createElement("span"); s.className="tag"; s.textContent=tg.trim(); tags.appendChild(s); }); left.appendChild(tags); } row.appendChild(left); let right=document.createElement("div"); right.className="actions-small"; let edit=document.createElement("button"); edit.className="btn btn-ghost"; edit.textContent=(localStorage.getItem(LANG_KEY)==='da'?"Rediger":"Edit"); edit.addEventListener("click", ()=>editItem(ex.id)); right.appendChild(edit);
+    /* RENDER LIST with platform filter and permissioned Edit/Delete */
+    function renderList(){
+      // clear previous duplicate classes
+      document.querySelectorAll('.duplicate').forEach(el => el.classList.remove('duplicate'));
 
-      // Only show delete button if admin or paid
-      if(isAdmin() || isPaid()){
-        let del=document.createElement("button"); del.className="btn btn-ghost"; del.style.color="var(--danger)"; del.textContent=(localStorage.getItem(LANG_KEY)==='da'?"Slet":"Delete"); del.addEventListener("click", ()=>{ if(!isAdmin() && !isPaid()){ alert('Admin or Paid access required'); return; } if(confirm(t('deleteConfirm'))){ exercises = exercises.filter(x=>x.id!==ex.id); localStorage.setItem(EX_KEY, JSON.stringify(exercises)); renderList(); }}); right.appendChild(del);
+      let q = ($("search") && $("search").value.trim().toLowerCase()) || "";
+      let fc = ($("filter-category") && $("filter-category").value) || "";
+      let fl = ($("filter-level") && $("filter-level").value) || "";
+      let list = $("list"); if(!list) return; list.innerHTML="";
+      let items = exercises.slice();
+
+      // platform filter: if user selected any platform(s), only include those matching
+      if(platformState.size > 0){
+        items = items.filter(it => {
+          const p = linkPlatform(it.link);
+          return p && platformState.has(p);
+        });
       }
 
-      row.appendChild(right); list.appendChild(row); }); updateSelectedSet(); }
+      if(fc && fc!=="") items = items.filter(x=>x.category===fc);
+      if(fl && fl!=="") items = items.filter(x=>x.level===fl);
+      if(q) items = items.filter(x => x.title.toLowerCase().includes(q) || (x.description||"").toLowerCase().includes(q) || (x.tags||"").toLowerCase().includes(q) );
+      if($("show-favorites") && $("show-favorites").textContent!==t('showFavorites')) items = items.filter(x=>x.favorite);
+      if(items.length===0){ list.innerHTML = `<div style="color:var(--muted)">${t('noMatches')}</div>`; return; }
+
+      items.forEach(ex=>{
+        let row=document.createElement("div"); row.className="exercise"; row.dataset.id=ex.id;
+        let cb=document.createElement("input"); cb.type="checkbox"; cb.className="select-item"; cb.addEventListener("change", updateSelectedSet); row.appendChild(cb);
+        let left=document.createElement("div"); left.style.flex="1";
+        let ttitle=document.createElement("div"); ttitle.style.fontWeight="800"; ttitle.style.fontSize="15px"; ttitle.textContent=ex.title; left.appendChild(ttitle);
+        let meta=document.createElement("div"); meta.style.color="var(--muted)"; meta.style.marginTop="6px"; meta.textContent = `${ex.category} • ${ex.level} • ${ex.players} • ${ex.duration}m`; left.appendChild(meta);
+        if(ex.link){
+          let a=document.createElement("a"); a.href=ex.link; a.target="_blank"; a.textContent=ex.link; a.style.color="var(--muted)"; a.style.display="block"; a.style.marginTop="6px";
+          // platform icon label
+          const p = linkPlatform(ex.link);
+          if(p){
+            const sp = document.createElement('span'); sp.style.marginLeft='8px'; sp.style.color='var(--muted)'; sp.style.fontSize='12px'; sp.textContent = `(${p})`;
+            a.appendChild(sp);
+          }
+          left.appendChild(a);
+        }
+        if(ex.tags){
+          let tags=document.createElement("div"); tags.style.marginTop="8px";
+          ex.tags.split(",").forEach(tg=>{ let s=document.createElement("span"); s.className="tag"; s.textContent=tg.trim(); tags.appendChild(s); });
+          left.appendChild(tags);
+        }
+        row.appendChild(left);
+
+        let right=document.createElement("div"); right.className="actions-small";
+        // Edit: only for paid or admin
+        if(isAdmin() || isPaid()){
+          let edit=document.createElement("button"); edit.className="btn btn-ghost"; edit.textContent=(localStorage.getItem(LANG_KEY)==='da'?"Rediger":"Edit"); edit.addEventListener("click", ()=>{ if(!isAdmin() && !isPaid()){ alert('Paid access required'); return; } editItem(ex.id); }); right.appendChild(edit);
+        }
+        // Delete: only for paid or admin (paid allowed per-item delete)
+        if(isAdmin() || isPaid()){
+          let del=document.createElement("button"); del.className="btn btn-ghost"; del.style.color="var(--danger)"; del.textContent=(localStorage.getItem(LANG_KEY)==='da'?"Slet":"Delete");
+          del.addEventListener("click", ()=>{ if(!isAdmin() && !isPaid()){ alert('Admin or Paid access required'); return; } if(confirm(t('deleteConfirm'))){ exercises = exercises.filter(x=>x.id!==ex.id); localStorage.setItem(EX_KEY, JSON.stringify(exercises)); renderList(); } });
+          right.appendChild(del);
+        }
+
+        row.appendChild(right); list.appendChild(row);
+      });
+      updateSelectedSet();
+    }
 
     function editItem(id){ let ex = exercises.find(x=>x.id===id); if(!ex) return; editingId=id; $("title").value=ex.title; $("category").value=ex.category; $("players").value=ex.players; $("duration").value=ex.duration; $("level").value=ex.level; $("intensity").value=ex.intensity; $("link").value=ex.link; $("description").value=ex.description; $("tags").value=ex.tags; $("save-btn").textContent = t('saveBtn'); window.scrollTo({top:0,behavior:"smooth"}); }
 
-    /* SESSION BUILDER */
+    /* SESSION BUILDER (unchanged permissions) */
     function updateSelectedSet(){ selectedIds.clear(); document.querySelectorAll(".select-item").forEach(cb=>{ if(cb.checked) selectedIds.add(cb.closest(".exercise").dataset.id); }); updateSelectedCount(); }
     function updateSelectedCount(){ const suffix = t('selectedCountSuffix') || ' selected'; if($("selected-count")) $("selected-count").textContent = (selectedIds.size || 0) + suffix; }
-
     function addSelectedToSession(){ if(!isAdmin() && !isPaid()){ alert(localStorage.getItem(LANG_KEY)==='da'?"Betalt adgang kræves.":"Paid access required."); return; } let box=$("session-items"); selectedIds.forEach(id=>{ if(box.querySelector(`[data-id="${id}"]`)) return; let ex=exercises.find(x=>x.id===id); if(!ex) return; let row=document.createElement("div"); row.className="exercise"; row.dataset.id=id; row.innerHTML=`<div style="flex:1"><div style="font-weight:700">${ex.title}</div><div style="color:var(--muted)">${ex.duration}m • ${ex.category}</div></div><button class="btn btn-ghost remove-from-session" style="color:var(--danger)">${localStorage.getItem(LANG_KEY)==='da'?"Fjern":"Remove"}</button>`; row.querySelector("button").addEventListener("click", ()=>{ row.remove(); recalcSession(); }); box.appendChild(row); }); recalcSession(); }
     function recalcSession(){ let total=0,count=0; document.querySelectorAll("#session-items .exercise").forEach(row=>{ let ex=exercises.find(x=>x.id===row.dataset.id); if(ex){ total+=Number(ex.duration||0); count++; }}); if($("session-total")) $("session-total").textContent=total+" m"; if($("session-count")) $("session-count").textContent=count+" exercises"; }
     function clearSessionBuilder(){ if(!isAdmin() && !isPaid()){ alert(localStorage.getItem(LANG_KEY)==='da'?"Betalt adgang kræves.":"Paid access required."); return; } if($("session-items")) $("session-items").innerHTML=""; if($("session-name")) $("session-name").value=""; if($("session-desc")) $("session-desc").value=""; recalcSession(); }
@@ -495,18 +538,14 @@
       titleEl.textContent = session.name || session.title || 'Saved session';
       metaEl.textContent = `${(session.items?session.items.length: (session.payload && session.payload.links? session.payload.links.length:0))} exercises • ${session.total||0} m`;
       bodyEl.innerHTML = "";
-
       if(session.description) {
         const p = document.createElement('p'); p.style.color='var(--muted)'; p.textContent = session.description; bodyEl.appendChild(p);
       }
-
       const ul = document.createElement('div'); ul.style.display='grid'; ul.style.gap='10px'; ul.style.marginTop='12px';
       if(Array.isArray(session.items) && session.items.length){
         session.items.forEach(id => {
           const ex = exercises.find(e=>e.id === id);
-          const el = document.createElement('div');
-          el.className='exercise';
-          el.style.alignItems='center';
+          const el = document.createElement('div'); el.className='exercise'; el.style.alignItems='center';
           if(ex){
             el.innerHTML = `<div style="flex:1"><div style="font-weight:700">${escapeHtml(ex.title)}</div><div style="color:var(--muted)">${escapeHtml(ex.category)} • ${escapeHtml(ex.duration + 'm')}</div></div><div style="margin-left:10px"><a class="btn btn-small btn-ghost" href="${escapeAttr(ex.link || '#')}" target="_blank">Open link</a></div>`;
           } else {
@@ -516,158 +555,78 @@
         });
       } else if(session.payload && Array.isArray(session.payload.links) && session.payload.links.length){
         session.payload.links.forEach((ln, idx) => {
-          const el = document.createElement('div');
-          el.className='exercise';
-          el.style.alignItems='center';
+          const el = document.createElement('div'); el.className='exercise'; el.style.alignItems='center';
           el.innerHTML = `<div style="flex:1"><div style="font-weight:700">Link ${idx+1}</div><div style="color:var(--muted)">${escapeHtml(ln)}</div></div><div style="margin-left:10px"><a class="btn btn-small btn-ghost" href="${escapeAttr(ln)}" target="_blank">Open</a></div>`;
           ul.appendChild(el);
         });
       } else {
-        const empty = document.createElement('div'); empty.style.color='var(--muted)'; empty.textContent = 'No exercises or links in this session';
-        ul.appendChild(empty);
+        const empty = document.createElement('div'); empty.style.color='var(--muted)'; empty.textContent = 'No exercises or links in this session'; ul.appendChild(empty);
       }
-
       bodyEl.appendChild(ul);
       modal.style.display = 'flex';
       $("session-detail-close").focus();
     }
-
     function escapeHtml(text){ if(text===null || text===undefined) return ''; return String(text).replace(/[&<>"']/g, function(m){ return ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' })[m]; }); }
     function escapeAttr(s){ if(!s) return '#'; return s.replace(/"/g, '&quot;'); }
-
     $("session-detail-close")?.addEventListener('click', ()=>{ $("session-detail-modal").style.display='none'; });
 
     /* OPEN SAVED SESSION */
     function openSavedSession(sessionId){
       try {
         const session = sessions.find(s => s.id === sessionId);
-        if(!session){
-          console.warn('Session not found', sessionId);
-          alert('Session not found or has been deleted.');
-          return;
-        }
+        if(!session){ console.warn('Session not found', sessionId); alert('Session not found or has been deleted.'); return; }
         if(!session.items && session.links) { session.payload = session.payload || {}; session.payload.links = session.links; }
-        if(!Array.isArray(session.items) && !(session.payload && Array.isArray(session.payload.links))){
-          console.error('Invalid session format', session);
-          alert('Session format invalid. Try restoring from a backup.');
-          return;
-        }
+        if(!Array.isArray(session.items) && !(session.payload && Array.isArray(session.payload.links))){ console.error('Invalid session format', session); alert('Session format invalid. Try restoring from a backup.'); return; }
         showDetailedSessionViewFullScreen(session);
-      } catch(err){
-        console.error('Error opening session', err);
-        alert('Could not open session. Check console for details.');
-      }
+      } catch(err){ console.error('Error opening session', err); alert('Could not open session. Check console for details.'); }
     }
 
-    /* BACKUP & RESTORE */
+    /* BACKUP & RESTORE - now admin-only visibility and still accessible only if admin (action protected) */
     function onBackup(){
-      // Everyone can download backup (button visible). If you want to restrict, add a check here.
+      if(!isAdmin()){ alert('Admin access required to backup'); return; }
       try {
         const meta = { createdAt:new Date().toISOString(), lezgoVersion: 'v3', meta: JSON.parse(localStorage.getItem(STORAGE_META_KEY) || "{}") };
-        const payload = {
-          meta,
-          data: {
-            exercises: exercises || [],
-            sessions: sessions || [],
-            categories: categories || [],
-            levels: levels || [],
-            intensities: intensities || [],
-            players: players || []
-          }
-        };
+        const payload = { meta, data: { exercises: exercises || [], sessions: sessions || [], categories: categories || [], levels: levels || [], intensities: intensities || [], players: players || [] } };
         const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `lezgo-backup-${new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')}.json`;
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        URL.revokeObjectURL(url);
-      } catch(e){
-        console.error('Backup error', e);
-        alert('Backup failed. See console.');
-      }
+        const a = document.createElement('a'); a.href = url; a.download = `lezgo-backup-${new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')}.json`; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+      } catch(e){ console.error('Backup error', e); alert('Backup failed. See console.'); }
     }
 
     async function onRestoreFile(ev){
-      const file = ev.target.files && ev.target.files[0];
-      if(!file) return;
+      if(!isAdmin()){ alert('Admin access required to restore'); ev.target.value=''; return; } // protect
+      const file = ev.target.files && ev.target.files[0]; if(!file) return;
       try {
-        const text = await file.text();
-        const parsed = JSON.parse(text);
-        if(!parsed || !parsed.data) throw new Error('Invalid backup format (missing data).');
-
+        const text = await file.text(); const parsed = JSON.parse(text); if(!parsed || !parsed.data) throw new Error('Invalid backup format (missing data).');
         const incomingExercises = Array.isArray(parsed.data.exercises) ? parsed.data.exercises : [];
         const incomingSessions = Array.isArray(parsed.data.sessions) ? parsed.data.sessions : [];
         const incomingCategories = Array.isArray(parsed.data.categories) ? parsed.data.categories : [];
         const incomingLevels = Array.isArray(parsed.data.levels) ? parsed.data.levels : [];
         const incomingIntensities = Array.isArray(parsed.data.intensities) ? parsed.data.intensities : [];
         const incomingPlayers = Array.isArray(parsed.data.players) ? parsed.data.players : [];
-
-        // Merge exercises by id
-        const exById = new Map((exercises||[]).map(e=>[e.id,e]));
-        incomingExercises.forEach(e=>{
-          if(!e.id) e.id = uid();
-          exById.set(e.id, e);
-        });
-        exercises = Array.from(exById.values());
-
-        // Merge sessions by id
-        const sesById = new Map((sessions||[]).map(s=>[s.id,s]));
-        incomingSessions.forEach(s=>{
-          if(!s.id) s.id = uid();
-          sesById.set(s.id, s);
-        });
-        sessions = Array.from(sesById.values());
-
-        // Merge simple arrays
-        categories = Array.from(new Set([...(categories||[]), ...incomingCategories]));
-        levels = Array.from(new Set([...(levels||[]), ...incomingLevels]));
-        intensities = Array.from(new Set([...(intensities||[]), ...incomingIntensities]));
-        players = Array.from(new Set([...(players||[]), ...incomingPlayers]));
-
-        // Save
-        localStorage.setItem(EX_KEY, JSON.stringify(exercises));
-        localStorage.setItem(SES_KEY, JSON.stringify(sessions));
-        localStorage.setItem(CAT_KEY, JSON.stringify(categories));
-        localStorage.setItem(LVL_KEY, JSON.stringify(levels));
-        localStorage.setItem(INT_KEY, JSON.stringify(intensities));
-        localStorage.setItem(PLR_KEY, JSON.stringify(players));
-        saveMeta();
-
+        const exById = new Map((exercises||[]).map(e=>[e.id,e])); incomingExercises.forEach(e=>{ if(!e.id) e.id = uid(); exById.set(e.id, e); }); exercises = Array.from(exById.values());
+        const sesById = new Map((sessions||[]).map(s=>[s.id,s])); incomingSessions.forEach(s=>{ if(!s.id) s.id = uid(); sesById.set(s.id, s); }); sessions = Array.from(sesById.values());
+        categories = Array.from(new Set([...(categories||[]), ...incomingCategories])); levels = Array.from(new Set([...(levels||[]), ...incomingLevels])); intensities = Array.from(new Set([...(intensities||[]), ...incomingIntensities])); players = Array.from(new Set([...(players||[]), ...incomingPlayers]));
+        localStorage.setItem(EX_KEY, JSON.stringify(exercises)); localStorage.setItem(SES_KEY, JSON.stringify(sessions)); localStorage.setItem(CAT_KEY, JSON.stringify(categories)); localStorage.setItem(LVL_KEY, JSON.stringify(levels)); localStorage.setItem(INT_KEY, JSON.stringify(intensities)); localStorage.setItem(PLR_KEY, JSON.stringify(players)); saveMeta();
         populateCategories(); populateLevels(); populateIntensity(); populatePlayers(); renderList(); renderSessions(); updateBadges(); updateSessionLock(); enforcePermissions();
-
         alert('Restore completed. Data merged.');
-      } catch(err){
-        console.error('Restore error', err);
-        alert('Restore failed: ' + (err.message || err));
-      } finally {
-        ev.target.value = '';
-      }
+      } catch(err){ console.error('Restore error', err); alert('Restore failed: ' + (err.message || err)); } finally { ev.target.value = ''; }
     }
 
     /* BADGES + LOCK */
     function updateBadges(){ if($("badges")) $("badges").innerHTML=""; if(isAdmin()){ let d=document.createElement("div"); d.className="badge"; d.textContent="ADMIN"; $("badges").appendChild(d); $("btn-logout-header").style.display="inline-flex"; } else { $("btn-logout-header").style.display="none"; } if(isPaid()){ let d=document.createElement("div"); d.className="badge"; d.textContent="PAID"; $("badges").appendChild(d); } }
     function updateSessionLock(){ let locked = (!isPaid() && !isAdmin()); if($("save-session")) $("save-session").disabled=locked; if($("add-selected")) $("add-selected").disabled=locked; if($("session-lock-info")) $("session-lock-info").style.display = locked ? "block":"none"; }
 
-    /* ENFORCE PERMISSIONS */
+    /* ENFORCE PERMISSIONS (Backup/Restore and Delete All visible only to admin; paid can per-item delete/edit) */
     function enforcePermissions(){
-      // Delete All for admin OR paid users
-      if(isAdmin() || isPaid()){
-        $("delete-all-btn").style.display='inline-block';
-      } else {
-        $("delete-all-btn").style.display='none';
-      }
+      // Delete All visible only to admin
+      if(isAdmin()){ $("delete-all-btn").style.display='inline-block'; } else { $("delete-all-btn").style.display='none'; }
 
-      // Session builder controls
+      // Session builder controls for paid or admin
       if(isAdmin() || isPaid()){
-        $("save-session").style.display='inline-block';
-        $("clear-session").style.display='inline-block';
+        if($("save-session")) $("save-session").style.display='inline-block';
+        if($("clear-session")) $("clear-session").style.display='inline-block';
         if($("add-selected")) $("add-selected").style.display='inline-block';
-        if($("save-session")) $("save-session").disabled=false;
-        if($("add-selected")) $("add-selected").disabled=false;
-        if($("clear-session")) $("clear-session").disabled=false;
         if($("session-lock-info")) $("session-lock-info").style.display='none';
       } else {
         if($("save-session")) $("save-session").style.display='none';
@@ -676,13 +635,14 @@
         if($("session-lock-info")) $("session-lock-info").style.display='block';
       }
 
-      // Ensure bottom bar visible for everyone
+      // Bottom bar (backup/restore) visible only if admin
       const bb = document.getElementById('lezgo-bottom-bar');
       if(bb){
-        bb.style.display = 'flex';
-        bb.style.zIndex = '99999';
-        bb.removeAttribute('aria-hidden');
-        bb.querySelectorAll('.lezgo-btn').forEach(b => { b.style.display = 'inline-block'; b.style.visibility = 'visible'; b.disabled = false; });
+        if(isAdmin()){
+          bb.style.display = 'flex'; bb.setAttribute('aria-hidden','false');
+        } else {
+          bb.style.display = 'none'; bb.setAttribute('aria-hidden','true');
+        }
       }
 
       renderList();
@@ -695,7 +655,7 @@
     function robustInitWrapper(){ try{ init(); console.log("init() executed."); }catch(err){ console.error("init() failed:", err); } }
     if(document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', robustInitWrapper); } else { robustInitWrapper(); }
 
-    /* SERVICE WORKER registration */
+    /* SERVICE WORKER registration (unchanged) */
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('./service-worker.js')
@@ -704,7 +664,7 @@
       });
     }
 
-    /* Video metadata helpers */
+    /* ========== Video metadata helpers & analyze ========== */
     async function fetchVideoMetadata(link){
       try{
         const yt = extractYouTubeId(link);
