@@ -29,7 +29,7 @@
       --border-soft: rgba(255,255,255,.04);
     }
 
-    /* ---------- LIGHT MODE (soft grey) ---------- */
+    /* LIGHT MODE */
     body.light {
       --bg-top: #caced5;
       --bg-bottom: #bfc3cb;
@@ -45,19 +45,22 @@
 
     .app-bg{
       background: linear-gradient(180deg,var(--bg-top) 0%,var(--bg-bottom) 100%);
-      color:var(--text);min-height:100vh;
+      color:var(--text);min-height:100vh;padding-bottom:40px;
     }
 
     .container{max-width:1100px;margin:14px auto;padding:12px;width:94%}
 
     /* ---------- HEADER / LOGO ---------- */
     header{display:flex;flex-direction:column;align-items:center;gap:12px;margin-bottom:12px;padding-top:8px}
-
-    /* logo responsive + more visible in light mode but not too bright */
-    #logo{width:min(62vw,520px);max-height:26vh;height:auto;display:block;margin:0 auto;object-fit:contain;transition:filter .18s,opacity .18s}
+    #logo{width:min(62vw,520px);max-height:20vh;height:auto;display:block;margin:0 auto;object-fit:contain;transition:filter .18s,opacity .18s}
     body.light #logo{filter:brightness(0.65) saturate(1.1) contrast(1.08);opacity:0.98}
 
-    .controls{display:flex;gap:12px;align-items:center;width:100%;justify-content:space-between;flex-wrap:wrap;padding:0 6px}
+    .controls{
+      display:flex;gap:12px;align-items:center;width:100%;justify-content:flex-end;flex-wrap:wrap;padding:0 6px;
+      max-width:1100px;
+    }
+
+    .controls-left { margin-right:auto; display:flex; gap:8px; align-items:center; }
 
     .badges{display:flex;gap:8px;align-items:center}
     .badge{background:rgba(255,255,255,.04);padding:6px 10px;border-radius:8px;font-weight:700;color:var(--muted)}
@@ -69,27 +72,15 @@
     .btn-ghost{background:transparent;border:1px solid var(--border-soft);color:var(--muted);padding:10px 12px}
     .btn-danger{background:var(--danger);color:#fff}
 
-    /* ---------- THEME TOGGLE (fix icons + sizing) ---------- */
+    /* ---------- THEME TOGGLE ---------- */
     .theme-toggle{
       height:48px; min-width:48px; display:inline-grid;place-items:center;
       border-radius:12px; border:1px solid var(--border-soft); background:transparent; cursor:pointer; padding:6px;
       transition:background .18s, border-color .18s, box-shadow .18s, transform .06s;
     }
-    .theme-toggle:active{transform:translateY(1px)}
     .theme-toggle svg{width:22px;height:22px;display:block}
-
-    /* Dark mode: yellow pill (visible) */
-    body:not(.light) .theme-toggle{
-      background:#facc15!important;border-color:#facc15!important;color:#000!important;box-shadow:0 10px 26px rgba(250,204,21,.16)
-    }
-
-    /* Light mode: white rounded tile with subtle border so icon fits nicely */
-    body.light .theme-toggle{
-      background:#ffffff!important;border-color:rgba(0,0,0,.08)!important;color:#000!important;box-shadow:0 6px 18px rgba(2,6,23,.06)
-    }
-
-    /* center icon color control */
-    .theme-toggle svg path,.theme-toggle svg circle{stroke:currentColor;fill:none}
+    body:not(.light) .theme-toggle{ background:#facc15!important;border-color:#facc15!important;color:#000!important }
+    body.light .theme-toggle{ background:#ffffff!important;border-color:rgba(0,0,0,.08)!important;color:#000!important }
 
     /* ---------- CARD / FORM ---------- */
     .card{background:var(--panel);border-radius:12px;padding:14px;margin-bottom:14px;box-shadow:var(--card-shadow);transition:background .2s,box-shadow .2s}
@@ -112,36 +103,25 @@
     .tag{background:rgba(255,255,255,.03);padding:6px 8px;border-radius:8px;margin-right:8px;font-size:13px;display:inline-block}
     .actions-small{display:flex;flex-direction:column;gap:6px}
 
-    /* ---------- MOBILE ---------- */
+    /* MOBILE ADJUST */
     @media(max-width:520px){
       #logo{width:min(74vw,420px);max-height:18vh}
       .theme-toggle{height:44px;min-width:44px}
+      .controls{justify-content:space-between}
     }
 
     /* Dark select fix */
-    body:not(.light) select, body:not(.light) select option, body:not(.light) select optgroup { color: var(--text) !important; background: var(--panel) !important; }
-    body:not(.light) select::-ms-expand { filter: none; }
-    body:not(.light) select { -webkit-appearance: menulist-button; }
-    body:not(.light) select:focus { outline: 2px solid rgba(255,255,255,0.06); outline-offset: 2px; }
+    body:not(.light) select, body:not(.light) select option { color: var(--text) !important; background: var(--panel) !important; }
 
-    /* --- Sørg for lange links brydes pænt på mobile --- */
-    .exercise a, .exercise div, .exercise span, #list {
-      word-break: break-word;
-      overflow-wrap: anywhere;
-      white-space: normal;
-    }
-    .exercise a {
-      display: block;
-      max-width: 100%;
-      text-decoration: underline;
-    }
-    #list .exercise {
-      overflow: visible;
-      word-wrap: break-word;
-    }
+    /* Text wrap for long links */
+    .exercise a, .exercise div, .exercise span, #list { word-break: break-word; overflow-wrap: anywhere; white-space: normal; }
+    .exercise a { display:block; max-width:100%; text-decoration:underline; color:var(--muted); }
 
-    /* preview image from share target */
+    /* preview image */
     #share-preview img{max-width:140px;border-radius:8px;display:block;margin-top:8px}
+
+    /* small safe helpers */
+    .hidden { display:none !important; }
   </style>
 </head>
 
@@ -153,20 +133,20 @@
       <img id="logo" src="lezgo-logo.svg" alt="LezGo logo">
 
       <div class="controls">
-        <div class="badges" id="badges"></div>
-
-        <div style="display:flex;gap:10px;align-items:center">
+        <div class="controls-left">
           <select id="lang-select" style="padding:8px;border-radius:8px;border:1px solid var(--border-soft);background:transparent;color:var(--text)" aria-label="Language select">
             <option value="en">English</option>
             <option value="da">Dansk</option>
           </select>
+        </div>
 
+        <div style="display:flex;gap:10px;align-items:center">
           <button id="btn-buy" class="btn btn-primary" data-i18n="buyAccess">Buy access</button>
           <button id="btn-admin" class="btn btn-ghost" data-i18n="adminLogin">Admin login</button>
 
-          <!-- Backup buttons (added) -->
-          <button id="btn-export" class="btn btn-ghost" title="Download backup">Download backup</button>
-          <button id="btn-import" class="btn btn-ghost" title="Restore backup">Restore backup</button>
+          <!-- backup buttons (only visible to admin) -->
+          <button id="btn-export" class="btn btn-ghost hidden" title="Download backup">Download backup</button>
+          <button id="btn-import" class="btn btn-ghost hidden" title="Restore backup">Restore backup</button>
           <input id="backup-file" type="file" accept="application/json" style="display:none">
 
           <!-- THEME TOGGLE -->
@@ -238,7 +218,7 @@
             <button id="clear-btn" class="btn btn-ghost" data-i18n="clearBtn">Clear form</button>
           </div>
 
-          <button id="delete-all-btn" class="btn btn-danger" data-i18n="deleteAllBtn">🗑️ Delete all</button>
+          <button id="delete-all-btn" class="btn btn-danger hidden" data-i18n="deleteAllBtn">🗑️ Delete all</button>
         </div>
       </form>
     </section>
@@ -311,7 +291,6 @@
     </div>
   </div>
 
-  <!-- SCRIPT -->
   <script>
     /* CONFIG */
     const ADMIN_PASSWORD = "admin123";
@@ -329,97 +308,30 @@
     const DEFAULT_INT = ["Low","Medium","High"];
     const DEFAULT_PLAYERS = ["1","2","3","4","1-2","1-3","1-4","2-4","Any","Add new..."];
 
-    /* TRANSLATIONS (kept same as previously) */
     const translations = {
-      en: {
-        addEditTitle: "Add / Edit exercise (Padel)",
-        titleLabel: "Title",
-        titlePlaceholder: "e.g. Forehand topspin drill",
-        categoryLabel: "Category",
-        playersLabel: "Players",
-        durationLabel: "Duration (minutes)",
-        levelLabel: "Level",
-        intensityLabel: "Intensity",
-        videoLabel: "Video link (YouTube / Instagram / Facebook)",
-        videoPlaceholder: "https://...",
-        descriptionLabel: "Description",
-        tagsLabel: "Tags (comma separated)",
-        tagsPlaceholder: "e.g. Cross, Chiquita, Vibora",
-        saveBtn: "➕ Save exercise",
-        clearBtn: "Clear form",
-        deleteAllBtn: "🗑️ Delete all",
-        searchPlaceholder: "Search...",
-        filterAll: "ALL",
-        showFavorites: "Show favorites",
-        selectAll: "Select all",
-        addToSession: "Add to session",
-        selectedCountSuffix: " selected",
-        sessionBuilderTitle: "Training Session Builder",
-        sessionNameLabel: "Session name",
-        sessionDescLabel: "Session description",
-        exercisesLabel: "Exercises",
-        totalLabel: "Total:",
-        saveSession: "Save session",
-        clearSession: "Clear",
-        freeInfo: "Free users cannot save or build sessions. Buy access to unlock.",
-        noMatches: "No matches",
-        noSessions: "No sessions saved",
-        buyAccess: "Buy access",
-        adminLogin: "Admin login",
-        cancelBtn: "Cancel",
-        loginBtn: "Login",
-        savedSessionsTitle: "Saved sessions",
-        openBtn: "Open",
-        deleteBtn: "Delete",
-        deleteConfirm: "Delete item?",
-        deleteSessionConfirm: "Delete session?"
-      },
-      da: {
-        addEditTitle: "Tilføj / Rediger øvelse (Padel)",
-        titleLabel: "Titel",
-        titlePlaceholder: "f.eks. Forehand topspin drill",
-        categoryLabel: "Kategori",
-        playersLabel: "Spillere",
-        durationLabel: "Varighed (minutter)",
-        levelLabel: "Niveau",
-        intensityLabel: "Intensitet",
-        videoLabel: "Videolink (YouTube / Instagram / Facebook)",
-        videoPlaceholder: "https://...",
-        descriptionLabel: "Beskrivelse",
-        tagsLabel: "Tags (kommasepareret)",
-        tagsPlaceholder: "f.eks. Cross, Chiquita, Vibora",
-        saveBtn: "➕ Gem øvelse",
-        clearBtn: "Ryd formular",
-        deleteAllBtn: "🗑️ Slet alle",
-        searchPlaceholder: "Søg...",
-        filterAll: "ALLE",
-        showFavorites: "Vis favoritter",
-        selectAll: "Vælg alle",
-        addToSession: "Tilføj til session",
-        selectedCountSuffix: " valgt",
-        sessionBuilderTitle: "Byg træningssession",
-        sessionNameLabel: "Sessionsnavn",
-        sessionDescLabel: "Sessionsbeskrivelse",
-        exercisesLabel: "Øvelser",
-        totalLabel: "Total:",
-        saveSession: "Gem session",
-        clearSession: "Ryd",
-        freeInfo: "Gratis brugere kan ikke gemme eller bygge sessioner. Køb adgang for at låse op.",
-        noMatches: "Ingen resultater",
-        noSessions: "Ingen gemte sessioner",
-        buyAccess: "Køb adgang",
-        adminLogin: "Admin login",
-        cancelBtn: "Annuller",
-        loginBtn: "Login",
-        savedSessionsTitle: "Gemte sessioner",
-        openBtn: "Åbn",
-        deleteBtn: "Slet",
-        deleteConfirm: "Slet vare?",
-        deleteSessionConfirm: "Slet session?"
-      }
+      en: { addEditTitle:"Add / Edit exercise (Padel)", titleLabel:"Title", titlePlaceholder:"e.g. Forehand topspin drill", categoryLabel:"Category",
+        playersLabel:"Players", durationLabel:"Duration (minutes)", levelLabel:"Level", intensityLabel:"Intensity",
+        videoLabel:"Video link (YouTube / Instagram / Facebook)", videoPlaceholder:"https://...", descriptionLabel:"Description",
+        tagsLabel:"Tags (comma separated)", tagsPlaceholder:"e.g. Cross, Chiquita, Vibora", saveBtn:"➕ Save exercise",
+        clearBtn:"Clear form", deleteAllBtn:"🗑️ Delete all", searchPlaceholder:"Search...", filterAll:"ALL", showFavorites:"Show favorites",
+        selectAll:"Select all", addToSession:"Add to session", selectedCountSuffix:" selected", sessionBuilderTitle:"Training Session Builder",
+        sessionNameLabel:"Session name", sessionDescLabel:"Session description", exercisesLabel:"Exercises", totalLabel:"Total:", saveSession:"Save session",
+        clearSession:"Clear", freeInfo:"Free users cannot save or build sessions. Buy access to unlock.", noMatches:"No matches", noSessions:"No sessions saved",
+        buyAccess:"Buy access", adminLogin:"Admin login", cancelBtn:"Cancel", loginBtn:"Login", savedSessionsTitle:"Saved sessions", openBtn:"Open", deleteBtn:"Delete",
+        deleteConfirm:"Delete item?", deleteSessionConfirm:"Delete session?" },
+      da: { addEditTitle:"Tilføj / Rediger øvelse (Padel)", titleLabel:"Titel", titlePlaceholder:"f.eks. Forehand topspin drill", categoryLabel:"Kategori",
+        playersLabel:"Spillere", durationLabel:"Varighed (minutter)", levelLabel:"Niveau", intensityLabel:"Intensitet",
+        videoLabel:"Videolink (YouTube / Instagram / Facebook)", videoPlaceholder:"https://...", descriptionLabel:"Beskrivelse",
+        tagsLabel:"Tags (kommasepareret)", tagsPlaceholder:"f.eks. Cross, Chiquita, Vibora", saveBtn:"➕ Gem øvelse",
+        clearBtn:"Ryd formular", deleteAllBtn:"🗑️ Slet alle", searchPlaceholder:"Søg...", filterAll:"ALLE", showFavorites:"Vis favoritter",
+        selectAll:"Vælg alle", addToSession:"Tilføj til session", selectedCountSuffix:" valgt", sessionBuilderTitle:"Byg træningssession",
+        sessionNameLabel:"Sessionsnavn", sessionDescLabel:"Sessionsbeskrivelse", exercisesLabel:"Øvelser", totalLabel:"Total:", saveSession:"Gem session",
+        clearSession:"Ryd", freeInfo:"Gratis brugere kan ikke gemme eller bygge sessioner. Køb adgang for at låse op.", noMatches:"Ingen resultater", noSessions:"Ingen gemte sessioner",
+        buyAccess:"Køb adgang", adminLogin:"Admin login", cancelBtn:"Annuller", loginBtn:"Login", savedSessionsTitle:"Gemte sessioner", openBtn:"Åbn", deleteBtn:"Slet",
+        deleteConfirm:"Slet vare?", deleteSessionConfirm:"Slet session?" }
     };
 
-    /* STATE and helpers (kept same) */
+    /* STATE */
     let exercises = [];
     let categories = [];
     let levels = [];
@@ -435,41 +347,18 @@
     const isAdmin = () => localStorage.getItem("is_admin") === "1";
     const isPaid  = () => localStorage.getItem("is_paid") === "1";
 
-    /* THEME, storage, i18n, populate, render, session builder etc.
-       (All original functions kept exactly as in prior working file.)
-       For brevity in this message I will reuse the same functions previously supplied.
-       They are included below verbatim to ensure the file is complete and self-contained.
-    */
-
     /* THEME */
     function applyTheme(theme){
-      if(theme === 'light'){
-        document.body.classList.add('light');
-        document.querySelector('#meta-theme-color').setAttribute('content','#eceff1');
-        setThemeIcon('light');
-      } else {
-        document.body.classList.remove('light');
-        document.querySelector('#meta-theme-color').setAttribute('content','#0f1720');
-        setThemeIcon('dark');
-      }
+      if(theme === 'light'){ document.body.classList.add('light'); document.querySelector('#meta-theme-color').setAttribute('content','#eceff1'); setThemeIcon('light'); }
+      else { document.body.classList.remove('light'); document.querySelector('#meta-theme-color').setAttribute('content','#0f1720'); setThemeIcon('dark'); }
       localStorage.setItem(THEME_KEY, theme);
     }
-    function toggleTheme(){
-      const current = localStorage.getItem(THEME_KEY) || 'dark';
-      const next = current === 'dark' ? 'light' : 'dark';
-      applyTheme(next);
-    }
-    function setThemeIcon(mode){
-      const svg = document.getElementById('theme-icon');
-      if(!svg) return;
-      if(mode === 'light'){
-        svg.innerHTML = '<path d="M12 3v2M12 19v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1 12h2M21 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4M12 7a5 5 0 100 10 5 5 0 000-10z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>';
-      } else {
-        svg.innerHTML = '<path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>';
-      }
+    function toggleTheme(){ const current = localStorage.getItem(THEME_KEY) || 'dark'; const next = current === 'dark' ? 'light' : 'dark'; applyTheme(next); }
+    function setThemeIcon(mode){ const svg = document.getElementById('theme-icon'); if(!svg) return; if(mode==='light'){ svg.innerHTML = '<path d="M12 3v2M12 19v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1 12h2M21 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4M12 7a5 5 0 100 10 5 5 0 000-10z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>'; }
+      else { svg.innerHTML = '<path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>'; }
     }
 
-    /* STORAGE LOAD */
+    /* STORAGE */
     function loadAll(){
       exercises   = JSON.parse(localStorage.getItem(EX_KEY) || "[]");
       categories  = JSON.parse(localStorage.getItem(CAT_KEY) || "null") || DEFAULT_CATEGORIES;
@@ -486,54 +375,26 @@
       localStorage.setItem(PLR_KEY, JSON.stringify(players));
     }
 
-    /* I18N HELPERS */
-    function t(key){
-      const lang = localStorage.getItem(LANG_KEY) || 'en';
-      return (translations[lang] && translations[lang][key]) || (translations.en[key] || '');
-    }
+    /* I18N */
+    function t(key){ const lang = localStorage.getItem(LANG_KEY) || 'en'; return (translations[lang] && translations[lang][key]) || (translations.en[key] || ''); }
     function applyTranslationsToDOM(){
-      document.querySelectorAll('[data-i18n]').forEach(el=>{
-        const k = el.getAttribute('data-i18n');
-        if(k) el.textContent = t(k);
-      });
-      document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{
-        const k = el.getAttribute('data-i18n-placeholder');
-        if(k) el.placeholder = t(k);
-      });
+      document.querySelectorAll('[data-i18n]').forEach(el=>{ const k = el.getAttribute('data-i18n'); if(k) el.textContent = t(k); });
+      document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{ const k = el.getAttribute('data-i18n-placeholder'); if(k) el.placeholder = t(k); });
       const fc = $("filter-category"); if(fc && fc.options.length>0) fc.options[0].text = t('filterAll');
       const fl = $("filter-level"); if(fl && fl.options.length>0) fl.options[0].text = t('filterAll');
-      updateSelectedCount();
-      renderList();
-      renderSessions();
-      updateBadges();
+      updateSelectedCount(); renderList(); renderSessions(); updateBadges(); toggleAdminUI();
     }
 
-    /* POPULATE UI */
-    function populateCategories(){
-      const sel = $("category"); const fil = $("filter-category");
-      sel.innerHTML=""; fil.innerHTML="";
-      let optAll = document.createElement("option"); optAll.textContent = t('filterAll'); optAll.value = ""; fil.appendChild(optAll);
-      categories.forEach(c=>{
-        let o=document.createElement("option"); o.value=c; o.textContent=c; sel.appendChild(o);
-        let f=document.createElement("option"); f.value=c; f.textContent=c; fil.appendChild(f);
-      });
-      let add=document.createElement("option"); add.value="__ADD__"; add.textContent = (localStorage.getItem(LANG_KEY) === 'da') ? "Tilføj ny kategori..." : "Add new category..."; sel.appendChild(add);
-    }
-    function populateLevels(){
-      const sel = $("level"); const fil = $("filter-level");
-      sel.innerHTML=""; fil.innerHTML="";
-      let optAll = document.createElement("option"); optAll.textContent = t('filterAll'); optAll.value = ""; fil.appendChild(optAll);
-      levels.forEach(c=>{ let o=document.createElement("option"); o.value=c; o.textContent=c; sel.appendChild(o); let f=document.createElement("option"); f.value=c; f.textContent=c; fil.appendChild(f); });
-      let add=document.createElement("option"); add.value="__ADD__"; add.textContent = (localStorage.getItem(LANG_KEY) === 'da') ? "Tilføj nyt niveau..." : "Add new level..."; sel.appendChild(add);
-    }
-    function populateIntensity(){ const sel=$("intensity"); sel.innerHTML=""; intensities.forEach(c=>{ let o=document.createElement("option"); o.value=c; o.textContent=c; sel.appendChild(o); }); let add=document.createElement("option"); add.value="__ADD__"; add.textContent = (localStorage.getItem(LANG_KEY) === 'da') ? "Tilføj ny intensitet..." : "Add new intensity..."; sel.appendChild(add); }
+    /* UI populate */
+    function populateCategories(){ const sel=$("category"), fil=$("filter-category"); sel.innerHTML=""; fil.innerHTML=""; let optAll=document.createElement("option"); optAll.textContent=t('filterAll'); optAll.value=""; fil.appendChild(optAll); categories.forEach(c=>{ let o=document.createElement("option"); o.value=c; o.textContent=c; sel.appendChild(o); let f=document.createElement("option"); f.value=c; f.textContent=c; fil.appendChild(f); }); let add=document.createElement("option"); add.value="__ADD__"; add.textContent=(localStorage.getItem(LANG_KEY)==='da')?"Tilføj ny kategori...":"Add new category..."; sel.appendChild(add); }
+    function populateLevels(){ const sel=$("level"), fil=$("filter-level"); sel.innerHTML=""; fil.innerHTML=""; let optAll=document.createElement("option"); optAll.textContent=t('filterAll'); optAll.value=""; fil.appendChild(optAll); levels.forEach(c=>{ let o=document.createElement("option"); o.value=c; o.textContent=c; sel.appendChild(o); let f=document.createElement("option"); f.value=c; f.textContent=c; fil.appendChild(f); }); let add=document.createElement("option"); add.value="__ADD__"; add.textContent=(localStorage.getItem(LANG_KEY)==='da')?"Tilføj nyt niveau...":"Add new level..."; sel.appendChild(add); }
+    function populateIntensity(){ const sel=$("intensity"); sel.innerHTML=""; intensities.forEach(c=>{ let o=document.createElement("option"); o.value=c; o.textContent=c; sel.appendChild(o); }); let add=document.createElement("option"); add.value="__ADD__"; add.textContent=(localStorage.getItem(LANG_KEY)==='da')?"Tilføj ny intensitet...":"Add new intensity..."; sel.appendChild(add); }
     function populatePlayers(){ const sel=$("players"); sel.innerHTML=""; players.forEach(c=>{ let o=document.createElement("option"); o.value=c; o.textContent=c; sel.appendChild(o); }); }
 
     /* INIT */
     function init(){
       const savedTheme = localStorage.getItem(THEME_KEY) || 'dark';
       applyTheme(savedTheme);
-
       const savedLang = localStorage.getItem(LANG_KEY) || 'en';
       $("lang-select").value = savedLang;
 
@@ -555,9 +416,9 @@
       $("theme-toggle").addEventListener("click", toggleTheme);
       $("btn-admin").addEventListener("click", ()=> $("admin-modal").style.display="flex");
       $("admin-cancel").addEventListener("click", ()=> $("admin-modal").style.display="none");
-      $("admin-submit").addEventListener("click", ()=>{ if($("admin-password").value===ADMIN_PASSWORD){ localStorage.setItem("is_admin","1"); $("admin-modal").style.display="none"; updateBadges(); updateSessionLock(); alert('Admin enabled'); } else alert("Wrong password"); });
+      $("admin-submit").addEventListener("click", ()=>{ if($("admin-password").value===ADMIN_PASSWORD){ localStorage.setItem("is_admin","1"); $("admin-modal").style.display="none"; updateBadges(); toggleAdminUI(); updateSessionLock(); alert('Admin enabled'); } else alert("Wrong password"); });
 
-      $("btn-buy").addEventListener("click", ()=>{ if(isPaid()){ if(confirm(localStorage.getItem(LANG_KEY)==='da'?"Deaktiver betalt adgang?":"Disable paid access?")){ localStorage.removeItem("is_paid"); updateBadges(); updateSessionLock(); } } else { if(confirm(localStorage.getItem(LANG_KEY)==='da'?"Simuler køb?":"Simulate purchase?")){ localStorage.setItem("is_paid","1"); updateBadges(); updateSessionLock(); } } });
+      $("btn-buy").addEventListener("click", ()=>{ if(isPaid()){ if(confirm(localStorage.getItem(LANG_KEY)==='da'?"Deaktiver betalt adgang?":"Disable paid access?")){ localStorage.removeItem("is_paid"); updateBadges(); updateSessionLock(); toggleAdminUI(); } } else { if(confirm(localStorage.getItem(LANG_KEY)==='da'?"Simuler køb?":"Simulate purchase?")){ localStorage.setItem("is_paid","1"); updateBadges(); updateSessionLock(); toggleAdminUI(); } } });
 
       $("category").addEventListener("change", e=>{ if(e.target.value==="__ADD__"){ let n=prompt(localStorage.getItem(LANG_KEY)==='da'?"Ny kategori:":"New category:"); if(n){ categories.push(n.trim()); saveBase(); populateCategories(); } }});
       $("level").addEventListener("change", e=>{ if(e.target.value==="__ADD__"){ let n=prompt(localStorage.getItem(LANG_KEY)==='da'?"Nyt niveau:":"New level:"); if(n){ levels.push(n.trim()); saveBase(); populateLevels(); } }});
@@ -566,7 +427,7 @@
 
       $("save-btn").addEventListener("click", onSave);
       $("clear-btn").addEventListener("click", clearForm);
-      $("delete-all-btn").addEventListener("click", ()=>{ if(confirm(localStorage.getItem(LANG_KEY)==='da'?"Slet ALLE øvelser?":"Delete ALL exercises?")){ exercises=[]; localStorage.setItem(EX_KEY,"[]"); renderList(); }});
+      $("delete-all-btn").addEventListener("click", ()=>{ if(!isAdmin()) return; if(confirm(localStorage.getItem(LANG_KEY)==='da'?"Slet ALLE øvelser?":"Delete ALL exercises?")){ exercises=[]; localStorage.setItem(EX_KEY,"[]"); renderList(); }});
 
       $("search").addEventListener("input", renderList);
       $("filter-category").addEventListener("change", renderList);
@@ -579,43 +440,12 @@
       $("save-session").addEventListener("click", saveSession);
       $("clear-session").addEventListener("click", clearSessionBuilder);
 
-      $("lang-select").addEventListener("change", (e)=>{
-        const lang = e.target.value || 'en';
-        localStorage.setItem(LANG_KEY, lang);
-        applyTranslationsToDOM();
-        populateCategories(); populateLevels(); populateIntensity(); populatePlayers();
-      });
+      $("lang-select").addEventListener("change", (e)=>{ const lang = e.target.value || 'en'; localStorage.setItem(LANG_KEY, lang); applyTranslationsToDOM(); populateCategories(); populateLevels(); populateIntensity(); populatePlayers(); });
 
-      /* Analyze button behaviour */
-      $("analyze-btn").addEventListener('click', async (ev)=>{
-        ev.preventDefault();
-        const link = $("link").value.trim();
-        if(!link){ alert(localStorage.getItem(LANG_KEY)==='da' ? "Indsæt et videolink først" : "Please paste a video link first"); return; }
-        const btn = ev.currentTarget; const prev = btn.textContent; btn.textContent = localStorage.getItem(LANG_KEY)==='da' ? "Analyserer…" : "Analysing…"; btn.disabled = true;
-        try{
-          const meta = await fetchVideoMetadata(link);
-          if(meta){
-            if(meta.title) $("title").value = meta.title;
-            if(meta.description) $("description").value = meta.description;
-            const suggestions = analyzeTextToFields(meta.title || "", meta.description || "", localStorage.getItem(LANG_KEY) || 'en');
-            if(!$("category").value || $("category").value === "") {
-              if(suggestions.category) {
-                if(!categories.includes(suggestions.category)) { categories.push(suggestions.category); saveBase(); populateCategories(); }
-                $("category").value = suggestions.category;
-              }
-            }
-            if(!$("players").value || $("players").value==="") $("players").value = suggestions.players || $("players").options[0].value;
-            if(!$("level").value || $("level").value==="") $("level").value = suggestions.level || $("level").options[0].value;
-            if(!$("intensity").value || $("intensity").value==="") $("intensity").value = suggestions.intensity || $("intensity").options[0].value;
-            if(!$("tags").value || $("tags").value==="") $("tags").value = suggestions.tags || "";
-          } else {
-            alert(localStorage.getItem(LANG_KEY)==='da' ? "Kunne ikke hente metadata for videoen. Prøv med et YouTube-link eller tjek CORS." : "Could not fetch video metadata. Try a YouTube link or check CORS.");
-          }
-        }catch(err){ console.error("Analyze error:", err); alert(localStorage.getItem(LANG_KEY)==='da' ? "Fejl under analyse" : "Error during analysis"); }
-        finally{ btn.textContent = prev; btn.disabled = false; }
-      });
+      /* Analyze */
+      $("analyze-btn").addEventListener('click', async (ev)=>{ ev.preventDefault(); const link = $("link").value.trim(); if(!link){ alert(localStorage.getItem(LANG_KEY)==='da' ? "Indsæt et videolink først" : "Please paste a video link first"); return; } const btn = ev.currentTarget; const prev = btn.textContent; btn.textContent = localStorage.getItem(LANG_KEY)==='da' ? "Analyserer…" : "Analysing…"; btn.disabled = true; try{ const meta = await fetchVideoMetadata(link); if(meta){ if(meta.title) $("title").value = meta.title; if(meta.description) $("description").value = meta.description; const suggestions = analyzeTextToFields(meta.title || "", meta.description || "", localStorage.getItem(LANG_KEY) || 'en'); if(!$("category").value || $("category").value === "") { if(suggestions.category) { if(!categories.includes(suggestions.category)) { categories.push(suggestions.category); saveBase(); populateCategories(); } $("category").value = suggestions.category; } } if(!$("players").value || $("players").value==="") $("players").value = suggestions.players || $("players").options[0].value; if(!$("level").value || $("level").value==="") $("level").value = suggestions.level || $("level").options[0].value; if(!$("intensity").value || $("intensity").value==="") $("intensity").value = suggestions.intensity || $("intensity").options[0].value; if(!$("tags").value || $("tags").value==="") $("tags").value = suggestions.tags || ""; } else { alert(localStorage.getItem(LANG_KEY)==='da' ? "Kunne ikke hente metadata for videoen." : "Could not fetch video metadata."); } }catch(err){ console.error("Analyze error:", err); alert(localStorage.getItem(LANG_KEY)==='da' ? "Fejl under analyse" : "Error during analysis"); } finally{ btn.textContent = prev; btn.disabled = false; } });
 
-      /* Backup UI bindings */
+      /* Backup (admin only) */
       $("btn-export").addEventListener('click', exportData);
       $("btn-import").addEventListener('click', ()=> $("backup-file").click());
       $("backup-file").addEventListener('change', (e)=>{ if(e.target.files && e.target.files[0]) importDataFile(e.target.files[0]); });
@@ -624,6 +454,7 @@
     /* SAVE EXERCISE */
     function onSave(){
       let title = $("title").value.trim(); if(!title){ alert(localStorage.getItem(LANG_KEY)==='da'?"Indtast titel":"Enter title"); return; }
+      // anyone can add/modify an exercise (but deletion restricted)
       let ex = { id: editingId || uid(), title, category: $("category").value, players: $("players").value, duration: Number($("duration").value||0), level: $("level").value, intensity: $("intensity").value, link: $("link").value.trim(), description: $("description").value.trim(), tags: normalizeTags($("tags").value.trim()), favorite:false };
       if(editingId){ let idx = exercises.findIndex(x=>x.id===editingId); if(idx>-1) exercises[idx]=ex; } else exercises.unshift(ex);
       localStorage.setItem(EX_KEY, JSON.stringify(exercises));
@@ -632,7 +463,7 @@
     function normalizeTags(str){ if(!str) return ""; return str.split(",").map(t=>t.replace(/^#+/,"").trim()).filter(Boolean).join(", "); }
     function clearForm(){ editingId=null; $("title").value=""; $("category").selectedIndex=0; $("players").selectedIndex=0; $("duration").value=""; $("level").selectedIndex=0; $("intensity").selectedIndex=0; $("link").value=""; $("description").value=""; $("tags").value=""; $("save-btn").textContent=t('saveBtn'); }
 
-    /* RENDER LIST */
+    /* RENDER LIST - deletion buttons only for Admin */
     function renderList(){
       let q = $("search").value.trim().toLowerCase();
       let fc = $("filter-category").value; let fl = $("filter-level").value;
@@ -649,13 +480,21 @@
         let left=document.createElement("div"); left.style.flex="1";
         let ttitle=document.createElement("div"); ttitle.style.fontWeight="800"; ttitle.style.fontSize="15px"; ttitle.textContent=ex.title; left.appendChild(ttitle);
         let meta=document.createElement("div"); meta.style.color="var(--muted)"; meta.style.marginTop="6px"; meta.textContent = `${ex.category} • ${ex.level} • ${ex.players} • ${ex.duration}m`; left.appendChild(meta);
-        if(ex.link){ let a=document.createElement("a"); a.href=ex.link; a.target="_blank"; a.textContent=ex.link; a.style.color="var(--muted)"; a.style.display="block"; a.style.marginTop="6px"; left.appendChild(a); }
+        if(ex.link){ let a=document.createElement("a"); a.href=ex.link; a.target="_blank"; a.rel="noopener"; a.textContent=ex.link; a.style.display="block"; a.style.marginTop="6px"; left.appendChild(a); }
         if(ex.tags){ let tags=document.createElement("div"); tags.style.marginTop="8px"; ex.tags.split(",").forEach(tg=>{ let s=document.createElement("span"); s.className="tag"; s.textContent=tg.trim(); tags.appendChild(s); }); left.appendChild(tags); }
         row.appendChild(left);
         let right=document.createElement("div"); right.className="actions-small";
+
         let edit=document.createElement("button"); edit.className="btn btn-ghost"; edit.textContent=(localStorage.getItem(LANG_KEY)==='da'?"Rediger":"Edit"); edit.addEventListener("click", ()=>editItem(ex.id));
-        let del=document.createElement("button"); del.className="btn btn-ghost"; del.style.color="var(--danger)"; del.textContent=(localStorage.getItem(LANG_KEY)==='da'?"Slet":"Delete"); del.addEventListener("click", ()=>{ if(confirm(t('deleteConfirm'))){ exercises = exercises.filter(x=>x.id!==ex.id); localStorage.setItem(EX_KEY, JSON.stringify(exercises)); renderList(); }});
-        right.appendChild(edit); right.appendChild(del);
+        right.appendChild(edit);
+
+        // delete only if admin
+        if(isAdmin()){
+          let del=document.createElement("button"); del.className="btn btn-ghost"; del.style.color="var(--danger)"; del.textContent=(localStorage.getItem(LANG_KEY)==='da'?"Slet":"Delete");
+          del.addEventListener("click", ()=>{ if(confirm(t('deleteConfirm'))){ exercises = exercises.filter(x=>x.id!==ex.id); localStorage.setItem(EX_KEY, JSON.stringify(exercises)); renderList(); }});
+          right.appendChild(del);
+        }
+
         row.appendChild(right);
         list.appendChild(row);
       });
@@ -664,16 +503,14 @@
 
     function editItem(id){ let ex = exercises.find(x=>x.id===id); if(!ex) return; editingId=id; $("title").value=ex.title; $("category").value=ex.category; $("players").value=ex.players; $("duration").value=ex.duration; $("level").value=ex.level; $("intensity").value=ex.intensity; $("link").value=ex.link; $("description").value=ex.description; $("tags").value=ex.tags; $("save-btn").textContent = t('saveBtn'); window.scrollTo({top:0,behavior:"smooth"}); }
 
-    /* SESSION BUILDER (kept) */
+    /* SESSION BUILDER */
     function updateSelectedSet(){ selectedIds.clear(); document.querySelectorAll(".select-item").forEach(cb=>{ if(cb.checked) selectedIds.add(cb.closest(".exercise").dataset.id); }); updateSelectedCount(); }
     function updateSelectedCount(){ const suffix = t('selectedCountSuffix') || ' selected'; $("selected-count").textContent = (selectedIds.size || 0) + suffix; }
 
     function addSelectedToSession(){
       if(!isPaid() && !isAdmin()){ alert(localStorage.getItem(LANG_KEY)==='da'?"Betalt adgang kræves.":"Paid access required."); return; }
       let box=$("session-items");
-      selectedIds.forEach(id=>{
-        if(box.querySelector(`[data-id="${id}"]`)) return;
-        let ex=exercises.find(x=>x.id===id); if(!ex) return;
+      selectedIds.forEach(id=>{ if(box.querySelector(`[data-id="${id}"]`)) return; let ex=exercises.find(x=>x.id===id); if(!ex) return;
         let row=document.createElement("div"); row.className="exercise"; row.dataset.id=id;
         row.innerHTML=`<div style="flex:1"><div style="font-weight:700">${ex.title}</div><div style="color:var(--muted)">${ex.duration}m • ${ex.category}</div></div><button class="btn btn-ghost remove-from-session" style="color:var(--danger)">${localStorage.getItem(LANG_KEY)==='da'?"Fjern":"Remove"}</button>`;
         row.querySelector("button").addEventListener("click", ()=>{ row.remove(); recalcSession(); });
@@ -684,20 +521,25 @@
     function recalcSession(){ let total=0,count=0; document.querySelectorAll("#session-items .exercise").forEach(row=>{ let ex=exercises.find(x=>x.id===row.dataset.id); if(ex){ total+=Number(ex.duration||0); count++; }}); $("session-total").textContent=total+" m"; $("session-count").textContent=count+" exercises"; }
     function clearSessionBuilder(){ $("session-items").innerHTML=""; $("session-name").value=""; $("session-desc").value=""; recalcSession(); }
     function saveSession(){ if(!isPaid() && !isAdmin()){ alert(localStorage.getItem(LANG_KEY)==='da'?"Betalt adgang kræves.":"Paid access required."); return; } let name=$("session-name").value.trim(); if(!name){ alert(localStorage.getItem(LANG_KEY)==='da'?"Tilføj et sessionsnavn":"Add a session name"); return; } let ids=[]; document.querySelectorAll("#session-items .exercise").forEach(r=>ids.push(r.dataset.id)); let total = ids.reduce((a,id)=>{ let ex=exercises.find(x=>x.id===id); return a+(ex?Number(ex.duration||0):0); },0); let ses={id:uid(),name,description:$("session-desc").value,items:ids,total}; sessions.unshift(ses); localStorage.setItem(SES_KEY, JSON.stringify(sessions)); renderSessions(); clearSessionBuilder(); }
-    function renderSessions(){ let box=$("sessions-list"); box.innerHTML=""; if(sessions.length===0){ box.innerHTML = `<div style="color:var(--muted)">${t('noSessions')}</div>`; return; } sessions.forEach(s=>{ let div=document.createElement("div"); div.className="exercise"; div.innerHTML=`<div style="flex:1"><div style="font-weight:800">${s.name}</div><div style="color:var(--muted)">${s.items.length} exercises • ${s.total} m</div></div><button class="btn btn-ghost open-session">${t('openBtn')}</button><button class="btn btn-ghost delete-session" style="color:var(--danger)">${t('deleteBtn')}</button>`; let btns=div.querySelectorAll("button"); btns[0].addEventListener("click", ()=>alert(localStorage.getItem(LANG_KEY)==='da'?"Kommer snart: detaljeret visning":"Coming soon: detailed view")); btns[1].addEventListener("click", ()=>{ if(confirm(t('deleteSessionConfirm'))){ sessions = sessions.filter(x=>x.id!==s.id); localStorage.setItem(SES_KEY, JSON.stringify(sessions)); renderSessions(); } }); box.appendChild(div); }); }
+    function renderSessions(){ let box=$("sessions-list"); box.innerHTML=""; if(sessions.length===0){ box.innerHTML = `<div style="color:var(--muted)">${t('noSessions')}</div>`; return; } sessions.forEach(s=>{ let div=document.createElement("div"); div.className="exercise"; div.innerHTML=`<div style="flex:1"><div style="font-weight:800">${s.name}</div><div style="color:var(--muted)">${s.items.length} exercises • ${s.total} m</div></div><button class="btn btn-ghost open-session">${t('openBtn')}</button>`; let btns=div.querySelectorAll("button"); btns[0].addEventListener("click", ()=>alert(localStorage.getItem(LANG_KEY)==='da'?"Kommer snart: detaljeret visning":"Coming soon: detailed view")); // delete session only for admin
+        if(isAdmin()){ let del=document.createElement("button"); del.className="btn btn-ghost delete-session"; del.style.color="var(--danger)"; del.textContent=t('deleteBtn'); del.addEventListener("click", ()=>{ if(confirm(t('deleteSessionConfirm'))){ sessions = sessions.filter(x=>x.id!==s.id); localStorage.setItem(SES_KEY, JSON.stringify(sessions)); renderSessions(); } }); div.appendChild(del); }
+        box.appendChild(div);
+      }); }
 
-    /* BADGES + LOCK */
+    /* BADGES + UI toggles */
     function updateBadges(){ $("badges").innerHTML=""; if(isAdmin()){ let d=document.createElement("div"); d.className="badge"; d.textContent="ADMIN"; $("badges").appendChild(d); } if(isPaid()){ let d=document.createElement("div"); d.className="badge"; d.textContent="PAID"; $("badges").appendChild(d); } }
-    function updateSessionLock(){ let locked = (!isPaid() && !isAdmin()); $("save-session").disabled=locked; $("add-selected").disabled=locked; $("session-lock-info").style.display = locked ? "block":"none"; }
-
-    /* REGISTER SERVICE WORKER */
-    if("serviceWorker" in navigator){
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register("./service-worker.js").catch(err=>console.warn("SW failed:",err));
-      });
+    function toggleAdminUI(){
+      // show/hide backup controls only for admin
+      if(isAdmin()){
+        $("btn-export").classList.remove('hidden'); $("btn-import").classList.remove('hidden'); $("delete-all-btn").classList.remove('hidden');
+      } else {
+        $("btn-export").classList.add('hidden'); $("btn-import").classList.add('hidden'); $("delete-all-btn").classList.add('hidden');
+      }
+      renderList(); renderSessions(); updateSessionLock();
     }
+    function updateSessionLock(){ let locked = (!isPaid() && !isAdmin()); $("save-session").disabled = locked; $("add-selected").disabled = locked; $("session-lock-info").style.display = locked ? "block":"none"; }
 
-    /* ========== Video metadata helpers (same) ========== */
+    /* VIDEO METADATA helpers */
     async function fetchVideoMetadata(link){
       try{
         const yt = extractYouTubeId(link);
@@ -721,7 +563,7 @@
       const suggestions = {};
       const categoryMap = { "Bandeja":["bandeja"], "Chiquita":["chiquita"], "Vibora":["vibora"], "Serve":["serve"], "Smash":["smash"], "Lob":["lob"], "Defense":["defend","defense"], "Volley":["volley"], "Groundstroke":["forehand","backhand"], "Double wall":["double wall"] };
       for(const [cat, keys] of Object.entries(categoryMap)){ for(const k of keys) if(text.includes(k)){ suggestions.category = cat; break; } if(suggestions.category) break; }
-      if(text.match(/\bbeginner|beginners|begynder|nybegynder\b/)) suggestions.level = localize("Beginner", lang);
+      if(text.match(/\bbeginner|begynder\b/)) suggestions.level = localize("Beginner", lang);
       else if(text.match(/\bintermediate|mellem|øvet\b/)) suggestions.level = localize("Intermediate", lang);
       else if(text.match(/\badvanced|avanceret|pro\b/)) suggestions.level = localize("Advanced", lang);
       const playersMatch = text.match(/\b(1|2|3|4|1\-2|1\-3|1\-4|2\-4)\b/);
@@ -740,92 +582,10 @@
     function capitalize(s){ if(!s) return s; return s.charAt(0).toUpperCase() + s.slice(1); }
     function localize(key, lang){ if(!lang) lang='en'; const map = { en: {"Beginner":"Beginner","Intermediate":"Intermediate","Advanced":"Advanced","Low":"Low","Medium":"Medium","High":"High"}, da: {"Beginner":"Beginner","Intermediate":"Intermediate","Advanced":"Advanced","Low":"Low","Medium":"Medium","High":"High"} }; return (map[lang] && map[lang][key]) || key; }
 
-    /* ========== Share Target receiver (robust) ========== */
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.addEventListener('message', ev => {
-        try {
-          const msg = ev.data;
-          if (!msg || msg.type !== 'share-target') return;
-          const payload = msg.payload || {};
-          console.log('Received shared payload:', payload);
-
-          let sharedUrl = payload.url || "";
-
-          if (!sharedUrl && payload.text) {
-            const urlMatch = payload.text.match(/https?:\/\/[^\s"']+/i);
-            if (urlMatch) sharedUrl = urlMatch[0];
-          }
-          if (!sharedUrl && payload.title) {
-            const urlMatch2 = payload.title.match(/https?:\/\/[^\s"']+/i);
-            if (urlMatch2) sharedUrl = urlMatch2[0];
-          }
-
-          if (sharedUrl && document.getElementById('link')) {
-            document.getElementById('link').value = sharedUrl;
-          }
-
-          if (payload.title && document.getElementById('title')) {
-            document.getElementById('title').value = payload.title;
-          }
-          if (payload.text && document.getElementById('description')) {
-            document.getElementById('description').value = payload.text;
-          }
-
-          if (Array.isArray(payload.files) && payload.files.length > 0) {
-            const f = payload.files[0];
-            try {
-              let preview = document.getElementById('share-preview');
-              if (!preview) {
-                preview = document.createElement('div');
-                preview.id = 'share-preview';
-                document.querySelector('form')?.appendChild(preview);
-              }
-              preview.innerHTML = '';
-              const img = document.createElement('img');
-              img.src = f.data;
-              img.alt = f.name || 'shared';
-              preview.appendChild(img);
-              let hidden = document.getElementById('shared-file-data');
-              if(!hidden){
-                hidden = document.createElement('input');
-                hidden.type = 'hidden';
-                hidden.id = 'shared-file-data';
-                document.querySelector('form')?.appendChild(hidden);
-              }
-              hidden.value = f.data;
-            } catch(e){ console.warn('preview error', e); }
-          }
-
-          try {
-            const note = document.createElement('div');
-            note.textContent = (localStorage.getItem('lezgo_lang') === 'da') ? 'Indhold indsat fra Deling' : 'Content populated from Share';
-            note.style.color = 'var(--muted)';
-            note.style.marginTop = '6px';
-            document.querySelector('form')?.insertBefore(note, document.querySelector('form').firstChild);
-            setTimeout(()=>note.remove(), 5000);
-          } catch(e){}
-        } catch(err){
-          console.error('Error handling SW message', err);
-        }
-      });
-    }
-
-    (function checkSharedFlag(){
-      try{
-        const p = new URLSearchParams(window.location.search);
-        if(p.get('shared') === '1'){
-          const url = new URL(window.location.href);
-          url.searchParams.delete('shared');
-          history.replaceState({}, '', url.toString());
-          const t = document.getElementById('title');
-          if(t){ t.focus(); }
-        }
-      }catch(e){}
-    })();
-
-    /* ========== Backup: export & import ========== */
+    /* BACKUP - admin only (export/import) */
     function exportData(){
       try{
+        if(!isAdmin()){ alert('Only admin can export backups'); return; }
         const payload = {
           exercises: JSON.parse(localStorage.getItem(EX_KEY) || "[]"),
           sessions: JSON.parse(localStorage.getItem(SES_KEY) || "[]"),
@@ -841,13 +601,11 @@
         a.download = `lezgo-backup-${new Date().toISOString().slice(0,10)}.json`;
         document.body.appendChild(a); a.click(); a.remove();
         URL.revokeObjectURL(url);
-      }catch(err){
-        console.error('Export failed', err);
-        alert('Export failed: ' + (err.message||err));
-      }
+      }catch(err){ console.error('Export failed', err); alert('Export failed: ' + (err.message||err)); }
     }
 
     function importDataFile(file){
+      if(!isAdmin()){ alert('Only admin can import backups'); return; }
       const reader = new FileReader();
       reader.onload = (e) => {
         try{
@@ -861,16 +619,16 @@
           if (data.players) localStorage.setItem(PLR_KEY, JSON.stringify(data.players));
           alert('Data imported — genindlæser app...');
           location.reload();
-        } catch(err){
-          alert('Fejl ved import: ugyldigt JSON');
-          console.error(err);
-        }
+        } catch(err){ alert('Fejl ved import: ugyldigt JSON'); console.error(err); }
       };
       reader.readAsText(file);
     }
 
     /* START */
     init();
+
+    /* Helpful debug: remove before production if you want */
+    console.log('LezGo index loaded. Admin?', isAdmin(), 'Paid?', isPaid());
   </script>
 </body>
 </html>
