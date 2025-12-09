@@ -1,43 +1,58 @@
-// service-worker.js - simpel og sikker caching (scope = repo mappe når registreret som './service-worker.js')
-const CACHE_NAME = 'lezgo-v1';
-const ASSETS = [
+const CACHE_NAME = 'lezgo-cache-v1';
+const ASSETS_TO_CACHE = [
   './',
   './index.html',
+  './manifest.json',
   './ICON-192x192.png',
-  './ICON-512x512.png'
-  // Tilføj flere assets her hvis nødvendigt (css, js, offline.html osv.)
+  './lezgo-logo.svg',
+  // tilføj øvrige assets som css, js, billeder I bruger
 ];
 
-self.addEventListener('install', event => {
+self.addEventListener('install', (event) => {
+  console.log('[SW] install');
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS))
+    caches.open(CACHE_NAME).then((cache) => {
+      return cache.addAll(ASSETS_TO_CACHE).catch(err => {
+        console.warn('[SW] cache.addAll failed', err);
+      });
+    })
   );
   self.skipWaiting();
 });
 
-self.addEventListener('activate', event => {
+self.addEventListener('activate', (event) => {
+  console.log('[SW] activate');
   event.waitUntil(
     caches.keys().then(keys => Promise.all(
-      keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
-    )).then(() => self.clients.claim())
+      keys.map(k => { if(k !== CACHE_NAME) return caches.delete(k); })
+    ))
   );
+  self.clients.claim();
 });
 
-self.addEventListener('fetch', event => {
-  // online-first for navigation (gør at brugeren får opdateret startside hvis online)
-  if (event.request.mode === 'navigate') {
-    event.respondWith(
-      fetch(event.request).then(res => {
-        const copy = res.clone();
-        caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy));
-        return res;
-      }).catch(() => caches.match('./'))
-    );
-    return;
-  }
+self.addEventListener('fetch', (event) => {
+  // Basic cache-first strategy for same-origin GET requests
+  if (event.request.method !== 'GET') return;
 
-  // cache-first for øvrige assets
   event.respondWith(
-    caches.match(event.request).then(resp => resp || fetch(event.request))
+    caches.match(event.request).then(cached => {
+      if (cached) return cached;
+      return fetch(event.request).then(response => {
+        // Optionally cache new GET requests for offline
+        if (response && response.status === 200 && response.type === 'basic') {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then(cache => {
+            cache.put(event.request, clone);
+          });
+        }
+        return response;
+      }).catch(err => {
+        // fallback: try to serve index.html for navigation requests
+        if (event.request.mode === 'navigate') {
+          return caches.match('./index.html');
+        }
+        return new Response('Offline', { status: 503, statusText: 'Offline' });
+      });
+    })
   );
 });
