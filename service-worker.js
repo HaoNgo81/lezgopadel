@@ -1,53 +1,103 @@
-// service-worker.js
-const CACHE_NAME = 'lezgo-padel-cache-v3';
+/* Simple but robust Service Worker for LezGo Padel */
+/* Version - bump to force refresh when you change files */
+const CACHE_NAME = 'lezgo-cache-v1';
+const RUNTIME_CACHE = 'lezgo-runtime-v1';
 const OFFLINE_URL = '/offline.html';
-const ASSETS = [
-  '/',
+
+const PRECACHE_ASSETS = [
+  '/', 
   '/index.html',
   '/manifest.json',
-  '/offline.html',
+  OFFLINE_URL,
   '/lezgo-logo.svg',
-  '/icon-192.png',
-  '/icon-512.png'
+  '/ICON-192x192.png',
+  '/ICON-512x512.png',
+  '/apple-touch-icon.png'
+  // Tilføj yderligere filer her hvis nødvendigt
 ];
 
-self.addEventListener('install', event=>{
+self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache=>cache.addAll(ASSETS)).catch(err=>console.warn('SW install err',err))
+    (async () => {
+      const cache = await caches.open(CACHE_NAME);
+      await cache.addAll(PRECACHE_ASSETS.map(url => new Request(url, {cache: 'reload'})));
+      // activate straks
+      await self.skipWaiting();
+    })()
   );
-  self.skipWaiting();
 });
 
-self.addEventListener('activate', event=>{
+self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then(keys=>Promise.all(keys.map(k=>k!==CACHE_NAME ? caches.delete(k) : null)))
+    (async () => {
+      // ryd gamle caches (behold kun de vi vil have)
+      const keys = await caches.keys();
+      await Promise.all(
+        keys.map(key => {
+          if (key !== CACHE_NAME && key !== RUNTIME_CACHE) return caches.delete(key);
+        })
+      );
+      await self.clients.claim();
+    })()
   );
-  self.clients.claim();
 });
 
-async function cacheFirst(req){
-  const cache = await caches.open(CACHE_NAME);
-  const cached = await cache.match(req);
-  if(cached) return cached;
-  try{
-    const resp = await fetch(req);
-    if(resp && resp.status===200 && req.method==='GET') cache.put(req,resp.clone());
-    return resp;
-  }catch(err){
-    return caches.match(OFFLINE_URL);
-  }
-}
+self.addEventListener('fetch', (event) => {
+  const req = event.request;
+  const url = new URL(req.url);
 
-self.addEventListener('fetch', event=>{
-  if(event.request.mode === 'navigate' || (event.request.method === 'GET' && event.request.headers.get('accept') && event.request.headers.get('accept').includes('text/html'))){
+  // 1) navigation requests -> network-first, fallback til cache, så offline.html
+  if (req.mode === 'navigate') {
     event.respondWith(
-      fetch(event.request).then(resp=>{
-        const copy = resp.clone();
-        caches.open(CACHE_NAME).then(c=>{ if(resp && resp.status===200) c.put(event.request, copy); });
-        return resp;
-      }).catch(()=>caches.match(event.request).then(c=>c || caches.match(OFFLINE_URL)))
+      (async () => {
+        try {
+          const networkResp = await fetch(req);
+          // opdater runtime cache med den nyeste navigation hvis 200
+          const cache = await caches.open(RUNTIME_CACHE);
+          cache.put(req, networkResp.clone());
+          return networkResp;
+        } catch (err) {
+          // prøv cache
+          const cache = await caches.open(CACHE_NAME);
+          const cached = await cache.match('/index.html') || await cache.match(OFFLINE_URL);
+          return cached || Response.error();
+        }
+      })()
     );
     return;
   }
-  event.respondWith(cacheFirst(event.request));
+
+  // 2) For statiske assets (images, icons, svg) -> cache-first
+  if (req.destination === 'image' || /\.(png|jpg|jpeg|gif|svg)$/.test(url.pathname)) {
+    event.respondWith(
+      caches.match(req).then(cached => {
+        if (cached) return cached;
+        return fetch(req).then(resp => {
+          return caches.open(RUNTIME_CACHE).then(cache => {
+            cache.put(req, resp.clone());
+            return resp;
+          });
+        }).catch(()=> caches.match(OFFLINE_URL));
+      })
+    );
+    return;
+  }
+
+  // 3) For CSS/JS/JSON -> network-first but fallback to cache
+  if (/\.(js|css|json)$/.test(url.pathname)) {
+    event.respondWith(
+      fetch(req).then(resp => {
+        // opdater cache
+        const copy = resp.clone();
+        caches.open(RUNTIME_CACHE).then(cache => cache.put(req, copy));
+        return resp;
+      }).catch(() => caches.match(req).then(c => c || caches.match(OFFLINE_URL)))
+    );
+    return;
+  }
+
+  // 4) default: prøv cache, så network
+  event.respondWith(
+    caches.match(req).then(cached => cached || fetch(req).catch(()=> caches.match(OFFLINE_URL)))
+  );
 });
