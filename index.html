@@ -47,7 +47,7 @@
     .app-bg{
       background: linear-gradient(180deg,var(--bg-top) 0%,var(--bg-bottom) 100%);
       color:var(--text);min-height:100vh;
-      padding-bottom:84px; /* space for bottom bar */
+      padding-bottom:170px; /* ensure space for bottom bar on mobile */
     }
 
     .container{max-width:var(--max-w);margin:14px auto;padding:12px;width:94%}
@@ -93,25 +93,28 @@
     .tag{background:rgba(255,255,255,.03);padding:6px 8px;border-radius:8px;margin-right:8px;font-size:13px;display:inline-block}
     .actions-small{display:flex;flex-direction:column;gap:6px}
 
-    /* bottom bar - mobile friendly */
+    /* bottom bar - mobile friendly (always visible) */
     #lezgo-bottom-bar{
-      position: fixed;
-      bottom: 12px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: calc(100% - 28px);
-      max-width: calc(var(--max-w) - 16px);
-      display:flex;
+      position: fixed !important;
+      bottom: 12px !important;
+      left: 12px !important;
+      right: 12px !important;
+      width: auto !important;
+      max-width: calc(var(--max-w) - 16px) !important;
+      margin: 0 auto !important;
+      display:flex !important;
       gap:10px;
       justify-content: center;
       align-items: center;
       padding: 10px;
       background: linear-gradient(180deg, rgba(0,0,0,0.06), rgba(0,0,0,0.02));
       border-radius: 12px;
-      z-index: 9999;
+      z-index: 99999 !important;
       box-shadow: 0 10px 28px rgba(0,0,0,0.16);
       -webkit-backdrop-filter: blur(6px);
       backdrop-filter: blur(6px);
+      transform: none !important;
+      pointer-events: auto !important;
     }
     #lezgo-bottom-bar .lezgo-btn {
       padding: .6rem .9rem;
@@ -123,13 +126,15 @@
       color: white;
       min-width:110px;
       text-align:center;
+      display:inline-block !important;
+      visibility:visible !important;
     }
     #lezgo-bottom-bar .lezgo-btn.restore { background:transparent; color:var(--text); border:1px solid var(--border-soft) }
     #lezgo-bottom-bar input[type=file]{ display:none }
 
     /* session detail full-screen modal */
     #session-detail-modal{
-      position: fixed; inset:0; z-index:10000; display:none; align-items:center; justify-content:center;
+      position: fixed; inset:0; z-index:100000; display:none; align-items:center; justify-content:center;
       background: linear-gradient(180deg, rgba(2,6,23,0.8), rgba(2,6,23,0.9));
       padding:20px;
     }
@@ -143,9 +148,9 @@
 
     /* small screens tweaks */
     @media(max-width:520px){
-      #lezgo-bottom-bar { padding:8px; gap:8px; left: 50%; transform: translateX(-50%); width: calc(100% - 20px); }
+      #lezgo-bottom-bar { padding:8px; gap:8px; }
       #lezgo-bottom-bar .lezgo-btn { min-width:100px; padding:.5rem .6rem; font-size:14px }
-      .container { padding:10px 10px 140px } /* extra bottom space for phones */
+      .container { padding:10px 10px 200px } /* extra bottom space for phones */
       #session-detail-modal .modal-card{ padding:12px; border-radius:10px; max-width:calc(100% - 24px) }
     }
 
@@ -239,7 +244,6 @@
             <button id="save-btn" class="btn btn-primary" data-i18n="saveBtn">➕ Save exercise</button>
             <button id="clear-btn" class="btn btn-ghost" data-i18n="clearBtn">Clear form</button>
           </div>
-          <!-- delete all is hidden for guests; will be rendered only for admins via JS -->
           <button id="delete-all-btn" class="btn btn-danger" data-i18n="deleteAllBtn" style="display:none">🗑️ Delete all</button>
         </div>
       </form>
@@ -282,7 +286,6 @@
           </div>
 
           <div style="display:flex;gap:10px;margin-top:10px;flex-wrap:wrap">
-            <!-- Save & Clear session buttons: hidden/disabled for guests via JS -->
             <button id="save-session" class="btn btn-primary" data-i18n="saveSession" style="display:none">Save session</button>
             <button id="clear-session" class="btn btn-ghost" data-i18n="clearSession" style="display:none">Clear</button>
           </div>
@@ -313,7 +316,7 @@
     </div>
   </div>
 
-  <!-- Bottom bar: only Backup + Restore (as requested). Restore uses hidden file input -->
+  <!-- Bottom bar: Backup + Restore (always visible). Restore uses hidden file input -->
   <div id="lezgo-bottom-bar" aria-hidden="false">
     <button id="btn-backup" class="lezgo-btn">Backup</button>
     <label for="file-restore" class="lezgo-btn restore" style="cursor:pointer">Restore</label>
@@ -343,7 +346,7 @@
     const SES_KEY = "lezgo_sessions_v1";
     const THEME_KEY = 'lezgo_theme';
     const LANG_KEY = 'lezgo_lang';
-    const STORAGE_META_KEY = 'lezgo_meta_v1'; // for metadata (we'll include theme/lang timestamp)
+    const STORAGE_META_KEY = 'lezgo_meta_v1';
 
     const DEFAULT_CATEGORIES = ["Back wall","Bandeja","Chiquita","Defense","Double wall","Groundstroke","Lob","Serve","Smash","Vibora","Volley"].sort();
     const DEFAULT_LEVELS = ["Beginner","Intermediate","Advanced"];
@@ -388,8 +391,6 @@
 
     /* INIT */
     function init(){
-      // Ensure guest mode start: don't set is_admin by default
-      // (we still allow admin if previously logged in)
       const savedTheme = localStorage.getItem(THEME_KEY) || 'dark'; applyTheme(savedTheme);
       const savedLang = localStorage.getItem(LANG_KEY) || 'en'; $("lang-select").value = savedLang;
       loadAll(); populateCategories(); populateLevels(); populateIntensity(); populatePlayers(); bindEvents(); applyTranslationsToDOM(); renderList(); renderSessions(); updateBadges(); enforcePermissions();
@@ -413,7 +414,7 @@
 
       $("save-btn").addEventListener("click", onSave);
       $("clear-btn").addEventListener("click", clearForm);
-      $("delete-all-btn").addEventListener("click", ()=>{ if(!isAdmin()){ alert('Admin access required'); return; } if(confirm(localStorage.getItem(LANG_KEY)==='da'?"Slet ALLE øvelser?":"Delete ALL exercises?")){ exercises=[]; localStorage.setItem(EX_KEY,"[]"); renderList(); }});
+      $("delete-all-btn").addEventListener("click", ()=>{ if(!isAdmin() && !isPaid()){ alert('Admin or Paid access required'); return; } if(confirm(localStorage.getItem(LANG_KEY)==='da'?"Slet ALLE øvelser?":"Delete ALL exercises?")){ exercises=[]; localStorage.setItem(EX_KEY,"[]"); renderList(); }});
 
       $("search").addEventListener("input", renderList);
       $("filter-category").addEventListener("change", renderList);
@@ -444,9 +445,9 @@
     /* RENDER LIST */
     function renderList(){ let q = ($("search") && $("search").value.trim().toLowerCase()) || ""; let fc = ($("filter-category") && $("filter-category").value) || ""; let fl = ($("filter-level") && $("filter-level").value) || ""; let list = $("list"); if(!list) return; list.innerHTML=""; let items = exercises.slice(); if(fc && fc!=="") items = items.filter(x=>x.category===fc); if(fl && fl!=="") items = items.filter(x=>x.level===fl); if(q) items = items.filter(x => x.title.toLowerCase().includes(q) || (x.description||"").toLowerCase().includes(q) || (x.tags||"").toLowerCase().includes(q) ); if($("show-favorites") && $("show-favorites").textContent!==t('showFavorites')) items = items.filter(x=>x.favorite); if(items.length===0){ list.innerHTML = `<div style="color:var(--muted)">${t('noMatches')}</div>`; return; } items.forEach(ex=>{ let row=document.createElement("div"); row.className="exercise"; row.dataset.id=ex.id; let cb=document.createElement("input"); cb.type="checkbox"; cb.className="select-item"; cb.addEventListener("change", updateSelectedSet); row.appendChild(cb); let left=document.createElement("div"); left.style.flex="1"; let ttitle=document.createElement("div"); ttitle.style.fontWeight="800"; ttitle.style.fontSize="15px"; ttitle.textContent=ex.title; left.appendChild(ttitle); let meta=document.createElement("div"); meta.style.color="var(--muted)"; meta.style.marginTop="6px"; meta.textContent = `${ex.category} • ${ex.level} • ${ex.players} • ${ex.duration}m`; left.appendChild(meta); if(ex.link){ let a=document.createElement("a"); a.href=ex.link; a.target="_blank"; a.textContent=ex.link; a.style.color="var(--muted)"; a.style.display="block"; a.style.marginTop="6px"; left.appendChild(a); } if(ex.tags){ let tags=document.createElement("div"); tags.style.marginTop="8px"; ex.tags.split(",").forEach(tg=>{ let s=document.createElement("span"); s.className="tag"; s.textContent=tg.trim(); tags.appendChild(s); }); left.appendChild(tags); } row.appendChild(left); let right=document.createElement("div"); right.className="actions-small"; let edit=document.createElement("button"); edit.className="btn btn-ghost"; edit.textContent=(localStorage.getItem(LANG_KEY)==='da'?"Rediger":"Edit"); edit.addEventListener("click", ()=>editItem(ex.id)); right.appendChild(edit);
 
-      // Only show delete button if admin
-      if(isAdmin()){
-        let del=document.createElement("button"); del.className="btn btn-ghost"; del.style.color="var(--danger)"; del.textContent=(localStorage.getItem(LANG_KEY)==='da'?"Slet":"Delete"); del.addEventListener("click", ()=>{ if(!isAdmin()){ alert('Admin access required'); return; } if(confirm(t('deleteConfirm'))){ exercises = exercises.filter(x=>x.id!==ex.id); localStorage.setItem(EX_KEY, JSON.stringify(exercises)); renderList(); }}); right.appendChild(del);
+      // Only show delete button if admin or paid
+      if(isAdmin() || isPaid()){
+        let del=document.createElement("button"); del.className="btn btn-ghost"; del.style.color="var(--danger)"; del.textContent=(localStorage.getItem(LANG_KEY)==='da'?"Slet":"Delete"); del.addEventListener("click", ()=>{ if(!isAdmin() && !isPaid()){ alert('Admin or Paid access required'); return; } if(confirm(t('deleteConfirm'))){ exercises = exercises.filter(x=>x.id!==ex.id); localStorage.setItem(EX_KEY, JSON.stringify(exercises)); renderList(); }}); right.appendChild(del);
       }
 
       row.appendChild(right); list.appendChild(row); }); updateSelectedSet(); }
@@ -462,11 +463,8 @@
     function clearSessionBuilder(){ if(!isAdmin() && !isPaid()){ alert(localStorage.getItem(LANG_KEY)==='da'?"Betalt adgang kræves.":"Paid access required."); return; } if($("session-items")) $("session-items").innerHTML=""; if($("session-name")) $("session-name").value=""; if($("session-desc")) $("session-desc").value=""; recalcSession(); }
     function saveSession(){ if(!isAdmin() && !isPaid()){ alert(localStorage.getItem(LANG_KEY)==='da'?"Betalt adgang kræves.":"Paid access required."); return; } let name=$("session-name").value.trim(); if(!name){ alert(localStorage.getItem(LANG_KEY)==='da'?"Tilføj et sessionsnavn":"Add a session name"); return; } let ids=[]; document.querySelectorAll("#session-items .exercise").forEach(r=>ids.push(r.dataset.id)); let total = ids.reduce((a,id)=>{ let ex=exercises.find(x=>x.id===id); return a+(ex?Number(ex.duration||0):0); },0); let ses={id:uid(),name,description:$("session-desc").value,items:ids,total,createdAt:new Date().toISOString()}; sessions.unshift(ses); localStorage.setItem(SES_KEY, JSON.stringify(sessions)); renderSessions(); clearSessionBuilder(); }
 
-    function renderSessions(){ let box=$("sessions-list"); if(!box) return; box.innerHTML=""; if(sessions.length===0){ box.innerHTML=`<div style="color:var(--muted)">${t('noSessions')}</div>`; return; } sessions.forEach(s=>{ let div=document.createElement("div"); div.className="exercise"; div.innerHTML=`<div style="flex:1"><div style="font-weight:800">${s.name}</div><div style="color:var(--muted)">${(s.items||[]).length} exercises • ${s.total||0} m</div></div>`; // buttons container
-      const btnOpen = document.createElement('button'); btnOpen.className='btn btn-ghost open-session'; btnOpen.textContent = t('openBtn');
-      const btnDelete = document.createElement('button'); btnDelete.className='btn btn-ghost delete-session'; btnDelete.style.color='var(--danger)'; btnDelete.textContent = t('deleteBtn');
+    function renderSessions(){ let box=$("sessions-list"); if(!box) return; box.innerHTML=""; if(sessions.length===0){ box.innerHTML=`<div style="color:var(--muted)">${t('noSessions')}</div>`; return; } sessions.forEach(s=>{ let div=document.createElement("div"); div.className="exercise"; div.innerHTML=`<div style="flex:1"><div style="font-weight:800">${s.name}</div><div style="color:var(--muted)">${(s.items||[]).length} exercises • ${s.total||0} m</div></div>`; const btnOpen = document.createElement('button'); btnOpen.className='btn btn-ghost open-session'; btnOpen.textContent = t('openBtn'); const btnDelete = document.createElement('button'); btnDelete.className='btn btn-ghost delete-session'; btnDelete.style.color='var(--danger)'; btnDelete.textContent = t('deleteBtn');
 
-      // Open: if user has permission to view sessions (admin or paid) -> show modal; otherwise show restricted message
       btnOpen.addEventListener('click', ()=> {
         if(!isAdmin() && !isPaid()){
           alert(localStorage.getItem(LANG_KEY)==='da' ? "Du skal være admin eller have betalt adgang for at åbne sessions." : "You need admin or paid access to open sessions.");
@@ -475,21 +473,20 @@
         openSavedSession(s.id);
       });
 
-      // Delete: only for admin
       btnDelete.addEventListener('click', ()=> {
-        if(!isAdmin()){
-          alert('Admin access required');
+        if(!isAdmin() && !isPaid()){
+          alert('Admin or Paid access required');
           return;
         }
         if(confirm(t('deleteSessionConfirm'))){ sessions = sessions.filter(x=>x.id!==s.id); localStorage.setItem(SES_KEY, JSON.stringify(sessions)); renderSessions(); }
       });
 
       div.appendChild(btnOpen);
-      if(isAdmin()) div.appendChild(btnDelete);
+      if(isAdmin() || isPaid()) div.appendChild(btnDelete);
       box.appendChild(div);
     }); }
 
-    /* Full-screen session viewer (used by openSavedSession) */
+    /* Full-screen session viewer */
     function showDetailedSessionViewFullScreen(session){
       const modal = $("session-detail-modal");
       const titleEl = $("session-detail-title");
@@ -499,12 +496,10 @@
       metaEl.textContent = `${(session.items?session.items.length: (session.payload && session.payload.links? session.payload.links.length:0))} exercises • ${session.total||0} m`;
       bodyEl.innerHTML = "";
 
-      // Show description if exists
       if(session.description) {
         const p = document.createElement('p'); p.style.color='var(--muted)'; p.textContent = session.description; bodyEl.appendChild(p);
       }
 
-      // Build exercise list
       const ul = document.createElement('div'); ul.style.display='grid'; ul.style.gap='10px'; ul.style.marginTop='12px';
       if(Array.isArray(session.items) && session.items.length){
         session.items.forEach(id => {
@@ -520,7 +515,6 @@
           ul.appendChild(el);
         });
       } else if(session.payload && Array.isArray(session.payload.links) && session.payload.links.length){
-        // older/legacy sessions that stored links
         session.payload.links.forEach((ln, idx) => {
           const el = document.createElement('div');
           el.className='exercise';
@@ -534,8 +528,6 @@
       }
 
       bodyEl.appendChild(ul);
-
-      // Close handlers
       modal.style.display = 'flex';
       $("session-detail-close").focus();
     }
@@ -545,7 +537,7 @@
 
     $("session-detail-close")?.addEventListener('click', ()=>{ $("session-detail-modal").style.display='none'; });
 
-    /* OPEN SAVED SESSION (robust fix for previous "Coming soon") */
+    /* OPEN SAVED SESSION */
     function openSavedSession(sessionId){
       try {
         const session = sessions.find(s => s.id === sessionId);
@@ -554,21 +546,12 @@
           alert('Session not found or has been deleted.');
           return;
         }
-
-        // Normalize legacy sessions with links field
-        if(!session.items && session.links) {
-          session.payload = session.payload || {};
-          session.payload.links = session.links;
-        }
-
-        // If session.items exist, ensure items array is valid
+        if(!session.items && session.links) { session.payload = session.payload || {}; session.payload.links = session.links; }
         if(!Array.isArray(session.items) && !(session.payload && Array.isArray(session.payload.links))){
           console.error('Invalid session format', session);
           alert('Session format invalid. Try restoring from a backup.');
           return;
         }
-
-        // Show full-screen modal for session (as requested)
         showDetailedSessionViewFullScreen(session);
       } catch(err){
         console.error('Error opening session', err);
@@ -576,8 +559,9 @@
       }
     }
 
-    /* BACKUP & RESTORE (exports exercises + sessions + metadata) */
+    /* BACKUP & RESTORE */
     function onBackup(){
+      // Everyone can download backup (button visible). If you want to restrict, add a check here.
       try {
         const meta = { createdAt:new Date().toISOString(), lezgoVersion: 'v3', meta: JSON.parse(localStorage.getItem(STORAGE_META_KEY) || "{}") };
         const payload = {
@@ -614,7 +598,6 @@
         const parsed = JSON.parse(text);
         if(!parsed || !parsed.data) throw new Error('Invalid backup format (missing data).');
 
-        // Incoming arrays (validate)
         const incomingExercises = Array.isArray(parsed.data.exercises) ? parsed.data.exercises : [];
         const incomingSessions = Array.isArray(parsed.data.sessions) ? parsed.data.sessions : [];
         const incomingCategories = Array.isArray(parsed.data.categories) ? parsed.data.categories : [];
@@ -622,7 +605,7 @@
         const incomingIntensities = Array.isArray(parsed.data.intensities) ? parsed.data.intensities : [];
         const incomingPlayers = Array.isArray(parsed.data.players) ? parsed.data.players : [];
 
-        // Merge exercises by id (new overrides)
+        // Merge exercises by id
         const exById = new Map((exercises||[]).map(e=>[e.id,e]));
         incomingExercises.forEach(e=>{
           if(!e.id) e.id = uid();
@@ -638,13 +621,13 @@
         });
         sessions = Array.from(sesById.values());
 
-        // Merge simple arrays avoiding duplicates
+        // Merge simple arrays
         categories = Array.from(new Set([...(categories||[]), ...incomingCategories]));
         levels = Array.from(new Set([...(levels||[]), ...incomingLevels]));
         intensities = Array.from(new Set([...(intensities||[]), ...incomingIntensities]));
         players = Array.from(new Set([...(players||[]), ...incomingPlayers]));
 
-        // Save all
+        // Save
         localStorage.setItem(EX_KEY, JSON.stringify(exercises));
         localStorage.setItem(SES_KEY, JSON.stringify(sessions));
         localStorage.setItem(CAT_KEY, JSON.stringify(categories));
@@ -653,7 +636,6 @@
         localStorage.setItem(PLR_KEY, JSON.stringify(players));
         saveMeta();
 
-        // Re-render
         populateCategories(); populateLevels(); populateIntensity(); populatePlayers(); renderList(); renderSessions(); updateBadges(); updateSessionLock(); enforcePermissions();
 
         alert('Restore completed. Data merged.');
@@ -669,10 +651,10 @@
     function updateBadges(){ if($("badges")) $("badges").innerHTML=""; if(isAdmin()){ let d=document.createElement("div"); d.className="badge"; d.textContent="ADMIN"; $("badges").appendChild(d); $("btn-logout-header").style.display="inline-flex"; } else { $("btn-logout-header").style.display="none"; } if(isPaid()){ let d=document.createElement("div"); d.className="badge"; d.textContent="PAID"; $("badges").appendChild(d); } }
     function updateSessionLock(){ let locked = (!isPaid() && !isAdmin()); if($("save-session")) $("save-session").disabled=locked; if($("add-selected")) $("add-selected").disabled=locked; if($("session-lock-info")) $("session-lock-info").style.display = locked ? "block":"none"; }
 
-    /* ENFORCE PERMISSIONS UI */
+    /* ENFORCE PERMISSIONS */
     function enforcePermissions(){
-      // Exercises: show/hide Delete All
-      if(isAdmin()){
+      // Delete All for admin OR paid users
+      if(isAdmin() || isPaid()){
         $("delete-all-btn").style.display='inline-block';
       } else {
         $("delete-all-btn").style.display='none';
@@ -682,29 +664,38 @@
       if(isAdmin() || isPaid()){
         $("save-session").style.display='inline-block';
         $("clear-session").style.display='inline-block';
-        $("add-selected").style.display='inline-block';
-        $("save-session").disabled=false;
-        $("add-selected").disabled=false;
-        $("clear-session").disabled=false;
-        $("session-lock-info").style.display='none';
+        if($("add-selected")) $("add-selected").style.display='inline-block';
+        if($("save-session")) $("save-session").disabled=false;
+        if($("add-selected")) $("add-selected").disabled=false;
+        if($("clear-session")) $("clear-session").disabled=false;
+        if($("session-lock-info")) $("session-lock-info").style.display='none';
       } else {
-        $("save-session").style.display='none';
-        $("clear-session").style.display='none';
-        $("add-selected").style.display='inline-block'; // allow checkbox selection but block action
-        $("add-selected").disabled=false;
-        $("session-lock-info").style.display='block';
+        if($("save-session")) $("save-session").style.display='none';
+        if($("clear-session")) $("clear-session").style.display='none';
+        if($("add-selected")) $("add-selected").style.display='inline-block';
+        if($("session-lock-info")) $("session-lock-info").style.display='block';
       }
 
-      // Render lists again so delete buttons are inserted/removed
+      // Ensure bottom bar visible for everyone
+      const bb = document.getElementById('lezgo-bottom-bar');
+      if(bb){
+        bb.style.display = 'flex';
+        bb.style.zIndex = '99999';
+        bb.removeAttribute('aria-hidden');
+        bb.querySelectorAll('.lezgo-btn').forEach(b => { b.style.display = 'inline-block'; b.style.visibility = 'visible'; b.disabled = false; });
+      }
+
       renderList();
       renderSessions();
+      updateBadges();
+      updateSessionLock();
     }
 
     /* START */
-    function robustInitWrapper(){ try{ init(); console.log("init() executed."); }catch(err){ console.error("init() failed:", err); /* minimal fallbacks */ } }
+    function robustInitWrapper(){ try{ init(); console.log("init() executed."); }catch(err){ console.error("init() failed:", err); } }
     if(document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', robustInitWrapper); } else { robustInitWrapper(); }
 
-    /* SERVICE WORKER registration (kept) */
+    /* SERVICE WORKER registration */
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('./service-worker.js')
@@ -713,7 +704,7 @@
       });
     }
 
-    /* ========== Simple video metadata helpers (same as before) ========== */
+    /* Video metadata helpers */
     async function fetchVideoMetadata(link){
       try{
         const yt = extractYouTubeId(link);
