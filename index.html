@@ -36,11 +36,10 @@
     .exercise .meta{color:var(--muted);margin-top:8px}
     .tag{background:rgba(255,255,255,.03);padding:6px 8px;border-radius:8px;margin-right:8px;font-size:13px;display:inline-block;margin-top:8px}
 
-    /* IMPORTANT: force horizontal rendering of title/link */
+    /* FORCE HORIZONTAL TEXT */
     .exercise .left div, .exercise .left a { white-space: normal !important; word-break: break-word !important; overflow-wrap: anywhere !important; hyphens: auto !important; }
     .exercise a { color:#2fa1ff; text-decoration:underline; }
 
-    /* right action column */
     .actions-small{display:flex;flex-direction:column;gap:8px;align-items:flex-end}
 
     /* bottom bar */
@@ -51,10 +50,6 @@
     .load-more{display:block;margin:8px auto;padding:8px 12px;border-radius:8px;border:1px solid var(--border-soft);background:transparent;color:var(--muted)}
 
     @media(max-width:520px){ .container{padding:10px 10px 260px} #lezgo-bottom-bar{left:10px;right:10px} .actions-small{align-items:flex-end} }
-
-    /* Saved links small style */
-    #saved-links-list .link-row{display:flex;gap:8px;align-items:center;justify-content:space-between;padding:8px;border-radius:8px;border:1px solid var(--border-soft);margin-top:8px}
-    #saved-links-list .meta{color:var(--muted);font-size:13px;overflow-wrap:anywhere}
   </style>
 </head>
 <body>
@@ -64,7 +59,6 @@
         <img id="logo" src="lezgo-logo.svg" alt="LezGo logo">
         <div id="badges" style="display:flex;gap:8px"></div>
       </div>
-
       <div style="display:flex;gap:10px;align-items:center">
         <select id="lang-select" style="padding:8px;border-radius:8px;border:1px solid var(--border-soft);background:transparent;color:inherit" aria-label="Language select">
           <option value="da">Dansk</option><option value="en">English</option>
@@ -75,16 +69,24 @@
       </div>
     </header>
 
-    <!-- Form -->
+    <!-- FORM / FILTER -->
     <section class="card">
-      <h3 style="margin:0 0 10px 0;color:var(--muted)">Tilføj / Rediger øvelse (Padel)</h3>
-      <form id="exercise-form" class="grid" onsubmit="return false;">
-        <div style="grid-column:1/-1;"><label>Titel</label><input id="title" type="text" placeholder="f.eks. Forehand topspin drill"></div>
+      <div class="grid">
+        <div style="grid-column:1/-1">
+          <h3 style="margin:0 0 10px 0;color:var(--muted)">Tilføj / Rediger øvelse (Padel)</h3>
+        </div>
+
+        <div style="grid-column:1/-1;">
+          <label>Titel</label>
+          <input id="title" type="text" placeholder="f.eks. Forehand topspin drill">
+        </div>
+
         <div><label>Kategori</label><select id="category"></select></div>
         <div><label>Spillere</label><select id="players"></select></div>
         <div><label>Varighed (min)</label><input id="duration" type="number" min="0" placeholder="20"></div>
         <div><label>Niveau</label><select id="level"></select></div>
         <div><label>Intensitet</label><select id="intensity"></select></div>
+
         <div style="grid-column:1/-1;">
           <label>Videolink (YouTube / Instagram / Facebook)</label>
           <div style="display:flex;gap:8px;align-items:center">
@@ -92,8 +94,10 @@
             <button id="analyze-btn" class="btn btn-ghost">🔍 Analyser</button>
           </div>
         </div>
+
         <div style="grid-column:1/-1;"><label>Beskrivelse</label><textarea id="description"></textarea></div>
         <div style="grid-column:1/-1;"><label>Tags (kommasepareret)</label><input id="tags" type="text" placeholder="fx Cross, Chiquita, Vibora"></div>
+
         <div style="grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;margin-top:8px">
           <div style="display:flex;gap:10px">
             <button id="save-btn" class="btn btn-primary">➕ Gem øvelse</button>
@@ -101,70 +105,72 @@
           </div>
           <button id="delete-all-btn" class="btn btn-danger" style="display:none">🗑️ Slet alle</button>
         </div>
-      </form>
-    </section>
-
-    <!-- List + Session Builder -->
-    <section class="card">
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;align-items:center">
-        <input id="search" type="text" placeholder="Søg..." style="flex:1;padding:10px;border-radius:10px;border:1px solid var(--border-soft);background:transparent;color:inherit">
-        <div>
-          <button id="pf-y" class="btn btn-ghost btn-small">YouTube</button>
-          <button id="pf-i" class="btn btn-ghost btn-small">Instagram</button>
-          <button id="pf-f" class="btn btn-ghost btn-small">Facebook</button>
-        </div>
-        <select id="filter-category" style="padding:10px;border-radius:10px;border:1px solid var(--border-soft);background:transparent;color:inherit"><option>ALL</option></select>
-        <select id="filter-level" style="padding:10px;border-radius:10px;border:1px solid var(--border-soft);background:transparent;color:inherit"><option>ALL</option></select>
-        <button id="show-favorites" class="btn btn-ghost">Vis favoritter</button>
-      </div>
-
-      <div style="display:grid;grid-template-columns:1fr 380px;gap:12px">
-        <div>
-          <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
-            <div style="margin-left:auto" id="selected-count">0 valgt</div>
-          </div>
-          <div id="list" style="min-height:120px"></div>
-          <button id="load-more" class="load-more" style="display:none">Vis flere</button>
-        </div>
-
-        <aside class="card">
-          <h4 style="margin:0">Training Session Builder</h4>
-
-          <label>Sessionsnavn</label>
-          <input id="session-name" type="text">
-
-          <label style="margin-top:8px">Sessionsbeskrivelse</label>
-          <input id="session-desc" type="text">
-
-          <label style="margin-top:8px">Øvelser</label>
-          <div id="session-items" style="max-height:240px;overflow:auto"></div>
-
-          <div style="display:flex;gap:10px;align-items:center;margin-top:10px;">
-            <div>Total:</div>
-            <div id="session-total" style="font-weight:700">0 m</div>
-            <div style="margin-left:auto" id="session-count">0 øvelser</div>
-          </div>
-
-          <div style="display:flex;gap:10px;margin-top:10px;flex-wrap:wrap">
-            <button id="save-session" class="btn btn-primary" style="display:none">Gem session</button>
-            <button id="clear-session" class="btn btn-ghost" style="display:none">Ryd</button>
-          </div>
-
-          <div id="session-lock-info" style="margin-top:14px;color:var(--muted);display:none;">
-            Gratis brugere kan ikke gemme eller bygge sessioner. Køb adgang for at låse op.
-          </div>
-
-          <hr style="border:none;border-top:1px solid var(--border-soft);margin:14px 0">
-          <h4 style="margin:0 0 6px 0;">Gemte sessioner</h4>
-          <div id="sessions-list" style="max-height:160px;overflow:auto"></div>
-
-          <hr style="border:none;border-top:1px solid var(--border-soft);margin:14px 0">
-          <h4 style="margin:0 0 6px 0;">Gemte links</h4>
-          <div id="saved-links-list" style="max-height:220px;overflow:auto"></div>
-        </aside>
       </div>
     </section>
-  </div>
+
+    <!-- FILTER (left) + Session Builder + Sessions + Exercise-list (moved) -->
+    <div style="display:grid;grid-template-columns:1fr 420px;gap:12px">
+      <!-- LEFT: Filters only -->
+      <div class="card">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;align-items:center">
+          <input id="search" type="text" placeholder="Søg..." style="flex:1;padding:10px;border-radius:10px;border:1px solid var(--border-soft);background:transparent;color:inherit">
+          <div>
+            <button id="pf-y" class="btn btn-ghost btn-small">YouTube</button>
+            <button id="pf-i" class="btn btn-ghost btn-small">Instagram</button>
+            <button id="pf-f" class="btn btn-ghost btn-small">Facebook</button>
+          </div>
+          <select id="filter-category" style="padding:10px;border-radius:10px;border:1px solid var(--border-soft);background:transparent;color:inherit"><option>ALL</option></select>
+          <select id="filter-level" style="padding:10px;border-radius:10px;border:1px solid var(--border-soft);background:transparent;color:inherit"><option>ALL</option></select>
+        </div>
+
+        <div style="color:var(--muted);font-size:13px">Filtre er her — selve øvelseslisten er flyttet til højre under Gemte sessioner.</div>
+      </div>
+
+      <!-- RIGHT: Session Builder + Sessions + (moved) exercise list -->
+      <aside class="card">
+        <h4 style="margin:0">Training Session Builder</h4>
+
+        <label>Sessionsnavn</label>
+        <input id="session-name" type="text">
+
+        <label style="margin-top:8px">Sessionsbeskrivelse</label>
+        <input id="session-desc" type="text">
+
+        <label style="margin-top:8px">Øvelser</label>
+        <div id="session-items" style="max-height:160px;overflow:auto"></div>
+
+        <div style="display:flex;gap:10px;align-items:center;margin-top:10px;">
+          <div>Total:</div>
+          <div id="session-total" style="font-weight:700">0 m</div>
+          <div style="margin-left:auto" id="session-count">0 øvelser</div>
+        </div>
+
+        <div style="display:flex;gap:10px;margin-top:10px;flex-wrap:wrap">
+          <button id="save-session" class="btn btn-primary" style="display:none">Gem session</button>
+          <button id="clear-session" class="btn btn-ghost" style="display:none">Ryd</button>
+        </div>
+
+        <div id="session-lock-info" style="margin-top:14px;color:var(--muted);display:none;">
+          Gratis brugere kan ikke gemme eller bygge sessioner. Køb adgang for at låse op.
+        </div>
+
+        <hr style="border:none;border-top:1px solid var(--border-soft);margin:14px 0">
+        <h4 style="margin:0 0 6px 0;">Gemte sessioner</h4>
+        <div id="sessions-list" style="max-height:160px;overflow:auto"></div>
+
+        <!-- MOVED: exercise list under saved sessions -->
+        <hr style="border:none;border-top:1px solid var(--border-soft);margin:14px 0">
+        <h4 style="margin:0 0 6px 0;">Øvelsesliste</h4>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+          <div id="selected-count" style="font-weight:700">0 valgt</div>
+          <div style="margin-left:auto;color:var(--muted);font-size:13px">Per-item handlinger: Tilføj / Rediger / Slet</div>
+        </div>
+        <div id="list" style="max-height:360px;overflow:auto"></div>
+        <button id="load-more" class="load-more" style="display:none">Vis flere</button>
+      </aside>
+    </div>
+
+  </div><!-- container end -->
 
   <!-- Admin modal -->
   <div id="admin-modal" style="position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:999">
@@ -238,7 +244,6 @@ function init(){
   populateSelects();
   bindEvents();
   renderSessions();
-  renderSavedLinks();
   renderList(true);
   enforcePermissions();
 }
@@ -258,7 +263,7 @@ function bindEvents(){
   $("delete-all-btn").addEventListener("click", ()=> {
     if(!isAdmin()){ alert('Admin adgang kræves'); return; }
     const pass = prompt('Admin kode for at bekræfte slet alle'); if(pass !== ADMIN_PASSWORD){ alert('Forkert kode'); return; }
-    if(confirm('Slet ALLE øvelser?')){ exercises=[]; persistExercises(); renderList(true); renderSessions(); renderSavedLinks(); }
+    if(confirm('Slet ALLE øvelser?')){ exercises=[]; persistExercises(); renderList(true); renderSessions(); }
   });
 
   $("search").addEventListener("input", ()=> { renderIndex=0; debounce(()=>renderList(true), 180); });
@@ -309,13 +314,13 @@ function onSave(){
   const obj = { id: editingId || uid(), title, link, category: $("category").value, players: $("players").value, duration: Number($("duration").value||0), level: $("level").value, intensity: $("intensity").value, description: $("description").value||"", tags: ($("tags").value||"").trim(), createdAt: new Date().toISOString() };
   if(editingId){ const idx = exercises.findIndex(x=>x.id===editingId); if(idx>-1) exercises[idx]=obj; } else exercises.unshift(obj);
   persistExercises();
-  editingId=null; clearForm(); renderIndex=0; renderList(true); renderSessions(); renderSavedLinks();
+  editingId=null; clearForm(); renderIndex=0; renderList(true); renderSessions();
 }
 
 /* CLEAR */
 function clearForm(){ editingId=null; $("title").value=""; $("link").value=""; if($("category")) $("category").selectedIndex=0; if($("players")) $("players").selectedIndex=0; $("duration").value=""; if($("level")) $("level").selectedIndex=0; if($("intensity")) $("intensity").selectedIndex=0; $("description").value=""; $("tags").value=""; }
 
-/* RENDER LIST (batch) */
+/* RENDER LIST (batched) */
 function renderList(reset=true){
   const list = $("list");
   if(!list) return;
@@ -379,7 +384,7 @@ function renderList(reset=true){
       right.appendChild(editBtn);
 
       const delBtn = document.createElement('button'); delBtn.className='btn btn-ghost'; delBtn.style.color='var(--danger)'; delBtn.textContent='Slet';
-      delBtn.addEventListener('click', ()=> showConfirm('Slet denne øvelse?', ()=>{ exercises = exercises.filter(x=>x.id!==ex.id); persistExercises(); renderList(true); renderSessions(); renderSavedLinks(); updateSelectedCount(); }));
+      delBtn.addEventListener('click', ()=> showConfirm('Slet denne øvelse?', ()=>{ exercises = exercises.filter(x=>x.id!==ex.id); persistExercises(); renderList(true); renderSessions(); updateSelectedCount(); }));
       right.appendChild(delBtn);
     }
 
@@ -420,7 +425,7 @@ function addToSessionBuilder(id){
     return;
   }
   const ex = exercises.find(e=>e.id===id); if(!ex) return;
-  const row = document.createElement('div'); row.className='exercise'; row.dataset.id = id; row.style.marginBottom='6px';
+  const row = document.createElement('div'); row.className = 'exercise'; row.dataset.id = id; row.style.marginBottom='6px';
   row.innerHTML = `<div style="flex:1"><div style="font-weight:700">${escapeHtml(ex.title)}</div><div style="color:var(--muted)">${ex.duration}m • ${escapeHtml(ex.category)}</div></div><button class="btn btn-ghost remove-from-session" style="color:var(--danger)">Fjern</button>`;
   row.querySelector('button').addEventListener('click', ()=> { row.remove(); recalcSession(); });
   box.appendChild(row);
@@ -460,36 +465,6 @@ function openSavedSession(id){
   recalcSession(); $("session-items").scrollIntoView({behavior:'smooth', block:'center'});
 }
 
-/* SAVED LINKS - placed under sessions */
-function renderSavedLinks(){
-  const box = $("saved-links-list"); if(!box) return; box.innerHTML = "";
-  const links = exercises.filter(e => e.link && e.link.trim() !== "");
-  if(links.length === 0){ box.innerHTML = `<div style="color:var(--muted)">Ingen gemte links</div>`; return; }
-  links.forEach(ex=>{
-    const row = document.createElement('div'); row.className = 'link-row';
-    const left = document.createElement('div'); left.style.flex='1';
-    const title = document.createElement('div'); title.style.fontWeight='700'; title.textContent = ex.title;
-    const meta = document.createElement('div'); meta.className='meta'; meta.textContent = ex.link;
-    left.appendChild(title); left.appendChild(meta);
-    const right = document.createElement('div'); right.style.display='flex'; right.style.gap='8px';
-    if(isAdmin() || isPaid()){
-      const btn = document.createElement('button'); btn.className='btn btn-primary btn-small'; btn.textContent='Tilføj'; btn.addEventListener('click', ()=> addToSessionBuilder(ex.id));
-      right.appendChild(btn);
-    }
-    row.appendChild(left); row.appendChild(right); box.appendChild(row);
-  });
-}
-
-/* BACKUP / RESTORE - kept minimal (can be extended) */
-function onBackup(){
-  if(!(isAdmin()||isPaid())){ alert('Admin eller betalt adgang kræves for backup'); return; }
-  const payload = { meta:{createdAt:new Date().toISOString()}, data:{exercises,sessions,categories,levels,intensities,players} };
-  const blob = new Blob([JSON.stringify(payload,null,2)], { type:'application/json' });
-  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `lezgo-backup-${new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')}.json`; document.body.appendChild(a); a.click(); a.remove();
-  alert('Backup downloadet.');
-}
-async function onRestoreFile(ev){ if(!(isAdmin()||isPaid())){ alert('Admin eller betalt adgang kræves for restore'); ev.target.value=''; return; } const file = ev.target.files && ev.target.files[0]; if(!file) return; try{ const text = await file.text(); const parsed = JSON.parse(text); if(!parsed || !parsed.data) throw new Error('Ugyldigt format'); const inc = parsed.data; const exMap = new Map((exercises||[]).map(e=>[e.id,e])); (inc.exercises||[]).forEach(e=>{ if(!e.id) e.id=uid(); exMap.set(e.id,e); }); exercises = Array.from(exMap.values()); const sesMap = new Map((sessions||[]).map(s=>[s.id,s])); (inc.sessions||[]).forEach(s=>{ if(!s.id) s.id=uid(); sesMap.set(s.id,s); }); sessions = Array.from(sesMap.values()); categories = Array.from(new Set([...(categories||[]), ...(inc.categories||[])])); levels = Array.from(new Set([...(levels||[]), ...(inc.levels||[])])); intensities = Array.from(new Set([...(intensities||[]), ...(inc.intensities||[])])); players = Array.from(new Set([...(players||[]), ...(inc.players||[])])); persistExercises(); persistSessions(); persistBase(); renderList(true); renderSessions(); renderSavedLinks(); alert('Restore gennemført.'); } catch(err){ console.error(err); alert('Restore fejlede: '+(err.message||err)); } finally { ev.target.value=''; } }
-
 /* CONFIRM modal */
 let _confirmCb = null;
 function showConfirm(message, cb){ _confirmCb = cb; $("confirm-message").textContent = message; $("confirm-modal").style.display = "flex"; }
@@ -501,17 +476,14 @@ function escapeHtml(s){ return (s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<
 
 /* PERMISSIONS + UI */
 function enforcePermissions(){
-  // bottom bar: show only for admin/paid (we currently use a minimal bottom bar area)
   const bb = $("lezgo-bottom-bar");
   if(bb) bb.style.display = (isAdmin()||isPaid()) ? 'flex' : 'none';
   $("delete-all-btn").style.display = isAdmin() ? 'inline-block' : 'none';
   $("save-session").style.display = (isAdmin()||isPaid()) ? 'inline-block' : 'none';
   $("clear-session").style.display = (isAdmin()||isPaid()) ? 'inline-block' : 'none';
-  // badges
   const badges = $("badges"); badges.innerHTML='';
   if(isAdmin()){ const d=document.createElement('div'); d.className='badge'; d.textContent='ADMIN'; badges.appendChild(d); $("btn-logout-header").style.display='inline-flex'; } else $("btn-logout-header").style.display='none';
   if(isPaid()){ const d=document.createElement('div'); d.className='badge'; d.textContent='PAID'; badges.appendChild(d); }
-  renderSavedLinks();
   renderList(true);
   renderSessions();
 }
