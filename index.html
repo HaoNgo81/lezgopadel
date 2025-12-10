@@ -127,7 +127,7 @@
           <select id="filter-level" style="flex:1;padding:10px;border-radius:10px;border:1px solid var(--border-soft);background:transparent;color:var(--text)"><option>ALL</option></select>
         </div>
 
-        <div class="muted-note" data-i18n="filterNote">Filtre er her — Session Builder er til højre. På small skærme stables de lodret.</div>
+        <div class="muted-note" id="filterNote" data-i18n="filterNote">Filtre er her — Session Builder er til højre. På small skærme stables de lodret.</div>
       </div>
 
       <aside class="card">
@@ -254,9 +254,7 @@ function t(key){ const lang = localStorage.getItem(LANG_KEY) || 'da'; return (tr
 function applyTranslationsToDOM(){
   document.querySelectorAll('[data-i18n]').forEach(el=>{ const k = el.getAttribute('data-i18n'); if(k) el.textContent = t(k); });
   document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{ const k = el.getAttribute('data-i18n-placeholder'); if(k) el.placeholder = t(k); });
-  // some dynamic placeholders
   $("filterNote") && ($("filterNote").textContent = t('filterNote') || $("filterNote").textContent);
-  // update bottom bar labels
   $("backup-btn") && ($("backup-btn").textContent = t('backupBtn') || 'Backup');
   $("restore-btn") && ($("restore-btn").textContent = t('restoreBtn') || 'Restore');
 }
@@ -271,10 +269,7 @@ function toggleTheme(){ const current = localStorage.getItem(THEME_KEY) || 'dark
 
 /* ================= INIT ================= */
 function init(){
-  // theme
   applyTheme(localStorage.getItem(THEME_KEY) || 'dark');
-
-  // lang
   const lang = localStorage.getItem(LANG_KEY) || 'da'; $("lang-select").value = lang;
 
   loadAll();
@@ -286,24 +281,29 @@ function init(){
   enforcePermissions();
 }
 function populateSelects(){
-  const sel = $("category"), filc = $("filter-category"), lvl = $("level"), fill = $("filter-level"), pl = $("players");
+  const sel = $("category"), filc = $("filter-category"), lvl = $("level"), fill = $("filter-level"), pl = $("players"), intSel = $("intensity");
   if(sel){ sel.innerHTML=''; categories.forEach(c=>{ const o=document.createElement('option'); o.value=c; o.textContent=c; sel.appendChild(o); }); const add=document.createElement('option'); add.value='__ADD__'; add.textContent='Add new category...'; sel.appendChild(add); }
   if(filc){ filc.innerHTML=''; let a=document.createElement('option'); a.text='ALL'; a.value=''; filc.appendChild(a); categories.forEach(c=>{ const o=document.createElement('option'); o.value=c; o.text=c; filc.appendChild(o); }); }
   if(lvl){ lvl.innerHTML=''; levels.forEach(c=>{ const o=document.createElement('option'); o.value=c; o.text=c; lvl.appendChild(o); }); const addL=document.createElement('option'); addL.value='__ADD__'; addL.text='Add new level...'; lvl.appendChild(addL); }
   if(fill){ fill.innerHTML=''; let a=document.createElement('option'); a.text='ALL'; a.value=''; fill.appendChild(a); levels.forEach(c=>{ const o=document.createElement('option'); o.value=c; o.text=c; fill.appendChild(o); }); }
-  if(pl){ pl.innerHTML=''; players.forEach(p=>{ const o=document.createElement('option'); o.value=p; o.text=p; pl.appendChild(o); }); }
+  if(pl){ pl.innerHTML=''; players.forEach(p=>{ const o=document.createElement('option'); o.value=p; o.text=p; pl.appendChild(o); }); const addP=document.createElement('option'); addP.value='__ADD__'; addP.text='Add new players range...'; pl.appendChild(addP); }
+  if(intSel){ intSel.innerHTML=''; intensities.forEach(i=>{ const o=document.createElement('option'); o.value=i; o.text=i; intSel.appendChild(o); }); const addI=document.createElement('option'); addI.value='__ADD__'; addI.text='Add new intensity...'; intSel.appendChild(addI); }
 }
 
 /* ================= BIND EVENTS ================= */
 function bindEvents(){
-  // theme toggle
   $("theme-toggle").addEventListener('click', toggleTheme);
-
-  // language change
   $("lang-select").addEventListener('change', (e)=>{ localStorage.setItem(LANG_KEY, e.target.value || 'da'); applyTranslationsToDOM(); });
 
   $("save-btn").addEventListener("click", onSave);
   $("clear-btn").addEventListener("click", clearForm);
+
+  // add new category/level/intensity/players handlers
+  $("category").addEventListener("change", e=>{ if(e.target.value==="__ADD__"){ let n = prompt(localStorage.getItem(LANG_KEY)==='da'?"Ny kategori:":"New category:"); if(n){ categories.push(n.trim()); persistBase(); populateSelects(); } }});
+  $("level").addEventListener("change", e=>{ if(e.target.value==="__ADD__"){ let n = prompt(localStorage.getItem(LANG_KEY)==='da'?"Nyt niveau:":"New level:"); if(n){ levels.push(n.trim()); persistBase(); populateSelects(); } }});
+  $("intensity").addEventListener("change", e=>{ if(e.target.value==="__ADD__"){ let n = prompt(localStorage.getItem(LANG_KEY)==='da'?"Ny intensitet:":"New intensity:"); if(n){ intensities.push(n.trim()); persistBase(); populateSelects(); } }});
+  $("players").addEventListener("change", e=>{ if(e.target.value==="__ADD__"||e.target.value==="Add new..."){ let n = prompt(localStorage.getItem(LANG_KEY)==='da'?"Tilføj ny spiller-range:":"Add new players range:"); if(n){ players.push(n.trim()); persistBase(); populateSelects(); } }});
+
   $("delete-all-btn").addEventListener("click", ()=> {
     if(!isAdmin()){ alert(t('adminLogin') + ' required'); return; }
     const pass = prompt(t('adminLogin') + ':'); if(pass !== ADMIN_PASSWORD){ alert('Wrong code'); return; }
@@ -318,6 +318,7 @@ function bindEvents(){
   $("pf-i").addEventListener("click", ()=> togglePf('instagram',$('pf-i')));
   $("pf-f").addEventListener("click", ()=> togglePf('facebook',$('pf-f')));
 
+  // Admin/login/logout
   $("btn-admin").addEventListener("click", ()=> $("admin-modal").style.display="flex");
   $("admin-cancel").addEventListener("click", ()=> $("admin-modal").style.display="none");
   $("admin-submit").addEventListener("click", ()=> {
@@ -325,12 +326,17 @@ function bindEvents(){
   });
   $("btn-logout").addEventListener("click", ()=> { localStorage.removeItem('is_admin'); enforcePermissions(); });
 
+  // buy access (paid)
   $("btn-buy").addEventListener("click", ()=> {
     if(isPaid()){ if(confirm(t('buyAccess') + '?')){ localStorage.removeItem('is_paid'); enforcePermissions(); } }
     else { if(confirm(t('buyAccess') + '?')){ localStorage.setItem('is_paid','1'); enforcePermissions(); } }
   });
 
   $("load-more").addEventListener("click", ()=> renderList(false));
+
+  // Save session: BIND HERE (this was missing)
+  $("save-session").addEventListener("click", saveSession);
+  $("clear-session").addEventListener("click", clearSessionBuilder);
 
   // backup/restore
   $("backup-btn").addEventListener("click", doBackup);
@@ -477,7 +483,9 @@ function removeFromSessionBuilder(id){
 
 function recalcSession(){ let total=0,count=0; document.querySelectorAll("#session-items .exercise").forEach(r=>{ const ex = exercises.find(e=>e.id===r.dataset.id); if(ex){ total+=Number(ex.duration||0); count++; }}); $("session-total").textContent = total + " m"; $("session-count").textContent = count + " øvelser"; }
 
-/* save session */
+function clearSessionBuilder(){ if($("session-items")) $("session-items").innerHTML=""; if($("session-name")) $("session-name").value=""; if($("session-desc")) $("session-desc").value=""; recalcSession(); }
+
+/* save session (was missing binding earlier) */
 function saveSession(){
   if(!isAdmin() && !isPaid()){ alert(localStorage.getItem(LANG_KEY)==='da' ? 'Betalt adgang kræves.' : 'Paid access required.'); return; }
   const name = ($("session-name").value||"").trim(); if(!name){ alert(localStorage.getItem(LANG_KEY)==='da' ? 'Tilføj et sessionsnavn' : 'Add a session name'); return; }
@@ -521,7 +529,6 @@ function escapeHtml(s){ return (s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<
 
 /* ================= PERMISSIONS + UI ================= */
 function enforcePermissions(){
-  // bottom bar visibility
   const bb = $("lezgo-bottom-bar"); if(bb) bb.style.display = (isAdmin()||isPaid()) ? 'flex' : 'none';
   $("delete-all-btn").style.display = isAdmin() ? 'inline-block' : 'none';
   $("save-session").style.display = (isAdmin()||isPaid()) ? 'inline-block' : 'none';
@@ -551,16 +558,13 @@ function handleRestoreFile(ev){
   reader.onload = function(e){
     try{
       const data = JSON.parse(e.target.result);
-      // ask user merge or replace
       const mode = confirm("Tryk OK for MERGE (tilføj), Annuller for ERSTATTE (erstat alt)");
       if(mode){
-        // merge: append non-duplicate exercises & sessions (by link/title)
         const addedEx = mergeExercises(data.exercises || []);
         const addedSes = mergeSessions(data.sessions || []);
         persistExercises(); persistSessions(); renderList(true); renderSessions();
         alert(`Importeret (merge). Øvelser tilføjet: ${addedEx}, sessioner tilføjet: ${addedSes}`);
       } else {
-        // replace
         exercises = data.exercises || [];
         sessions = data.sessions || [];
         categories = data.categories || DEFAULT_CATEGORIES;
@@ -573,7 +577,7 @@ function handleRestoreFile(ev){
     }catch(err){ alert('Kunne ikke læse fil: ' + err.message); }
   };
   reader.readAsText(file);
-  ev.target.value = ''; // reset
+  ev.target.value = '';
 }
 
 function mergeExercises(imported){
