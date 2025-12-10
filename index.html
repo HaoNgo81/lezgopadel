@@ -2,28 +2,24 @@
 <html lang="da">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1" />
   <title>LezGo Padel — Training Bank</title>
   <meta name="theme-color" content="#0f1720" id="meta-theme-color" />
   <style>
-    /* ---------- RESET / THEME ---------- */
+    /* RESET / THEME */
     *,*::before,*::after{box-sizing:border-box}
     html,body{height:100%;margin:0;padding:0;background:linear-gradient(180deg,#0f1720 0%,#071226 100%);color:#e6eef6;font-family:Inter,system-ui,Arial,sans-serif}
     :root{--panel:#0b1a25;--muted:#9aa7b3;--accent:#22c55e;--danger:#ef4444;--border-soft:rgba(255,255,255,.04);--max-w:1100px}
     a{color:inherit}
-
     .wrapper{max-width:var(--max-w);margin:12px auto;padding:8px;width:94%}
 
-    /* ---------- HEADER: centered logo + controls right ---------- */
-    header{position:relative;height:64px;margin-bottom:12px}
-    /* the centered logo */
-    #logo-wrap{position:absolute;left:50%;top:8px;transform:translateX(-50%);display:flex;align-items:center;gap:10px}
-    #logo{height:44px;display:block}
-    /* controls to the right */
-    .header-controls{position:absolute;right:0;top:8px;display:flex;gap:10px;align-items:center}
-    .badge{background:rgba(255,255,255,.04);padding:6px 10px;border-radius:8px;font-weight:700;color:var(--muted)}
+    /* HEADER - logo on its own centered line */
+    header{margin-bottom:12px}
+    #logo-line{width:100%;display:flex;justify-content:center;align-items:center;margin-bottom:8px}
+    #logo{height:48px;display:block}
+    .header-controls{display:flex;gap:10px;align-items:center;justify-content:flex-end}
 
-    /* Buttons */
+    .badge{background:rgba(255,255,255,.04);padding:6px 10px;border-radius:8px;font-weight:700;color:var(--muted)}
     .btn{border:0;padding:10px 14px;border-radius:12px;font-weight:700;cursor:pointer;background:transparent;color:inherit;display:inline-flex;align-items:center;gap:8px}
     .btn-primary{background:var(--accent);color:#05261a}
     .btn-ghost{background:transparent;border:1px solid var(--border-soft);color:var(--muted);padding:8px 10px;border-radius:10px}
@@ -35,60 +31,54 @@
     input[type=text],input[type=url],input[type=number],select,textarea{width:100%;padding:12px;border-radius:10px;border:1px solid var(--border-soft);background:transparent;color:inherit}
     textarea{min-height:84px;resize:vertical}
 
-    /* main layout: ensure filters and session builder share horizontal space */
+    /* layout: filters left, session right (side-by-side >=880px) */
     .main-grid{display:block}
-    @media(min-width:880px){
-      .main-grid{display:grid;grid-template-columns:1fr 420px;gap:12px;align-items:start}
-    }
+    @media(min-width:880px){ .main-grid{display:grid;grid-template-columns:1fr 420px;gap:12px;align-items:start} }
 
-    /* list / session styles */
+    /* items */
     .exercise{display:flex;gap:12px;padding:12px;border-radius:10px;border:1px solid var(--border-soft);align-items:flex-start;overflow:hidden}
-    .exercise .left{flex:1;min-width:0}
-    .exercise .meta{color:var(--muted);margin-top:8px}
+    .left{flex:1;min-width:0}
+    .meta{color:var(--muted);margin-top:8px}
     .tag{background:rgba(255,255,255,.03);padding:6px 8px;border-radius:8px;margin-right:8px;font-size:13px;display:inline-block;margin-top:8px}
     .actions-small{display:flex;flex-direction:column;gap:8px;align-items:flex-end}
 
-    /* horizontal text wrapping - avoid vertical rotation */
+    /* ensure horizontal text wrapping */
     .exercise .left div, .exercise .left a { white-space: normal !important; word-break: break-word !important; overflow-wrap: anywhere !important; hyphens: auto !important; }
     .exercise a { color:#2fa1ff; text-decoration:underline; }
 
-    /* small tweaks */
-    .muted-note{color:var(--muted);font-size:13px;margin-top:6px}
     #list{max-height:360px;overflow:auto}
     #session-items{max-height:180px;overflow:auto}
 
-    /* bottom spacing for PWA bottom bar if any */
-    body { padding-bottom:180px }
+    body{padding-bottom:180px}
   </style>
 </head>
 <body>
   <div class="wrapper">
     <header>
-      <!-- centered logo (keeps center even with controls on right) -->
-      <div id="logo-wrap">
+      <!-- Logo on its own line, centered -->
+      <div id="logo-line">
         <img id="logo" src="lezgo-logo.svg" alt="LEZGO">
       </div>
 
-      <!-- right controls -->
-      <div class="header-controls">
+      <!-- controls row (under logo) -->
+      <div style="display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:6px">
         <div id="badges" style="display:flex;gap:8px;align-items:center"></div>
-        <select id="lang-select" style="padding:8px;border-radius:8px;border:1px solid var(--border-soft);background:transparent;color:inherit">
-          <option value="da">Dansk</option>
-          <option value="en">English</option>
-        </select>
-        <button id="btn-buy" class="btn btn-primary">Køb adgang</button>
-        <button id="btn-admin" class="btn btn-ghost">Admin login</button>
-        <button id="btn-logout" class="btn btn-ghost" style="display:none;color:var(--danger)">Log ud</button>
+        <div class="header-controls">
+          <select id="lang-select" style="padding:8px;border-radius:8px;border:1px solid var(--border-soft);background:transparent;color:inherit">
+            <option value="da">Dansk</option><option value="en">English</option>
+          </select>
+          <button id="btn-buy" class="btn btn-primary">Køb adgang</button>
+          <button id="btn-admin" class="btn btn-ghost">Admin login</button>
+          <button id="btn-logout" class="btn btn-ghost" style="display:none;color:var(--danger)">Log ud</button>
+        </div>
       </div>
     </header>
 
-    <!-- top form card (unchanged) -->
+    <!-- form -->
     <section class="card">
       <h3 style="margin:0 0 10px 0;color:var(--muted)">Tilføj / Rediger øvelse (Padel)</h3>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-        <div style="grid-column:1/-1">
-          <input id="title" type="text" placeholder="f.eks. Forehand topspin drill" style="width:100%;padding:12px;border-radius:10px;border:1px solid var(--border-soft);background:transparent;color:inherit">
-        </div>
+        <div style="grid-column:1/-1"><input id="title" type="text" placeholder="f.eks. Forehand topspin drill"></div>
         <div><label>Kategori</label><select id="category"></select></div>
         <div><label>Spillere</label><select id="players"></select></div>
         <div><label>Varighed (min)</label><input id="duration" type="number" min="0" placeholder="20"></div>
@@ -97,7 +87,7 @@
 
         <div style="grid-column:1/-1">
           <label>Videolink (YouTube / Instagram / Facebook)</label>
-          <div style="display:flex;gap:8px">
+          <div style="display:flex;gap:8px;align-items:center">
             <input id="link" type="url" placeholder="https://..." style="flex:1">
             <button id="analyze-btn" class="btn btn-ghost">🔍 Analyser</button>
           </div>
@@ -116,9 +106,9 @@
       </div>
     </section>
 
-    <!-- MAIN: left = filters, right = session builder (now side-by-side on wide screens) -->
+    <!-- main area -->
     <div class="main-grid">
-      <!-- LEFT: Filters -->
+      <!-- left = filters -->
       <div class="card">
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center">
           <input id="search" type="text" placeholder="Søg..." style="flex:1;padding:10px;border-radius:10px;border:1px solid var(--border-soft);background:transparent;color:inherit">
@@ -134,10 +124,10 @@
           <select id="filter-level" style="flex:1;padding:10px;border-radius:10px;border:1px solid var(--border-soft);background:transparent;color:inherit"><option>ALL</option></select>
         </div>
 
-        <div class="muted-note">Filtre er her — Session Builder er til højre. På small skærme stables de lodret.</div>
+        <div style="color:var(--muted);font-size:13px">Filtre er her — Session Builder er til højre. På small skærme stables de lodret.</div>
       </div>
 
-      <!-- RIGHT: Session Builder + saved sessions + exercises (side-by-side on wide) -->
+      <!-- right = session builder + sessions + moved exercise list -->
       <aside class="card">
         <h4 style="margin:0 0 12px 0">Training Session Builder</h4>
 
@@ -148,7 +138,7 @@
         <input id="session-desc" type="text">
 
         <label style="margin-top:8px">Øvelser</label>
-        <div id="session-items"></div>
+        <div id="session-items" style="max-height:160px;overflow:auto"></div>
 
         <div style="display:flex;gap:10px;align-items:center;margin-top:10px;">
           <div>Total:</div>
@@ -173,7 +163,7 @@
         <h4 style="margin:0 0 8px 0">Øvelsesliste</h4>
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
           <div id="selected-count" style="font-weight:700">0 valgt</div>
-          <div style="margin-left:auto;color:var(--muted);font-size:13px">Per-item handlinger: Tilføj / Rediger / Slet</div>
+          <div style="margin-left:auto;color:var(--muted);font-size:13px">Per-item handlinger: Rediger / Slet</div>
         </div>
 
         <div id="list"></div>
@@ -182,7 +172,7 @@
     </div>
   </div>
 
-  <!-- confirm + admin modals (kept minimal) -->
+  <!-- admin + confirm modals -->
   <div id="admin-modal" style="position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:999">
     <div style="background:var(--panel);padding:14px;border-radius:10px;max-width:420px;width:92%">
       <h3 style="margin-top:0">Admin login</h3>
@@ -206,66 +196,311 @@
   </div>
 
 <script>
-/* ---------- minimal JS for permissions + render stub ---------- */
-/* This file preserves the behavior you had — only layout changed.
-   Replace with your full app script if you already have it. */
+/* CONFIG (samme keys som før) */
+const ADMIN_PASSWORD = "admin123";
+const EX_KEY = "lezgo_exercises_v1";
+const SES_KEY = "lezgo_sessions_v1";
+const CAT_KEY = "lezgo_categories_v1";
+const LVL_KEY = "lezgo_levels_v1";
+const INT_KEY = "lezgo_intensities_v1";
+const PLR_KEY = "lezgo_players_v1";
 
+const DEFAULT_CATEGORIES = ["Back wall","Bandeja","Chiquita","Defense","Double wall","Groundstroke","Lob","Serve","Smash","Vibora","Volley"].sort();
+const DEFAULT_LEVELS = ["Beginner","Intermediate","Advanced"];
+const DEFAULT_INT = ["Low","Medium","High"];
+const DEFAULT_PLAYERS = ["1","2","3","4","1-2","1-3","1-4","2-4","Any","Add new..."];
+
+let exercises = [], sessions = [], categories = [], levels = [], intensities = [], players = [];
+let editingId = null;
 const $ = id => document.getElementById(id);
-const isAdmin = () => localStorage.getItem("is_admin")==="1";
-const isPaid = () => localStorage.getItem("is_paid")==="1";
+const uid = () => "id_" + Math.random().toString(36).slice(2,10);
+const isAdmin = () => localStorage.getItem("is_admin") === "1";
+const isPaid  = () => localStorage.getItem("is_paid") === "1";
 
-/* demo placeholders so UI shows correctly after replacing index */
+/* Batching */
+const RENDER_BATCH = 100;
+let renderIndex = 0;
+
+/* Load/persist */
+function loadAll(){
+  exercises = JSON.parse(localStorage.getItem(EX_KEY) || "[]");
+  sessions = JSON.parse(localStorage.getItem(SES_KEY) || "[]");
+  categories = JSON.parse(localStorage.getItem(CAT_KEY) || "null") || DEFAULT_CATEGORIES;
+  levels = JSON.parse(localStorage.getItem(LVL_KEY) || "null") || DEFAULT_LEVELS;
+  intensities = JSON.parse(localStorage.getItem(INT_KEY) || "null") || DEFAULT_INT;
+  players = JSON.parse(localStorage.getItem(PLR_KEY) || "null") || DEFAULT_PLAYERS;
+}
+function persistExercises(){ localStorage.setItem(EX_KEY, JSON.stringify(exercises)); }
+function persistSessions(){ localStorage.setItem(SES_KEY, JSON.stringify(sessions)); }
+function persistBase(){ localStorage.setItem(CAT_KEY, JSON.stringify(categories)); localStorage.setItem(LVL_KEY, JSON.stringify(levels)); localStorage.setItem(INT_KEY, JSON.stringify(intensities)); localStorage.setItem(PLR_KEY, JSON.stringify(players)); }
+
+/* INIT */
+function init(){
+  loadAll();
+  populateSelects();
+  bindEvents();
+  renderSessions();
+  renderList(true);
+  enforcePermissions();
+}
+function populateSelects(){
+  const sel = $("category"), filc = $("filter-category"), lvl = $("level"), fill = $("filter-level"), pl = $("players");
+  if(sel){ sel.innerHTML=''; categories.forEach(c=>{ const o=document.createElement('option'); o.value=c; o.textContent=c; sel.appendChild(o); }); const add=document.createElement('option'); add.value='__ADD__'; add.textContent='Add new category...'; sel.appendChild(add); }
+  if(filc){ filc.innerHTML=''; let a=document.createElement('option'); a.text='ALL'; a.value=''; filc.appendChild(a); categories.forEach(c=>{ const o=document.createElement('option'); o.value=c; o.text=c; filc.appendChild(o); }); }
+  if(lvl){ lvl.innerHTML=''; levels.forEach(c=>{ const o=document.createElement('option'); o.value=c; o.text=c; lvl.appendChild(o); }); const addL=document.createElement('option'); addL.value='__ADD__'; addL.text='Add new level...'; lvl.appendChild(addL); }
+  if(fill){ fill.innerHTML=''; let a=document.createElement('option'); a.text='ALL'; a.value=''; fill.appendChild(a); levels.forEach(c=>{ const o=document.createElement('option'); o.value=c; o.text=c; fill.appendChild(o); }); }
+  if(pl){ pl.innerHTML=''; players.forEach(p=>{ const o=document.createElement('option'); o.value=p; o.text=p; pl.appendChild(o); }); }
+}
+
+/* BIND EVENTS */
+function bindEvents(){
+  $("save-btn").addEventListener("click", onSave);
+  $("clear-btn").addEventListener("click", clearForm);
+  $("delete-all-btn").addEventListener("click", ()=> {
+    if(!isAdmin()){ alert('Admin adgang kræves'); return; }
+    const pass = prompt('Admin kode for at bekræfte slet alle'); if(pass !== ADMIN_PASSWORD){ alert('Forkert kode'); return; }
+    if(confirm('Slet ALLE øvelser?')){ exercises=[]; persistExercises(); renderList(true); renderSessions(); }
+  });
+
+  $("search").addEventListener("input", ()=> { renderIndex=0; debounce(()=>renderList(true), 180); });
+  $("filter-category").addEventListener("change", ()=> { renderIndex=0; renderList(true); });
+  $("filter-level").addEventListener("change", ()=> { renderIndex=0; renderList(true); });
+
+  $("pf-y").addEventListener("click", ()=> togglePf('youtube',$('pf-y')));
+  $("pf-i").addEventListener("click", ()=> togglePf('instagram',$('pf-i')));
+  $("pf-f").addEventListener("click", ()=> togglePf('facebook',$('pf-f')));
+
+  $("btn-admin").addEventListener("click", ()=> $("admin-modal").style.display="flex");
+  $("admin-cancel").addEventListener("click", ()=> $("admin-modal").style.display="none");
+  $("admin-submit").addEventListener("click", ()=> {
+    if($("admin-password").value===ADMIN_PASSWORD){ localStorage.setItem("is_admin","1"); $("admin-modal").style.display="none"; enforcePermissions(); alert('Admin enabled'); } else alert('Forkert kode');
+  });
+  $("btn-logout").addEventListener("click", ()=> { localStorage.removeItem('is_admin'); enforcePermissions(); });
+
+  $("btn-buy").addEventListener("click", ()=> {
+    if(isPaid()){ if(confirm('Deaktiver betalt adgang?')){ localStorage.removeItem('is_paid'); enforcePermissions(); } }
+    else { if(confirm('Simuler køb?')){ localStorage.setItem('is_paid','1'); enforcePermissions(); } }
+  });
+
+  $("load-more").addEventListener("click", ()=> renderList(false));
+
+  // confirm modal buttons
+  const confirmNo = document.getElementById('confirm-no') || null;
+  const confirmYes = document.getElementById('confirm-yes') || null;
+  if(confirmNo) confirmNo.addEventListener("click", ()=> closeConfirm(false));
+  if(confirmYes) confirmYes.addEventListener("click", ()=> closeConfirm(true));
+}
+
+/* debounce */
+let debounceTimer = null;
+function debounce(fn, wait){ clearTimeout(debounceTimer); debounceTimer = setTimeout(fn, wait); }
+
+/* platform filter */
+const platformState = new Set();
+function togglePf(name, el){ if(platformState.has(name)){ platformState.delete(name); el.classList.remove('active'); } else { platformState.add(name); el.classList.add('active'); } renderIndex=0; renderList(true); }
+
+/* SAVE / DUP CHECK */
+function onSave(){
+  const title = ($("title").value||"").trim();
+  const link = ($("link").value||"").trim();
+  if(!title){ alert('Indtast titel'); return; }
+  const dupTitle = exercises.some(e => e.title && e.title.toLowerCase() === title.toLowerCase() && e.id !== editingId);
+  const dupLink = link ? exercises.some(e => e.link === link && e.id !== editingId) : false;
+  if(dupTitle || dupLink){ alert('Duplikat fundet: titel eller link findes allerede. Ret eller brug en anden titel/link.'); return; }
+  const obj = { id: editingId || uid(), title, link, category: $("category").value, players: $("players").value, duration: Number($("duration").value||0), level: $("level").value, intensity: $("intensity").value, description: $("description").value||"", tags: ($("tags").value||"").trim(), createdAt: new Date().toISOString() };
+  if(editingId){ const idx = exercises.findIndex(x=>x.id===editingId); if(idx>-1) exercises[idx]=obj; } else exercises.unshift(obj);
+  persistExercises();
+  editingId=null; clearForm(); renderIndex=0; renderList(true); renderSessions();
+}
+
+/* CLEAR */
+function clearForm(){ editingId=null; $("title").value=""; $("link").value=""; if($("category")) $("category").selectedIndex=0; if($("players")) $("players").selectedIndex=0; $("duration").value=""; if($("level")) $("level").selectedIndex=0; if($("intensity")) $("intensity").selectedIndex=0; $("description").value=""; $("tags").value=""; }
+
+/* RENDER LIST (batched). Note: no per-item "Tilføj" button - checkboxes auto-add */
+function renderList(reset=true){
+  const list = $("list");
+  if(!list) return;
+  if(reset){ renderIndex=0; list.innerHTML=""; }
+  const q = ($("search").value||"").trim().toLowerCase();
+  const fc = ($("filter-category").value||"");
+  const fl = ($("filter-level").value||"");
+  let items = exercises.slice();
+
+  if(platformState.size>0){
+    items = items.filter(it=>{
+      if(!it.link) return false;
+      try{
+        const host = new URL(it.link).hostname.toLowerCase();
+        if(host.includes('youtube')||host.includes('youtu.be')) return platformState.has('youtube');
+        if(host.includes('instagram')) return platformState.has('instagram');
+        if(host.includes('facebook')) return platformState.has('facebook');
+      }catch(e){ return false; }
+      return false;
+    });
+  }
+
+  if(fc) items = items.filter(x=>x.category===fc);
+  if(fl) items = items.filter(x=>x.level===fl);
+  if(q) items = items.filter(x => (x.title||"").toLowerCase().includes(q) || (x.description||"").toLowerCase().includes(q) || (x.tags||"").toLowerCase().includes(q));
+
+  const total = items.length;
+  const start = renderIndex;
+  const end = Math.min(start + RENDER_BATCH, total);
+  const slice = items.slice(start, end);
+
+  const frag = document.createDocumentFragment();
+  slice.forEach(ex=>{
+    const row = document.createElement('div'); row.className='exercise'; row.dataset.id=ex.id;
+    const cb = document.createElement('input'); cb.type='checkbox'; cb.style.marginRight='8px';
+    // if this item already in session-items, set checked
+    if( $("session-items").querySelector(`[data-id="${ex.id}"]`) ) cb.checked = true;
+    cb.addEventListener('change', (ev)=> {
+      if(ev.target.checked) addToSessionBuilder(ex.id);
+      else removeFromSessionBuilder(ex.id);
+      updateSelectedCount();
+    });
+    row.appendChild(cb);
+
+    const left = document.createElement('div'); left.className='left';
+    const h = document.createElement('div'); h.style.fontWeight='800'; h.style.fontSize='15px'; h.textContent = ex.title;
+    left.appendChild(h);
+    const meta = document.createElement('div'); meta.className='meta'; meta.textContent = `${ex.category} • ${ex.level} • ${ex.players||''} • ${ex.duration}m`;
+    left.appendChild(meta);
+    if(ex.link){ const a = document.createElement('a'); a.href = ex.link; a.target='_blank'; a.style.display='block'; a.style.marginTop='6px'; a.textContent = ex.link; left.appendChild(a); }
+    if(ex.tags){ const tbox = document.createElement('div'); tbox.style.marginTop='8px'; ex.tags.split(',').forEach(tg=>{ const s=document.createElement('span'); s.className='tag'; s.textContent = tg.trim(); tbox.appendChild(s); }); left.appendChild(tbox); }
+    row.appendChild(left);
+
+    const right = document.createElement('div'); right.className='actions-small';
+    // Edit & Delete visible only to admin/paid
+    if(isAdmin() || isPaid()){
+      const editBtn = document.createElement('button'); editBtn.className='btn btn-ghost'; editBtn.textContent='Rediger';
+      editBtn.addEventListener('click', ()=> { editingId = ex.id; populateFormForEdit(ex); window.scrollTo({top:0,behavior:'smooth'}); });
+      right.appendChild(editBtn);
+
+      const delBtn = document.createElement('button'); delBtn.className='btn btn-ghost'; delBtn.style.color='var(--danger)'; delBtn.textContent='Slet';
+      delBtn.addEventListener('click', ()=> showConfirm('Slet denne øvelse?', ()=>{ exercises = exercises.filter(x=>x.id!==ex.id); persistExercises(); renderList(true); renderSessions(); removeFromSessionBuilder(ex.id); updateSelectedCount(); }));
+      right.appendChild(delBtn);
+    }
+
+    row.appendChild(right);
+    frag.appendChild(row);
+  });
+
+  list.appendChild(frag);
+  renderIndex = end;
+  const loadMore = $("load-more");
+  if(renderIndex < total){ loadMore.style.display='block'; loadMore.textContent = `Vis flere (${total - renderIndex})`; } else loadMore.style.display='none';
+  if(total === 0 && start===0){ list.innerHTML = `<div style="color:var(--muted)">Ingen resultater</div>`; }
+  updateSelectedCount();
+}
+
+/* populate form for edit */
+function populateFormForEdit(ex){
+  $("title").value = ex.title || "";
+  $("link").value = ex.link || "";
+  if($("category")) $("category").value = ex.category || "";
+  if($("players")) $("players").value = ex.players || "";
+  $("duration").value = ex.duration || "";
+  if($("level")) $("level").value = ex.level || "";
+  if($("intensity")) $("intensity").value = ex.intensity || "";
+  $("description").value = ex.description || "";
+  $("tags").value = ex.tags || "";
+}
+
+/* SESSION BUILDER: add/remove via checkbox */
+function addToSessionBuilder(id){
+  if(!isAdmin() && !isPaid()){ alert('Betalt adgang kræves'); // uncheck the box
+    const cb = document.querySelector(`#list [data-id="${id}"] input[type="checkbox"]`);
+    if(cb) cb.checked = false;
+    return;
+  }
+  const box = $("session-items");
+  if(box.querySelector(`[data-id="${id}"]`)) return; // already added
+  const ex = exercises.find(e=>e.id===id); if(!ex) return;
+  const row = document.createElement('div'); row.className='exercise'; row.dataset.id = id; row.style.marginBottom='6px';
+  row.innerHTML = `<div style="flex:1"><div style="font-weight:700">${escapeHtml(ex.title)}</div><div style="color:var(--muted)">${ex.duration}m • ${escapeHtml(ex.category)}</div></div><button class="btn btn-ghost remove-from-session" style="color:var(--danger)">Fjern</button>`;
+  row.querySelector('button').addEventListener('click', ()=> { row.remove(); // uncheck the checkbox in list if present
+    const cb = document.querySelector(`#list [data-id="${id}"] input[type="checkbox"]`); if(cb) cb.checked = false;
+    recalcSession(); updateSelectedCount();
+  });
+  box.appendChild(row);
+  recalcSession();
+  updateSelectedCount();
+}
+
+function removeFromSessionBuilder(id){
+  const box = $("session-items");
+  const node = box.querySelector(`[data-id="${id}"]`);
+  if(node) node.remove();
+  recalcSession();
+}
+
+/* recalc totals */
+function recalcSession(){ let total=0,count=0; document.querySelectorAll("#session-items .exercise").forEach(r=>{ const ex = exercises.find(e=>e.id===r.dataset.id); if(ex){ total+=Number(ex.duration||0); count++; }}); $("session-total").textContent = total + " m"; $("session-count").textContent = count + " øvelser"; }
+
+/* save session */
+function saveSession(){
+  if(!isAdmin() && !isPaid()){ alert('Betalt adgang kræves'); return; }
+  const name = ($("session-name").value||"").trim(); if(!name){ alert('Tilføj et sessionsnavn'); return; }
+  const ids = Array.from(document.querySelectorAll("#session-items .exercise")).map(r=>r.dataset.id);
+  const total = ids.reduce((a,id)=>{ const ex = exercises.find(e=>e.id===id); return a + (ex?Number(ex.duration||0):0); }, 0);
+  const s={ id: uid(), name, description: $("session-desc").value||"", items: ids, total, createdAt: new Date().toISOString() };
+  sessions.unshift(s); persistSessions(); renderSessions(); alert('Session gemt'); }
+
+/* render sessions */
+function renderSessions(){
+  const box = $("sessions-list"); box.innerHTML = "";
+  if(!sessions.length){ box.innerHTML = `<div style="color:var(--muted)">Ingen gemte sessioner</div>`; return; }
+  sessions.forEach(s=>{
+    const div = document.createElement('div'); div.className='exercise'; div.style.marginBottom='8px';
+    div.innerHTML = `<div style="flex:1"><div style="font-weight:800">${escapeHtml(s.name)}</div><div style="color:var(--muted)">${(s.items||[]).length} øvelser • ${s.total||0} m</div></div>`;
+    const openBtn = document.createElement('button'); openBtn.className='btn btn-ghost'; openBtn.textContent='Åbn'; openBtn.addEventListener('click', ()=> { openSavedSession(s.id); });
+    const delBtn = document.createElement('button'); delBtn.className='btn btn-ghost'; delBtn.style.color='var(--danger)'; delBtn.textContent='Slet'; delBtn.addEventListener('click', ()=> showConfirm('Slet denne session?', ()=>{ sessions = sessions.filter(x=>x.id!==s.id); persistSessions(); renderSessions(); }));
+    div.appendChild(openBtn); if(isAdmin()||isPaid()) div.appendChild(delBtn);
+    box.appendChild(div);
+  });
+}
+
+/* open saved session: populate session-items and ensure checkboxes reflect it */
+function openSavedSession(id){
+  const s = sessions.find(x=>x.id===id); if(!s) return alert('Session ikke fundet');
+  const box = $("session-items"); box.innerHTML = "";
+  s.items.forEach(iid=>{ const ex = exercises.find(e=>e.id===iid); if(!ex) return; const row = document.createElement('div'); row.className='exercise'; row.dataset.id=iid; row.style.marginBottom='6px'; row.innerHTML = `<div style="flex:1"><div style="font-weight:700">${escapeHtml(ex.title)}</div><div style="color:var(--muted)">${ex.duration}m • ${escapeHtml(ex.category)}</div></div><button class="btn btn-ghost remove-from-session" style="color:var(--danger)">Fjern</button>`; row.querySelector('button').addEventListener('click', ()=>{ row.remove(); recalcSession(); // uncheck checkbox if present
+    const cb = document.querySelector(`#list [data-id="${iid}"] input[type="checkbox"]`); if(cb) cb.checked = false; }); box.appendChild(row); });
+  recalcSession();
+  // set checkboxes in list to match
+  document.querySelectorAll('#list .exercise').forEach(r=>{
+    const cb = r.querySelector('input[type="checkbox"]');
+    if(cb) cb.checked = !!s.items.find(i=>i===r.dataset.id);
+  });
+  updateSelectedCount();
+}
+
+/* confirm modal */
+let _confirmCb = null;
+function showConfirm(message, cb){ _confirmCb = cb; $("confirm-message").textContent = message; $("confirm-modal").style.display = "flex"; }
+function closeConfirm(answer){ $("confirm-modal").style.display = "none"; if(answer && typeof _confirmCb === 'function') _confirmCb(); _confirmCb = null; }
+
+/* util */
+function updateSelectedCount(){ const boxes = document.querySelectorAll('#list input[type="checkbox"]'); let count=0; boxes.forEach(b=>{ if(b.checked) count++; }); $("selected-count").textContent = (count||0) + " valgt"; }
+function escapeHtml(s){ return (s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+/* permissions + UI */
 function enforcePermissions(){
-  const badges = $("badges"); badges.innerHTML="";
+  const bb = $("lezgo-bottom-bar");
+  if(bb) bb.style.display = (isAdmin()||isPaid()) ? 'flex' : 'none';
+  $("delete-all-btn").style.display = isAdmin() ? 'inline-block' : 'none';
+  $("save-session").style.display = (isAdmin()||isPaid()) ? 'inline-block' : 'none';
+  $("clear-session").style.display = (isAdmin()||isPaid()) ? 'inline-block' : 'none';
+  const badges = $("badges"); badges.innerHTML='';
   if(isAdmin()){ const d=document.createElement('div'); d.className='badge'; d.textContent='ADMIN'; badges.appendChild(d); $("btn-logout").style.display='inline-flex'; } else $("btn-logout").style.display='none';
   if(isPaid()){ const d=document.createElement('div'); d.className='badge'; d.textContent='PAID'; badges.appendChild(d); }
-  // show/hide save buttons etc
-  $("save-session").style.display = (isAdmin()||isPaid()) ? 'inline-block' : 'none';
-  $("delete-all-btn").style.display = isAdmin() ? 'inline-block' : 'none';
+  renderList(true);
+  renderSessions();
 }
 
-/* small demo list rendering (you replace with your full logic) */
-let demoItems = [
-  {id:'a',title:'Improve Padel Serve - Beginner Live Session',category:'Back wall',level:'Beginner',players:'1',duration:0,link:'https://youtu.be/example',tags:'serve,beginner'},
-  {id:'b',title:'Tips To Improve Your Padel Game',category:'Groundstroke',level:'Beginner',players:'1',duration:0,link:'https://youtu.be/example2',tags:'tips,game'}
-];
-function renderDemoList(){
-  const list = $("list"); list.innerHTML='';
-  demoItems.forEach(ex=>{
-    const row = document.createElement('div'); row.className='exercise';
-    const cb = document.createElement('input'); cb.type='checkbox'; cb.style.marginRight='8px';
-    const left = document.createElement('div'); left.className='left';
-    const h = document.createElement('div'); h.style.fontWeight='800'; h.textContent = ex.title;
-    left.appendChild(h);
-    const meta = document.createElement('div'); meta.className='meta'; meta.textContent = `${ex.category} • ${ex.level} • ${ex.players} • ${ex.duration}m`;
-    left.appendChild(meta);
-    row.appendChild(cb); row.appendChild(left);
-    const right = document.createElement('div'); right.className='actions-small';
-    if(isAdmin()||isPaid()){
-      const add = document.createElement('button'); add.className='btn btn-primary btn-small'; add.textContent='Tilføj'; add.addEventListener('click',()=>alert('Tilføj: '+ex.title));
-      const edit = document.createElement('button'); edit.className='btn btn-ghost'; edit.textContent='Rediger';
-      const del = document.createElement('button'); del.className='btn btn-ghost'; del.style.color='var(--danger)'; del.textContent='Slet';
-      right.appendChild(add); right.appendChild(edit); right.appendChild(del);
-    }
-    row.appendChild(right); list.appendChild(row);
-  });
-}
-
-/* init */
-document.addEventListener('DOMContentLoaded', ()=>{
-  enforcePermissions();
-  renderDemoList();
-  // basic admin login demo
-  $("btn-admin").addEventListener('click', ()=> $("admin-modal").style.display='flex');
-  $("admin-cancel").addEventListener('click', ()=> $("admin-modal").style.display='none');
-  $("admin-submit").addEventListener('click', ()=>{
-    if($("admin-password").value==='admin123'){ localStorage.setItem('is_admin','1'); $("admin-modal").style.display='none'; enforcePermissions(); renderDemoList(); } else alert('Forkert kode');
-  });
-  $("btn-buy").addEventListener('click', ()=> {
-    if(isPaid()){ localStorage.removeItem('is_paid'); } else localStorage.setItem('is_paid','1');
-    enforcePermissions(); renderDemoList();
-  });
-});
+/* START */
+document.addEventListener('DOMContentLoaded', ()=> init());
 </script>
 </body>
 </html>
