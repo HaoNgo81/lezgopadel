@@ -2,171 +2,198 @@
 <html lang="da">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
   <title>LezGo Padel — Training Bank</title>
   <meta name="theme-color" content="#0f1720" id="meta-theme-color" />
   <style>
-    /* reset + theme vars */
+    /* RESET + THEME */
     *,*::before,*::after{box-sizing:border-box}
-    html,body{height:100%;margin:0;padding:0;font-family:Inter,system-ui,Arial,sans-serif;-webkit-font-smoothing:antialiased}
-    :root{
-      --bg-top:#0f1720; --bg-bottom:#071226; --panel:#0b1a25; --muted:#9aa7b3; --text:#e6eef6; --accent:#22c55e; --accent-dark:#0b4428; --danger:#ef4444; --border-soft:rgba(255,255,255,.04);
-    }
-    body.light{
-      --bg-top:#caced5; --bg-bottom:#bfc3cb; --panel:#d8dce3; --muted:#3c4652; --text:#0b1220; --accent:#16a34a; --accent-dark:#106b37; --danger:#dc2626; --border-soft:rgba(0,0,0,.14);
-    }
-    body{background:linear-gradient(180deg,var(--bg-top) 0%,var(--bg-bottom) 100%);color:var(--text);transition:background .18s,color .18s;padding-bottom:180px}
+    html,body{height:100%;margin:0;padding:0;overflow-x:hidden;font-family:Inter,system-ui,Arial,sans-serif;-webkit-font-smoothing:antialiased}
+    :root{--bg-top:#0f1720;--bg-bottom:#071226;--panel:#0b1a25;--muted:#9aa7b3;--text:#e6eef6;--accent:#22c55e;--accent-dark:#0b4428;--danger:#ef4444;--border-soft:rgba(255,255,255,.04)}
+    body.light{--bg-top:#caced5;--bg-bottom:#bfc3cb;--panel:#d8dce3;--muted:#3c4652;--text:#0b1220;--accent:#16a34a;--accent-dark:#106b37;--danger:#dc2626}
+    body{background:linear-gradient(180deg,var(--bg-top) 0%,var(--bg-bottom) 100%);color:var(--text);padding-bottom:160px;transition:background .2s,color .2s}
 
-    .wrapper{max-width:1100px;margin:12px auto;padding:8px;width:94%}
-    header{margin-bottom:12px}
-    #logo-line{width:100%;display:flex;justify-content:center;align-items:center;margin-bottom:6px}
-    #logo{height:48px}
-    .header-controls{display:flex;gap:10px;align-items:center;justify-content:flex-end}
+    .container{max-width:1100px;margin:12px auto;padding:8px;width:94%}
+    #logo-line{display:flex;justify-content:center;margin-bottom:8px}
+    #logo{height:54px}
+
+    .header-row{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
     .badge{background:rgba(255,255,255,.04);padding:6px 10px;border-radius:8px;font-weight:700;color:var(--muted)}
 
-    .btn{border:0;padding:10px 14px;border-radius:12px;font-weight:700;cursor:pointer;background:transparent;color:inherit;display:inline-flex;align-items:center;gap:8px}
+    .btn{border:0;padding:10px 14px;border-radius:12px;font-weight:800;cursor:pointer;background:transparent;color:var(--text);display:inline-flex;align-items:center;gap:8px}
     .btn-primary{background:var(--accent);color:#05261a}
     .btn-ghost{background:transparent;border:1px solid var(--border-soft);color:var(--muted);padding:8px 10px;border-radius:10px}
-    .btn-danger{background:var(--danger);color:#fff;border-radius:10px}
     .btn-small{padding:6px 8px;border-radius:8px;font-weight:700}
+
+    .platform-btn{border-radius:8px;padding:8px 10px;border:1px solid var(--border-soft);background:transparent;color:var(--muted);cursor:pointer}
+    .platform-btn.active{background:var(--accent);color:#05261a;border-color:transparent;box-shadow:0 6px 18px rgba(0,0,0,.12)}
+    .platform-btn:focus{outline:2px solid rgba(255,255,255,0.06);outline-offset:3px}
 
     .card{background:var(--panel);border-radius:12px;padding:14px;margin-bottom:14px;box-shadow:0 10px 28px rgba(2,6,23,.6)}
     label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
     input[type=text],input[type=url],input[type=number],select,textarea{width:100%;padding:12px;border-radius:10px;border:1px solid var(--border-soft);background:transparent;color:var(--text)}
     textarea{min-height:84px;resize:vertical}
 
-    .main-grid{display:block}
-    @media(min-width:880px){ .main-grid{display:grid;grid-template-columns:1fr 420px;gap:12px;align-items:start} }
+    .two-col{display:grid;grid-template-columns:1fr 420px;gap:12px}
+    @media(max-width:980px){.two-col{grid-template-columns:1fr}}
 
     .exercise{display:flex;gap:12px;padding:12px;border-radius:10px;border:1px solid var(--border-soft);align-items:flex-start;overflow:hidden}
     .left{flex:1;min-width:0}
-    .meta{color:var(--muted);margin-top:8px}
+    .meta{color:var(--muted);margin-top:6px}
     .tag{background:rgba(255,255,255,.03);padding:6px 8px;border-radius:8px;margin-right:8px;font-size:13px;display:inline-block;margin-top:8px}
-    .actions-small{display:flex;flex-direction:column;gap:8px;align-items:flex-end}
-    .exercise .left div, .exercise .left a { white-space: normal !important; word-break: break-word !important; overflow-wrap: anywhere !important; hyphens: auto !important; }
-    .exercise a { color:#2fa1ff; text-decoration:underline; }
+    .actions-small{display:flex;flex-direction:column;gap:6px;align-items:flex-end}
+    .exercise .left div, .exercise .left a { white-space:normal !important; word-break:break-word !important; overflow-wrap:anywhere !important; hyphens:auto !important }
+    .exercise a{color:#2fa1ff;text-decoration:underline}
 
-    #list{max-height:360px;overflow:auto}
-    #session-items{max-height:180px;overflow:auto}
+    #list{max-height:420px;overflow:auto}
+    #session-items{max-height:260px;overflow:auto}
 
-    #lezgo-bottom-bar{position:fixed;bottom:12px;left:12px;right:12px;max-width:calc(1100px - 24px);margin:0 auto;display:flex;gap:12px;justify-content:center;align-items:center;padding:10px;border-radius:12px;z-index:99999;box-shadow:0 10px 28px rgba(0,0,0,0.16);background:linear-gradient(180deg,rgba(0,0,0,0.06),rgba(0,0,0,0.02))}
-    body.light #lezgo-bottom-bar{background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(255,255,255,.00))}
-    #lezgo-bottom-bar .lezgo-btn{padding:.6rem .9rem;border-radius:10px;background:var(--accent);color:#05261a;font-weight:800;min-width:110px}
-    #lezgo-bottom-bar .lezgo-btn.restore{background:transparent;border:1px solid var(--border-soft);color:inherit}
+    #bottom-bar{position:fixed;bottom:12px;left:12px;right:12px;max-width:calc(1100px - 24px);margin:0 auto;display:flex;gap:12px;justify-content:center;align-items:center;padding:10px;border-radius:12px;z-index:9999;box-shadow:0 10px 28px rgba(0,0,0,0.16);background:linear-gradient(180deg,rgba(0,0,0,0.04),rgba(0,0,0,0.02))}
+    .bottom-btn{padding:10px 14px;border-radius:10px;background:var(--accent);color:#05261a;font-weight:800}
+    .bottom-btn.restore{background:transparent;border:1px solid var(--border-soft);color:var(--text)}
 
-    .muted-note{color:var(--muted);font-size:13px;margin-top:6px}
+    .search-row{display:flex;gap:8px;align-items:center}
+    .search-row input[type=text]{flex:1;min-width:0}
   </style>
 </head>
 <body>
-  <div class="wrapper">
+  <div class="container">
     <header>
       <div id="logo-line"><img id="logo" src="lezgo-logo.svg" alt="LEZGO"></div>
 
-      <div style="display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:6px">
+      <div class="header-row">
         <div id="badges" style="display:flex;gap:8px;align-items:center"></div>
-        <div class="header-controls">
+
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
           <button id="theme-toggle" class="btn btn-ghost" title="Toggle theme">🌓</button>
           <select id="lang-select" style="padding:8px;border-radius:8px;border:1px solid var(--border-soft);background:transparent;color:var(--text)">
             <option value="da">Dansk</option><option value="en">English</option>
           </select>
-          <button id="btn-buy" class="btn btn-primary" data-i18n="buyAccess">Køb adgang</button>
-          <button id="btn-admin" class="btn btn-ghost" data-i18n="adminLogin">Admin login</button>
+          <button id="btn-buy" class="btn btn-primary">Køb adgang</button>
+          <button id="btn-admin" class="btn btn-ghost">Admin login</button>
           <button id="btn-logout" class="btn btn-ghost" style="display:none;color:var(--danger)">Log ud</button>
         </div>
       </div>
     </header>
 
-    <section class="card" id="form-card">
-      <h3 id="title-heading" style="margin:0 0 10px 0;color:var(--muted)" data-i18n="addEditTitle">Tilføj / Rediger øvelse (Padel)</h3>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+    <!-- form -->
+    <section class="card">
+      <h3 style="margin:0 0 12px 0;color:var(--muted)">Tilføj / Rediger øvelse (Padel)</h3>
+      <form id="exercise-form" onsubmit="return false;" style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
         <div style="grid-column:1/-1">
-          <label id="label-title" data-i18n="titleLabel">Titel</label>
-          <input id="title" type="text" placeholder="f.eks. Forehand topspin drill" data-i18n-placeholder="titlePlaceholder">
+          <label>Titel</label>
+          <input id="title" type="text" placeholder="f.eks. Forehand topspin drill">
         </div>
 
-        <div><label id="label-category" data-i18n="categoryLabel">Kategori</label><select id="category"></select></div>
-        <div><label id="label-players" data-i18n="playersLabel">Spillere</label><select id="players"></select></div>
-        <div><label id="label-duration" data-i18n="durationLabel">Varighed (min)</label><input id="duration" type="number" min="0" placeholder="20"></div>
-        <div><label id="label-level" data-i18n="levelLabel">Niveau</label><select id="level"></select></div>
-        <div><label id="label-intensity" data-i18n="intensityLabel">Intensitet</label><select id="intensity"></select></div>
+        <div>
+          <label>Kategori</label>
+          <select id="category"></select>
+        </div>
+
+        <div>
+          <label>Spillere</label>
+          <select id="players"></select>
+        </div>
+
+        <div>
+          <label>Varighed (min)</label>
+          <input id="duration" type="number" min="0" placeholder="20">
+        </div>
+
+        <div>
+          <label>Niveau</label>
+          <select id="level"></select>
+        </div>
+
+        <div>
+          <label>Intensitet</label>
+          <select id="intensity"></select>
+        </div>
 
         <div style="grid-column:1/-1">
-          <label id="label-video" data-i18n="videoLabel">Videolink (YouTube / Instagram / Facebook)</label>
+          <label>Videolink (YouTube / Instagram / Facebook)</label>
           <div style="display:flex;gap:8px;align-items:center">
-            <input id="link" type="url" placeholder="https://..." data-i18n-placeholder="videoPlaceholder" style="flex:1">
-            <button id="analyze-btn" class="btn btn-ghost" title="Analyze video">🔍</button>
+            <input id="link" type="url" placeholder="https://..." style="flex:1">
+            <button id="analyze-btn" class="btn btn-ghost">🔍 Analyser</button>
           </div>
         </div>
 
-        <div style="grid-column:1/-1"><label id="label-desc" data-i18n="descriptionLabel">Beskrivelse</label><textarea id="description"></textarea></div>
-        <div style="grid-column:1/-1"><label id="label-tags" data-i18n="tagsLabel">Tags (kommasepareret)</label><input id="tags" type="text" placeholder="fx Cross, Chiquita, Vibora" data-i18n-placeholder="tagsPlaceholder"></div>
-
-        <div style="grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;margin-top:8px">
-          <div style="display:flex;gap:10px">
-            <button id="save-btn" class="btn btn-primary" data-i18n="saveBtn">➕ Gem øvelse</button>
-            <button id="clear-btn" class="btn btn-ghost" data-i18n="clearBtn">Ryd</button>
-          </div>
-          <button id="delete-all-btn" class="btn btn-danger" style="display:none" data-i18n="deleteAllBtn">🗑️ Slet alle</button>
+        <div style="grid-column:1/-1">
+          <label>Beskrivelse</label>
+          <textarea id="description"></textarea>
         </div>
-      </div>
+
+        <div style="grid-column:1/-1">
+          <label>Tags (kommasepareret)</label>
+          <input id="tags" type="text" placeholder="fx Cross, Chiquita, Vibora">
+        </div>
+
+        <div style="grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;margin-top:6px">
+          <div style="display:flex;gap:8px">
+            <button id="save-btn" class="btn btn-primary">➕ Gem øvelse</button>
+            <button id="clear-btn" class="btn btn-ghost">Ryd</button>
+          </div>
+          <button id="delete-all-btn" class="btn btn-danger" style="display:none">🗑️ Slet alle</button>
+        </div>
+      </form>
     </section>
 
-    <div class="main-grid">
+    <div class="two-col">
+      <!-- left: filters + list -->
       <div class="card">
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center">
-          <input id="search" type="text" placeholder="Søg..." style="flex:1;padding:10px;border-radius:10px;border:1px solid var(--border-soft);background:transparent;color:var(--text)" data-i18n-placeholder="searchPlaceholder">
-          <div style="display:flex;gap:6px">
-            <button id="pf-y" class="btn btn-ghost btn-small">YouTube</button>
-            <button id="pf-i" class="btn btn-ghost btn-small">Instagram</button>
-            <button id="pf-f" class="btn btn-ghost btn-small">Facebook</button>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div class="search-row">
+            <input id="search" type="text" placeholder="Søg..." aria-label="Search">
+
+            <!-- PLATFORM BUTTONS: data-platform attribute used by script -->
+            <div style="display:flex;gap:6px">
+              <button type="button" id="pf-y" class="platform-btn" data-platform="youtube" aria-pressed="false">YouTube</button>
+              <button type="button" id="pf-i" class="platform-btn" data-platform="instagram" aria-pressed="false">Instagram</button>
+              <button type="button" id="pf-f" class="platform-btn" data-platform="facebook" aria-pressed="false">Facebook</button>
+            </div>
           </div>
-        </div>
 
-        <div style="display:flex;gap:8px;margin-bottom:8px">
-          <select id="filter-category" style="flex:1;padding:10px;border-radius:10px;border:1px solid var(--border-soft);background:transparent;color:var(--text)"><option>ALL</option></select>
-          <select id="filter-level" style="flex:1;padding:10px;border-radius:10px;border:1px solid var(--border-soft);background:transparent;color:var(--text)"><option>ALL</option></select>
-        </div>
+          <div style="display:flex;gap:8px">
+            <select id="filter-category" style="flex:1;padding:10px;border-radius:10px;border:1px solid var(--border-soft);background:transparent;color:var(--text)"><option>ALL</option></select>
+            <select id="filter-level" style="flex:1;padding:10px;border-radius:10px;border:1px solid var(--border-soft);background:transparent;color:var(--text)"><option>ALL</option></select>
+          </div>
 
-        <div class="muted-note" id="filterNote" data-i18n="filterNote">Filtre er her — Session Builder er til højre. På small skærme stables de lodret.</div>
+          <div style="color:var(--muted);font-size:13px">Filtre er her — Session Builder er til højre. På small skærme stables de lodret.</div>
+
+          <div id="list" style="margin-top:6px"></div>
+          <div style="display:flex;justify-content:center"><button id="load-more" class="btn btn-ghost" style="display:none">Vis flere</button></div>
+        </div>
       </div>
 
+      <!-- right: session builder -->
       <aside class="card">
-        <h4 style="margin:0 0 12px 0" data-i18n="sessionBuilderTitle">Training Session Builder</h4>
+        <h4 style="margin:0 0 12px 0">Training Session Builder</h4>
 
-        <label data-i18n="sessionNameLabel">Sessionsnavn</label>
+        <label>Sessionsnavn</label>
         <input id="session-name" type="text">
 
-        <label style="margin-top:8px" data-i18n="sessionDescLabel">Sessionsbeskrivelse</label>
+        <label style="margin-top:8px">Sessionsbeskrivelse</label>
         <input id="session-desc" type="text">
 
-        <label style="margin-top:8px" data-i18n="exercisesLabel">Øvelser</label>
+        <label style="margin-top:8px">Øvelser</label>
         <div id="session-items"></div>
 
-        <div style="display:flex;gap:10px;align-items:center;margin-top:10px;">
-          <div data-i18n="totalLabel">Total:</div>
+        <div style="display:flex;gap:10px;align-items:center;margin-top:10px">
+          <div>Total:</div>
           <div id="session-total" style="font-weight:700">0 m</div>
           <div style="margin-left:auto" id="session-count">0 øvelser</div>
         </div>
 
-        <div style="display:flex;gap:10px;margin-top:10px">
-          <button id="save-session" class="btn btn-primary" data-i18n="saveSession">Gem session</button>
-          <button id="clear-session" class="btn btn-ghost" data-i18n="clearSession">Ryd</button>
+        <div style="display:flex;gap:10px;margin-top:8px">
+          <button id="save-session" class="btn btn-primary">Gem session</button>
+          <button id="clear-session" class="btn btn-ghost">Ryd</button>
         </div>
 
-        <div id="session-lock-info" style="margin-top:14px;color:var(--muted);display:none;" data-i18n="freeInfo">Gratis brugere kan ikke gemme eller bygge sessioner. Køb adgang for at låse op.</div>
+        <div id="session-lock-info" style="margin-top:12px;color:var(--muted);display:none">Gratis brugere kan ikke gemme eller bygge sessioner. Køb adgang for at låse op.</div>
 
-        <hr style="border:none;border-top:1px solid var(--border-soft);margin:14px 0">
-        <h4 style="margin:0 0 6px 0;" data-i18n="savedSessionsTitle">Gemte sessioner</h4>
-        <div id="sessions-list" style="max-height:160px;overflow:auto"></div>
-
-        <hr style="border:none;border-top:1px solid var(--border-soft);margin:14px 0">
-        <h4 style="margin:0 0 6px 0">Øvelsesliste</h4>
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
-          <div id="selected-count" style="font-weight:700">0 valgt</div>
-          <div style="margin-left:auto;color:var(--muted);font-size:13px">Per-item handlinger: Rediger / Slet</div>
-        </div>
-        <div id="list"></div>
-        <button id="load-more" class="btn btn-ghost" style="display:none;margin-top:10px">Vis flere</button>
+        <hr style="border:none;border-top:1px solid var(--border-soft);margin:12px 0;">
+        <h4 style="margin:0 0 8px 0">Gemte sessioner</h4>
+        <div id="sessions-list" style="max-height:180px;overflow:auto"></div>
       </aside>
     </div>
   </div>
@@ -174,18 +201,18 @@
   <!-- admin modal -->
   <div id="admin-modal" style="position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:999">
     <div style="background:var(--panel);padding:14px;border-radius:10px;max-width:420px;width:92%">
-      <h3 style="margin-top:0" data-i18n="adminLogin">Admin login</h3>
+      <h3 style="margin-top:0">Admin login</h3>
       <input id="admin-password" type="password" placeholder="Password" style="width:100%;padding:10px;border-radius:8px;border:1px solid var(--border-soft);margin-bottom:12px">
       <div style="display:flex;gap:12px;justify-content:flex-end">
-        <button id="admin-cancel" class="btn btn-ghost" data-i18n="cancelBtn">Annuller</button>
-        <button id="admin-submit" class="btn btn-primary" data-i18n="loginBtn">Login</button>
+        <button id="admin-cancel" class="btn btn-ghost">Annuller</button>
+        <button id="admin-submit" class="btn btn-primary">Login</button>
       </div>
     </div>
   </div>
 
-  <!-- confirm -->
+  <!-- confirm modal -->
   <div id="confirm-modal" style="display:none;position:fixed;inset:0;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);z-index:1000">
-    <div style="background:var(--panel);padding:18px;border-radius:12px;max-width:420px;width:92%;box-shadow:0 20px 60px rgba(0,0,0,0.6)">
+    <div style="background:var(--panel);padding:18px;border-radius:12px;max-width:420px;width:92%">
       <h3 id="confirm-title">Bekræft</h3>
       <p id="confirm-message" style="color:var(--muted)">Er du sikker?</p>
       <div style="display:flex;gap:10px;justify-content:flex-end">
@@ -195,22 +222,22 @@
     </div>
   </div>
 
-  <!-- bottom bar (backup/restore) -->
-  <div id="lezgo-bottom-bar" style="display:none">
-    <button id="backup-btn" class="lezgo-btn">Backup</button>
-    <button id="restore-btn" class="lezgo-btn restore">Restore</button>
+  <!-- bottom bar for backup/restore -->
+  <div id="bottom-bar" style="display:none">
+    <button id="backup-btn" class="bottom-btn">Backup</button>
+    <button id="restore-btn" class="bottom-btn restore">Restore</button>
     <input id="restore-file" type="file" accept="application/json" style="display:none">
   </div>
 
 <script>
-/* ================= CONFIG / TRANSLATIONS ================= */
+/* ---------- CONFIG ---------- */
 const ADMIN_PASSWORD = "admin123";
-const EX_KEY = "lezgo_exercises_v1";
-const SES_KEY = "lezgo_sessions_v1";
-const CAT_KEY = "lezgo_categories_v1";
-const LVL_KEY = "lezgo_levels_v1";
-const INT_KEY = "lezgo_intensities_v1";
-const PLR_KEY = "lezgo_players_v1";
+const EX_KEY = "lezgo_exercises_v3";
+const SES_KEY = "lezgo_sessions_v3";
+const CAT_KEY = "lezgo_categories_v3";
+const LVL_KEY = "lezgo_levels_v3";
+const INT_KEY = "lezgo_intensities_v3";
+const PLR_KEY = "lezgo_players_v3";
 const THEME_KEY = 'lezgo_theme';
 const LANG_KEY = 'lezgo_lang';
 
@@ -219,24 +246,19 @@ const DEFAULT_LEVELS = ["Beginner","Intermediate","Advanced"];
 const DEFAULT_INT = ["Low","Medium","High"];
 const DEFAULT_PLAYERS = ["1","2","3","4","1-2","1-3","1-4","2-4","Any","Add new..."];
 
-const translations = {
-  en: { addEditTitle:"Add / Edit exercise (Padel)", titleLabel:"Title", titlePlaceholder:"e.g. Forehand topspin drill", categoryLabel:"Category", playersLabel:"Players", durationLabel:"Duration (minutes)", levelLabel:"Level", intensityLabel:"Intensity", videoLabel:"Video link (YouTube / Instagram / Facebook)", videoPlaceholder:"https://...", descriptionLabel:"Description", tagsLabel:"Tags (comma separated)", tagsPlaceholder:"e.g. Cross, Chiquita, Vibora", saveBtn:"➕ Save exercise", clearBtn:"Clear form", deleteAllBtn:"🗑️ Delete all", searchPlaceholder:"Search...", filterNote:"Filters are here — Session Builder is on the right.", showFavorites:"Show favorites", selectAll:"Select all", addToSession:"Add to session", selectedCountSuffix:" selected", sessionBuilderTitle:"Training Session Builder", sessionNameLabel:"Session name", sessionDescLabel:"Session description", exercisesLabel:"Exercises", totalLabel:"Total:", saveSession:"Save session", clearSession:"Clear", freeInfo:"Free users cannot save or build sessions. Buy access to unlock.", noMatches:"No matches", noSessions:"No sessions saved", buyAccess:"Buy access", adminLogin:"Admin login", cancelBtn:"Cancel", loginBtn:"Login", savedSessionsTitle:"Saved sessions", openBtn:"Open", deleteBtn:"Delete", deleteConfirm:"Delete item?", deleteSessionConfirm:"Delete session?", backupBtn:"Backup", restoreBtn:"Restore" },
-  da: { addEditTitle:"Tilføj / Rediger øvelse (Padel)", titleLabel:"Titel", titlePlaceholder:"f.eks. Forehand topspin drill", categoryLabel:"Kategori", playersLabel:"Spillere", durationLabel:"Varighed (min)", levelLabel:"Niveau", intensityLabel:"Intensitet", videoLabel:"Videolink (YouTube / Instagram / Facebook)", videoPlaceholder:"https://...", descriptionLabel:"Beskrivelse", tagsLabel:"Tags (kommasepareret)", tagsPlaceholder:"f.eks. Cross, Chiquita, Vibora", saveBtn:"➕ Gem øvelse", clearBtn:"Ryd formular", deleteAllBtn:"🗑️ Slet alle", searchPlaceholder:"Søg...", filterNote:"Filtre er her — Session Builder er til højre.", showFavorites:"Vis favoritter", selectAll:"Vælg alle", addToSession:"Tilføj til session", selectedCountSuffix:" valgt", sessionBuilderTitle:"Byg træningssession", sessionNameLabel:"Sessionsnavn", sessionDescLabel:"Sessionsbeskrivelse", exercisesLabel:"Øvelser", totalLabel:"Total:", saveSession:"Gem session", clearSession:"Ryd", freeInfo:"Gratis brugere kan ikke gemme eller bygge sessioner. Køb adgang for at låse op.", noMatches:"Ingen resultater", noSessions:"Ingen gemte sessioner", buyAccess:"Køb adgang", adminLogin:"Admin login", cancelBtn:"Annuller", loginBtn:"Login", savedSessionsTitle:"Gemte sessioner", openBtn:"Åbn", deleteBtn:"Slet", deleteConfirm:"Slet vare?", deleteSessionConfirm:"Slet session?", backupBtn:"Backup", restoreBtn:"Restore" }
-};
-
-/* ================= STATE ================= */
-let exercises = [], sessions = [], categories = [], levels = [], intensities = [], players = [];
-let editingId = null;
 const $ = id => document.getElementById(id);
 const uid = () => "id_" + Math.random().toString(36).slice(2,10);
 const isAdmin = () => localStorage.getItem("is_admin") === "1";
 const isPaid  = () => localStorage.getItem("is_paid") === "1";
 
-/* batching */
-const RENDER_BATCH = 100;
+/* ---------- STATE ---------- */
+let exercises = [], sessions = [], categories = [], levels = [], intensities = [], players = [];
+let editingId = null;
 let renderIndex = 0;
+const BATCH = 100;
+const platformState = new Set(); // holds 'youtube','instagram','facebook'
 
-/* ================= STORAGE ================= */
+/* ---------- STORAGE ---------- */
 function loadAll(){
   exercises = JSON.parse(localStorage.getItem(EX_KEY) || "[]");
   sessions = JSON.parse(localStorage.getItem(SES_KEY) || "[]");
@@ -245,185 +267,151 @@ function loadAll(){
   intensities = JSON.parse(localStorage.getItem(INT_KEY) || "null") || DEFAULT_INT;
   players = JSON.parse(localStorage.getItem(PLR_KEY) || "null") || DEFAULT_PLAYERS;
 }
-function persistExercises(){ localStorage.setItem(EX_KEY, JSON.stringify(exercises)); }
-function persistSessions(){ localStorage.setItem(SES_KEY, JSON.stringify(sessions)); }
-function persistBase(){ localStorage.setItem(CAT_KEY, JSON.stringify(categories)); localStorage.setItem(LVL_KEY, JSON.stringify(levels)); localStorage.setItem(INT_KEY, JSON.stringify(intensities)); localStorage.setItem(PLR_KEY, JSON.stringify(players)); }
+function persistAll(){ localStorage.setItem(EX_KEY, JSON.stringify(exercises)); localStorage.setItem(SES_KEY, JSON.stringify(sessions)); localStorage.setItem(CAT_KEY, JSON.stringify(categories)); localStorage.setItem(LVL_KEY, JSON.stringify(levels)); localStorage.setItem(INT_KEY, JSON.stringify(intensities)); localStorage.setItem(PLR_KEY, JSON.stringify(players)); }
 
-/* ================= I18N ================= */
-function t(key){ const lang = localStorage.getItem(LANG_KEY) || 'da'; return (translations[lang] && translations[lang][key]) || (translations.en[key] || ''); }
-function applyTranslationsToDOM(){
-  document.querySelectorAll('[data-i18n]').forEach(el=>{ const k = el.getAttribute('data-i18n'); if(k) el.textContent = t(k); });
-  document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{ const k = el.getAttribute('data-i18n-placeholder'); if(k) el.placeholder = t(k); });
-  $("filterNote") && ($("filterNote").textContent = t('filterNote') || $("filterNote").textContent);
-  $("backup-btn") && ($("backup-btn").textContent = t('backupBtn') || 'Backup');
-  $("restore-btn") && ($("restore-btn").textContent = t('restoreBtn') || 'Restore');
-}
-
-/* ================= THEME ================= */
-function applyTheme(theme){
-  if(theme === 'light'){ document.body.classList.add('light'); document.querySelector('#meta-theme-color').setAttribute('content','#eceff1'); $("theme-toggle").textContent = '🌞'; }
-  else { document.body.classList.remove('light'); document.querySelector('#meta-theme-color').setAttribute('content','#0f1720'); $("theme-toggle").textContent = '🌙'; }
-  localStorage.setItem(THEME_KEY, theme);
-}
-function toggleTheme(){ const current = localStorage.getItem(THEME_KEY) || 'dark'; const next = current === 'dark' ? 'light' : 'dark'; applyTheme(next); }
-
-/* ================= INIT ================= */
+/* ---------- INIT ---------- */
 function init(){
   applyTheme(localStorage.getItem(THEME_KEY) || 'dark');
-  const lang = localStorage.getItem(LANG_KEY) || 'da'; $("lang-select").value = lang;
-
-  loadAll();
-  populateSelects();
-  bindEvents();
-  applyTranslationsToDOM();
-  renderSessions();
-  renderList(true);
-  enforcePermissions();
+  $("lang-select").value = localStorage.getItem(LANG_KEY) || 'da';
+  loadAll(); populateSelects(); bindEvents(); refreshUI();
 }
+
+/* ---------- UI helpers ---------- */
 function populateSelects(){
-  const sel = $("category"), filc = $("filter-category"), lvl = $("level"), fill = $("filter-level"), pl = $("players"), intSel = $("intensity");
-  if(sel){ sel.innerHTML=''; categories.forEach(c=>{ const o=document.createElement('option'); o.value=c; o.textContent=c; sel.appendChild(o); }); const add=document.createElement('option'); add.value='__ADD__'; add.textContent='Add new category...'; sel.appendChild(add); }
-  if(filc){ filc.innerHTML=''; let a=document.createElement('option'); a.text='ALL'; a.value=''; filc.appendChild(a); categories.forEach(c=>{ const o=document.createElement('option'); o.value=c; o.text=c; filc.appendChild(o); }); }
-  if(lvl){ lvl.innerHTML=''; levels.forEach(c=>{ const o=document.createElement('option'); o.value=c; o.text=c; lvl.appendChild(o); }); const addL=document.createElement('option'); addL.value='__ADD__'; addL.text='Add new level...'; lvl.appendChild(addL); }
-  if(fill){ fill.innerHTML=''; let a=document.createElement('option'); a.text='ALL'; a.value=''; fill.appendChild(a); levels.forEach(c=>{ const o=document.createElement('option'); o.value=c; o.text=c; fill.appendChild(o); }); }
-  if(pl){ pl.innerHTML=''; players.forEach(p=>{ const o=document.createElement('option'); o.value=p; o.text=p; pl.appendChild(o); }); const addP=document.createElement('option'); addP.value='__ADD__'; addP.text='Add new players range...'; pl.appendChild(addP); }
-  if(intSel){ intSel.innerHTML=''; intensities.forEach(i=>{ const o=document.createElement('option'); o.value=i; o.text=i; intSel.appendChild(o); }); const addI=document.createElement('option'); addI.value='__ADD__'; addI.text='Add new intensity...'; intSel.appendChild(addI); }
+  const cat = $("category"), lvl = $("level"), intSel = $("intensity"), pl = $("players"), fcat = $("filter-category"), flvl = $("filter-level");
+  if(cat){ cat.innerHTML=''; categories.forEach(c=>{ const o=document.createElement('option'); o.value=c; o.textContent=c; cat.appendChild(o); }); const add = document.createElement('option'); add.value='__ADD__'; add.textContent='Add new...'; cat.appendChild(add); }
+  if(fcat){ fcat.innerHTML=''; const optAll=document.createElement('option'); optAll.value=''; optAll.text='ALL'; fcat.appendChild(optAll); categories.forEach(c=>{ const o=document.createElement('option'); o.value=c; o.text=c; fcat.appendChild(o); }); }
+  if(lvl){ lvl.innerHTML=''; levels.forEach(c=>{ const o=document.createElement('option'); o.value=c; o.text=c; lvl.appendChild(o); }); const addL=document.createElement('option'); addL.value='__ADD__'; addL.text='Add new...'; lvl.appendChild(addL); }
+  if(flvl){ flvl.innerHTML=''; const optAll2=document.createElement('option'); optAll2.value=''; optAll2.text='ALL'; flvl.appendChild(optAll2); levels.forEach(c=>{ const o=document.createElement('option'); o.value=c; o.text=c; flvl.appendChild(o); }); }
+  if(intSel){ intSel.innerHTML=''; intensities.forEach(i=>{ const o=document.createElement('option'); o.value=i; o.text=i; intSel.appendChild(o); }); const addI=document.createElement('option'); addI.value='__ADD__'; addI.text='Add new...'; intSel.appendChild(addI); }
+  if(pl){ pl.innerHTML=''; players.forEach(p=>{ const o=document.createElement('option'); o.value=p; o.text=p; pl.appendChild(o); }); const addP=document.createElement('option'); addP.value='__ADD__'; addP.text='Add new...'; pl.appendChild(addP); }
 }
 
-/* ================= BIND EVENTS ================= */
 function bindEvents(){
-  $("theme-toggle").addEventListener('click', toggleTheme);
-  $("lang-select").addEventListener('change', (e)=>{ localStorage.setItem(LANG_KEY, e.target.value || 'da'); applyTranslationsToDOM(); });
+  // theme
+  $("theme-toggle").addEventListener('click', ()=> applyTheme(localStorage.getItem(THEME_KEY) === 'light' ? 'dark' : 'light'));
 
-  $("save-btn").addEventListener("click", onSave);
-  $("clear-btn").addEventListener("click", clearForm);
+  // lang
+  $("lang-select").addEventListener('change', e => { localStorage.setItem(LANG_KEY, e.target.value); });
 
-  // add new category/level/intensity/players handlers
-  $("category").addEventListener("change", e=>{ if(e.target.value==="__ADD__"){ let n = prompt(localStorage.getItem(LANG_KEY)==='da'?"Ny kategori:":"New category:"); if(n){ categories.push(n.trim()); persistBase(); populateSelects(); } }});
-  $("level").addEventListener("change", e=>{ if(e.target.value==="__ADD__"){ let n = prompt(localStorage.getItem(LANG_KEY)==='da'?"Nyt niveau:":"New level:"); if(n){ levels.push(n.trim()); persistBase(); populateSelects(); } }});
-  $("intensity").addEventListener("change", e=>{ if(e.target.value==="__ADD__"){ let n = prompt(localStorage.getItem(LANG_KEY)==='da'?"Ny intensitet:":"New intensity:"); if(n){ intensities.push(n.trim()); persistBase(); populateSelects(); } }});
-  $("players").addEventListener("change", e=>{ if(e.target.value==="__ADD__"||e.target.value==="Add new..."){ let n = prompt(localStorage.getItem(LANG_KEY)==='da'?"Tilføj ny spiller-range:":"Add new players range:"); if(n){ players.push(n.trim()); persistBase(); populateSelects(); } }});
+  // dropdown add new options
+  $("category").addEventListener('change', e => { if(e.target.value==='__ADD__'){ const n = prompt('Ny kategori:'); if(n){ categories.push(n.trim()); persistAll(); populateSelects(); } }});
+  $("level").addEventListener('change', e => { if(e.target.value==='__ADD__'){ const n = prompt('Nyt niveau:'); if(n){ levels.push(n.trim()); persistAll(); populateSelects(); } }});
+  $("intensity").addEventListener('change', e => { if(e.target.value==='__ADD__'){ const n = prompt('Ny intensitet:'); if(n){ intensities.push(n.trim()); persistAll(); populateSelects(); } }});
+  $("players").addEventListener('change', e => { if(e.target.value==='__ADD__' || e.target.value==='Add new...'){ const n = prompt('Tilføj ny spiller-range:'); if(n){ players.push(n.trim()); persistAll(); populateSelects(); } }});
 
-  $("delete-all-btn").addEventListener("click", ()=> {
-    if(!isAdmin()){ alert(t('adminLogin') + ' required'); return; }
-    const pass = prompt(t('adminLogin') + ':'); if(pass !== ADMIN_PASSWORD){ alert('Wrong code'); return; }
-    if(confirm(t('deleteAllBtn') + '?')){ exercises=[]; persistExercises(); renderList(true); renderSessions(); }
+  // form
+  $("save-btn").addEventListener('click', onSaveExercise);
+  $("clear-btn").addEventListener('click', clearForm);
+  $("delete-all-btn").addEventListener('click', ()=> {
+    if(!isAdmin()){ alert('Admin kræves'); return; }
+    const pass = prompt('Admin kode:'); if(pass !== ADMIN_PASSWORD){ alert('Forkert kode'); return; }
+    if(confirm('Slet ALLE øvelser?')){ exercises=[]; persistAll(); refreshUI(); }
   });
 
-  $("search").addEventListener("input", ()=> { renderIndex=0; debounce(()=>renderList(true), 180); });
-  $("filter-category").addEventListener("change", ()=> { renderIndex=0; renderList(true); });
-  $("filter-level").addEventListener("change", ()=> { renderIndex=0; renderList(true); });
+  // search & filters
+  $("search").addEventListener('input', ()=> { renderIndex=0; renderList(true); });
+  $("filter-category").addEventListener('change', ()=> { renderIndex=0; renderList(true); });
+  $("filter-level").addEventListener('change', ()=> { renderIndex=0; renderList(true); });
 
-  $("pf-y").addEventListener("click", ()=> togglePf('youtube',$('pf-y')));
-  $("pf-i").addEventListener("click", ()=> togglePf('instagram',$('pf-i')));
-  $("pf-f").addEventListener("click", ()=> togglePf('facebook',$('pf-f')));
-
-  // Admin/login/logout
-  $("btn-admin").addEventListener("click", ()=> $("admin-modal").style.display="flex");
-  $("admin-cancel").addEventListener("click", ()=> $("admin-modal").style.display="none");
-  $("admin-submit").addEventListener("click", ()=> {
-    if($("admin-password").value===ADMIN_PASSWORD){ localStorage.setItem("is_admin","1"); $("admin-modal").style.display="none"; enforcePermissions(); alert('Admin enabled'); } else alert("Wrong password");
-  });
-  $("btn-logout").addEventListener("click", ()=> { localStorage.removeItem('is_admin'); enforcePermissions(); });
-
-  // buy access (paid)
-  $("btn-buy").addEventListener("click", ()=> {
-    if(isPaid()){ if(confirm(t('buyAccess') + '?')){ localStorage.removeItem('is_paid'); enforcePermissions(); } }
-    else { if(confirm(t('buyAccess') + '?')){ localStorage.setItem('is_paid','1'); enforcePermissions(); } }
+  // platform buttons: unified handler using data-platform
+  document.querySelectorAll('.platform-btn').forEach(btn => {
+    btn.addEventListener('click', (e)=>{
+      const platform = btn.getAttribute('data-platform');
+      if(!platform) return;
+      if(platformState.has(platform)){ platformState.delete(platform); btn.classList.remove('active'); btn.setAttribute('aria-pressed','false'); }
+      else { platformState.add(platform); btn.classList.add('active'); btn.setAttribute('aria-pressed','true'); }
+      renderIndex=0; renderList(true);
+    });
   });
 
-  $("load-more").addEventListener("click", ()=> renderList(false));
+  // admin modal
+  $("btn-admin").addEventListener('click', ()=> $("admin-modal").style.display='flex');
+  $("admin-cancel").addEventListener('click', ()=> $("admin-modal").style.display='none');
+  $("admin-submit").addEventListener('click', ()=> {
+    if($("admin-password").value === ADMIN_PASSWORD){ localStorage.setItem('is_admin','1'); $("admin-modal").style.display='none'; applyPermissions(); alert('Admin aktiveret'); } else alert('Forkert kode');
+  });
+  $("btn-logout").addEventListener('click', ()=> { localStorage.removeItem('is_admin'); applyPermissions(); });
 
-  // Save session: BIND HERE (this was missing)
-  $("save-session").addEventListener("click", saveSession);
-  $("clear-session").addEventListener("click", clearSessionBuilder);
+  // buy access
+  $("btn-buy").addEventListener('click', ()=> {
+    if(isPaid()){ if(confirm('Deaktiver paid mode?')){ localStorage.removeItem('is_paid'); applyPermissions(); } }
+    else { if(confirm('Aktiver paid mode?')){ localStorage.setItem('is_paid','1'); applyPermissions(); } }
+  });
+
+  // load more
+  $("load-more").addEventListener('click', ()=> renderList(false));
+
+  // session actions
+  $("save-session").addEventListener('click', saveSession);
+  $("clear-session").addEventListener('click', clearSessionBuilder);
+
+  // analyze
+  $("analyze-btn").addEventListener('click', (ev)=>{ ev.preventDefault(); analyzeLinkAction(); });
 
   // backup/restore
-  $("backup-btn").addEventListener("click", doBackup);
-  $("restore-btn").addEventListener("click", ()=> $("restore-file").click());
-  $("restore-file").addEventListener("change", handleRestoreFile);
+  $("backup-btn").addEventListener('click', doBackup);
+  $("restore-btn").addEventListener('click', ()=> $("restore-file").click());
+  $("restore-file").addEventListener('change', handleRestoreFile);
 
   // confirm modal
-  $("confirm-no").addEventListener("click", ()=> closeConfirm(false));
-  $("confirm-yes").addEventListener("click", ()=> closeConfirm(true));
+  $("confirm-no").addEventListener('click', ()=> closeConfirm(false));
+  $("confirm-yes").addEventListener('click', ()=> closeConfirm(true));
 }
 
-/* debounce */
-let debounceTimer = null;
-function debounce(fn, wait){ clearTimeout(debounceTimer); debounceTimer = setTimeout(fn, wait); }
-
-/* platform filter */
-const platformState = new Set();
-function togglePf(name, el){ if(platformState.has(name)){ platformState.delete(name); el.classList.remove('active'); } else { platformState.add(name); el.classList.add('active'); } renderIndex=0; renderList(true); }
-
-/* ================= SAVE / DUP CHECK ================= */
-function onSave(){
-  const titleVal = ($("title").value||"").trim();
-  const linkVal = ($("link").value||"").trim();
-  if(!titleVal){ alert(t('titleLabel') + ': ' + (localStorage.getItem(LANG_KEY) === 'da' ? 'Indtast titel' : 'Enter title')); return; }
-  const dupTitle = exercises.some(e => e.title && e.title.toLowerCase() === titleVal.toLowerCase() && e.id !== editingId);
-  const dupLink = linkVal ? exercises.some(e => e.link === linkVal && e.id !== editingId) : false;
-  if(dupTitle || dupLink){ alert(localStorage.getItem(LANG_KEY)==='da' ? 'Duplikat fundet: titel eller link findes allerede' : 'Duplicate found: title or link exists'); return; }
-  const obj = { id: editingId || uid(), title: titleVal, link: linkVal, category: $("category").value, players: $("players").value, duration: Number($("duration").value||0), level: $("level").value, intensity: $("intensity").value, description: $("description").value||"", tags: ($("tags").value||"").trim(), createdAt: new Date().toISOString() };
-  if(editingId){ const idx = exercises.findIndex(x=>x.id===editingId); if(idx>-1) exercises[idx]=obj; } else exercises.unshift(obj);
-  persistExercises();
-  editingId=null; clearForm(); renderIndex=0; renderList(true); renderSessions();
-}
-
-/* clear form */
-function clearForm(){ editingId=null; $("title").value=""; $("link").value=""; if($("category")) $("category").selectedIndex=0; if($("players")) $("players").selectedIndex=0; $("duration").value=""; if($("level")) $("level").selectedIndex=0; if($("intensity")) $("intensity").selectedIndex=0; $("description").value=""; $("tags").value=""; }
-
-/* ================= RENDER LIST (batched) ================= */
-function renderList(reset=true){
+/* ---------- RENDER LIST (platform-aware) ---------- */
+function renderList(reset = true){
   const list = $("list");
   if(!list) return;
-  if(reset){ renderIndex=0; list.innerHTML=""; }
+  if(reset){ renderIndex=0; list.innerHTML=''; }
   const q = ($("search").value||"").trim().toLowerCase();
   const fc = ($("filter-category").value||"");
   const fl = ($("filter-level").value||"");
   let items = exercises.slice();
 
-  if(platformState.size>0){
-    items = items.filter(it=>{
+  // platform filter: if any platform selected, only accept items matching one of selected
+  if(platformState.size > 0){
+    items = items.filter(it => {
       if(!it.link) return false;
       try{
         const host = new URL(it.link).hostname.toLowerCase();
-        if(host.includes('youtube')||host.includes('youtu.be')) return platformState.has('youtube');
-        if(host.includes('instagram')) return platformState.has('instagram');
-        if(host.includes('facebook')) return platformState.has('facebook');
+        const isY = host.includes('youtube') || host.includes('youtu.be') || host.includes('youtube.googleapis.com');
+        const isI = host.includes('instagram') || host.includes('cdninstagram');
+        const isF = host.includes('facebook') || host.includes('fb.watch') || host.includes('fbcdn');
+        if(platformState.has('youtube') && isY) return true;
+        if(platformState.has('instagram') && isI) return true;
+        if(platformState.has('facebook') && isF) return true;
+        return false;
       }catch(e){ return false; }
-      return false;
     });
   }
 
-  if(fc) items = items.filter(x=>x.category===fc);
-  if(fl) items = items.filter(x=>x.level===fl);
+  if(fc) items = items.filter(x => x.category === fc);
+  if(fl) items = items.filter(x => x.level === fl);
   if(q) items = items.filter(x => (x.title||"").toLowerCase().includes(q) || (x.description||"").toLowerCase().includes(q) || (x.tags||"").toLowerCase().includes(q));
 
   const total = items.length;
   const start = renderIndex;
-  const end = Math.min(start + RENDER_BATCH, total);
+  const end = Math.min(start + BATCH, total);
   const slice = items.slice(start, end);
 
   const frag = document.createDocumentFragment();
-  slice.forEach(ex=>{
-    const row = document.createElement('div'); row.className='exercise'; row.dataset.id=ex.id;
+  slice.forEach(ex => {
+    const row = document.createElement('div'); row.className='exercise'; row.dataset.id = ex.id;
+
     const cb = document.createElement('input'); cb.type='checkbox'; cb.style.marginRight='8px';
-    if( $("session-items").querySelector(`[data-id="${ex.id}"]`) ) cb.checked = true;
-    cb.addEventListener('change', (ev)=> {
+    if($("session-items").querySelector(`[data-id="${ex.id}"]`)) cb.checked = true;
+    cb.addEventListener('change', ev => {
       if(ev.target.checked) addToSessionBuilder(ex.id);
       else removeFromSessionBuilder(ex.id);
-      updateSelectedCount();
     });
     row.appendChild(cb);
 
     const left = document.createElement('div'); left.className='left';
-    const h = document.createElement('div'); h.style.fontWeight='800'; h.style.fontSize='15px'; h.textContent = ex.title;
-    left.appendChild(h);
-    const meta = document.createElement('div'); meta.className='meta'; meta.textContent = `${ex.category} • ${ex.level} • ${ex.players||''} • ${ex.duration}m`;
-    left.appendChild(meta);
-    if(ex.link){ const a = document.createElement('a'); a.href = ex.link; a.target='_blank'; a.style.display='block'; a.style.marginTop='6px'; a.textContent = ex.link; left.appendChild(a); }
-    if(ex.tags){ const tbox = document.createElement('div'); tbox.style.marginTop='8px'; ex.tags.split(',').forEach(tg=>{ const s=document.createElement('span'); s.className='tag'; s.textContent = tg.trim(); tbox.appendChild(s); }); left.appendChild(tbox); }
+    const title = document.createElement('div'); title.style.fontWeight='800'; title.style.fontSize='15px'; title.textContent = ex.title; left.appendChild(title);
+    const meta = document.createElement('div'); meta.className='meta'; meta.textContent = `${ex.category || ''} • ${ex.level || ''} • ${ex.players || ''} • ${ex.duration || 0}m`; left.appendChild(meta);
+    if(ex.link){ const a = document.createElement('a'); a.href = ex.link; a.target = '_blank'; a.style.display='block'; a.style.marginTop='6px'; a.textContent = ex.link; left.appendChild(a); }
+    if(ex.tags){ const tagWrap = document.createElement('div'); tagWrap.style.marginTop='8px'; ex.tags.split(',').forEach(tg => { const s = document.createElement('span'); s.className='tag'; s.textContent = tg.trim(); tagWrap.appendChild(s); }); left.appendChild(tagWrap); }
     row.appendChild(left);
 
     const right = document.createElement('div'); right.className='actions-small';
@@ -433,7 +421,7 @@ function renderList(reset=true){
       right.appendChild(editBtn);
 
       const delBtn = document.createElement('button'); delBtn.className='btn btn-ghost'; delBtn.style.color='var(--danger)'; delBtn.textContent='Slet';
-      delBtn.addEventListener('click', ()=> showConfirm(t('deleteConfirm') || 'Slet vare?', ()=>{ exercises = exercises.filter(x=>x.id!==ex.id); persistExercises(); renderList(true); renderSessions(); removeFromSessionBuilder(ex.id); updateSelectedCount(); }));
+      delBtn.addEventListener('click', ()=> showConfirm('Er du sikker?', ()=>{ exercises = exercises.filter(x => x.id !== ex.id); persistAll(); refreshUI(); removeFromSessionBuilder(ex.id); }));
       right.appendChild(delBtn);
     }
     row.appendChild(right);
@@ -443,162 +431,119 @@ function renderList(reset=true){
   list.appendChild(frag);
   renderIndex = end;
   const loadMore = $("load-more");
-  if(renderIndex < total){ loadMore.style.display='block'; loadMore.textContent = `Vis flere (${total - renderIndex})`; } else loadMore.style.display='none';
-  if(total === 0 && start===0){ list.innerHTML = `<div style="color:var(--muted)">${t('noMatches')}</div>`; }
-  updateSelectedCount();
+  if(renderIndex < total){ loadMore.style.display = 'block'; loadMore.textContent = `Vis flere (${total - renderIndex})`; } else loadMore.style.display = 'none';
+  if(total === 0 && start === 0){ list.innerHTML = `<div style="color:var(--muted)">Ingen resultater</div>`; }
 }
 
-/* populate edit form */
-function populateFormForEdit(ex){
-  $("title").value = ex.title || "";
-  $("link").value = ex.link || "";
-  if($("category")) $("category").value = ex.category || "";
-  if($("players")) $("players").value = ex.players || "";
-  $("duration").value = ex.duration || "";
-  if($("level")) $("level").value = ex.level || "";
-  if($("intensity")) $("intensity").value = ex.intensity || "";
-  $("description").value = ex.description || "";
-  $("tags").value = ex.tags || "";
+/* ---------- FORM HANDLERS ---------- */
+function onSaveExercise(){
+  const title = ($("title").value || "").trim();
+  if(!title){ alert('Indtast titel'); return; }
+  const link = ($("link").value || "").trim();
+  const dupTitle = exercises.some(e => e.title && e.title.toLowerCase() === title.toLowerCase() && e.id !== editingId);
+  const dupLink = link ? exercises.some(e => e.link === link && e.id !== editingId) : false;
+  if(dupTitle || dupLink){ alert('Duplikat fundet: titel eller link findes allerede'); return; }
+  const item = { id: editingId || uid(), title, link, category: $("category").value, players: $("players").value, duration: Number($("duration").value||0), level: $("level").value, intensity: $("intensity").value, description: $("description").value||"", tags: ($("tags").value||"").trim(), createdAt: new Date().toISOString() };
+  if(editingId){ const idx = exercises.findIndex(x => x.id === editingId); if(idx>-1) exercises[idx] = item; } else exercises.unshift(item);
+  persistAll(); editingId = null; clearForm(); refreshUI();
 }
+function clearForm(){ editingId=null; $("title").value=''; $("link").value=''; if($("category")) $("category").selectedIndex=0; if($("players")) $("players").selectedIndex=0; $("duration").value=''; if($("level")) $("level").selectedIndex=0; if($("intensity")) $("intensity").selectedIndex=0; $("description").value=''; $("tags").value=''; }
+function populateFormForEdit(ex){ $("title").value = ex.title||''; $("link").value = ex.link||''; if($("category")) $("category").value = ex.category||''; if($("players")) $("players").value = ex.players||''; $("duration").value = ex.duration||''; if($("level")) $("level").value = ex.level||''; if($("intensity")) $("intensity").value = ex.intensity||''; $("description").value = ex.description||''; $("tags").value = ex.tags||''; }
 
-/* ================= SESSION BUILDER ================= */
+/* ---------- SESSION BUILDER ---------- */
 function addToSessionBuilder(id){
-  if(!isAdmin() && !isPaid()){ alert(localStorage.getItem(LANG_KEY)==='da' ? 'Betalt adgang kræves.' : 'Paid access required.'); const cb = document.querySelector(`#list [data-id="${id}"] input[type="checkbox"]`); if(cb) cb.checked = false; return; }
+  if(!isAdmin() && !isPaid()){ alert('Betalt adgang kræves.'); const cb = document.querySelector(`#list [data-id="${id}"] input[type="checkbox"]`); if(cb) cb.checked=false; return; }
   const box = $("session-items");
   if(box.querySelector(`[data-id="${id}"]`)) return;
-  const ex = exercises.find(e=>e.id===id); if(!ex) return;
+  const ex = exercises.find(e => e.id === id); if(!ex) return;
   const row = document.createElement('div'); row.className='exercise'; row.dataset.id = id; row.style.marginBottom='6px';
-  row.innerHTML = `<div style="flex:1"><div style="font-weight:700">${escapeHtml(ex.title)}</div><div style="color:var(--muted)">${ex.duration}m • ${escapeHtml(ex.category)}</div></div><button class="btn btn-ghost remove-from-session" style="color:var(--danger)">${t('deleteBtn')||'Fjern'}</button>`;
-  row.querySelector('button').addEventListener('click', ()=> { row.remove(); const cb = document.querySelector(`#list [data-id="${id}"] input[type="checkbox"]`); if(cb) cb.checked = false; recalcSession(); updateSelectedCount(); });
-  box.appendChild(row);
-  recalcSession();
+  row.innerHTML = `<div style="flex:1"><div style="font-weight:700">${escapeHtml(ex.title)}</div><div style="color:var(--muted)">${ex.duration}m • ${escapeHtml(ex.category)}</div></div><button class="btn btn-ghost" style="color:var(--danger)">Fjern</button>`;
+  row.querySelector('button').addEventListener('click', ()=>{ row.remove(); const cb = document.querySelector(`#list [data-id="${id}"] input[type="checkbox"]`); if(cb) cb.checked=false; recalcSession(); });
+  box.appendChild(row); recalcSession();
 }
+function removeFromSessionBuilder(id){ const box = $("session-items"); const node = box.querySelector(`[data-id="${id}"]`); if(node) node.remove(); recalcSession(); }
+function recalcSession(){ let total=0,count=0; document.querySelectorAll("#session-items .exercise").forEach(r => { const ex = exercises.find(e => e.id === r.dataset.id); if(ex){ total += Number(ex.duration||0); count++; }}); $("session-total").textContent = total + " m"; $("session-count").textContent = count + " øvelser"; }
+function clearSessionBuilder(){ if($("session-items")) $("session-items").innerHTML=''; if($("session-name")) $("session-name").value=''; if($("session-desc")) $("session-desc").value=''; recalcSession(); }
+function saveSession(){ if(!isAdmin() && !isPaid()){ alert('Betalt adgang kræves.'); return; } const name = ($("session-name").value||'').trim(); if(!name){ alert('Tilføj et sessionsnavn'); return; } const ids = Array.from(document.querySelectorAll('#session-items .exercise')).map(r=>r.dataset.id); const total = ids.reduce((a,id)=>{ const ex = exercises.find(e=>e.id===id); return a + (ex?Number(ex.duration||0):0); },0); const s = { id: uid(), name, description: $("session-desc").value||'', items: ids, total, createdAt: new Date().toISOString() }; sessions.unshift(s); persistAll(); renderSessions(); alert('Session gemt'); }
 
-function removeFromSessionBuilder(id){
-  const box = $("session-items");
-  const node = box.querySelector(`[data-id="${id}"]`);
-  if(node) node.remove();
-  recalcSession();
-}
-
-function recalcSession(){ let total=0,count=0; document.querySelectorAll("#session-items .exercise").forEach(r=>{ const ex = exercises.find(e=>e.id===r.dataset.id); if(ex){ total+=Number(ex.duration||0); count++; }}); $("session-total").textContent = total + " m"; $("session-count").textContent = count + " øvelser"; }
-
-function clearSessionBuilder(){ if($("session-items")) $("session-items").innerHTML=""; if($("session-name")) $("session-name").value=""; if($("session-desc")) $("session-desc").value=""; recalcSession(); }
-
-/* save session (was missing binding earlier) */
-function saveSession(){
-  if(!isAdmin() && !isPaid()){ alert(localStorage.getItem(LANG_KEY)==='da' ? 'Betalt adgang kræves.' : 'Paid access required.'); return; }
-  const name = ($("session-name").value||"").trim(); if(!name){ alert(localStorage.getItem(LANG_KEY)==='da' ? 'Tilføj et sessionsnavn' : 'Add a session name'); return; }
-  const ids = Array.from(document.querySelectorAll("#session-items .exercise")).map(r=>r.dataset.id);
-  const total = ids.reduce((a,id)=>{ const ex = exercises.find(e=>e.id===id); return a + (ex?Number(ex.duration||0):0); }, 0);
-  const s={ id: uid(), name, description: $("session-desc").value||"", items: ids, total, createdAt: new Date().toISOString() };
-  sessions.unshift(s); persistSessions(); renderSessions(); alert(localStorage.getItem(LANG_KEY)==='da' ? 'Session gemt' : 'Session saved'); }
-
-/* sessions render */
+/* ---------- RENDER SESSIONS ---------- */
 function renderSessions(){
-  const box = $("sessions-list"); box.innerHTML = "";
-  if(!sessions.length){ box.innerHTML = `<div style="color:var(--muted)">${t('noSessions')}</div>`; return; }
-  sessions.forEach(s=>{
+  const box = $("sessions-list"); box.innerHTML=''; if(!sessions.length){ box.innerHTML = `<div style="color:var(--muted)">Ingen gemte sessioner</div>`; return; }
+  sessions.forEach(s => {
     const div = document.createElement('div'); div.className='exercise'; div.style.marginBottom='8px';
     div.innerHTML = `<div style="flex:1"><div style="font-weight:800">${escapeHtml(s.name)}</div><div style="color:var(--muted)">${(s.items||[]).length} øvelser • ${s.total||0} m</div></div>`;
-    const openBtn = document.createElement('button'); openBtn.className='btn btn-ghost'; openBtn.textContent = t('openBtn') || 'Åbn'; openBtn.addEventListener('click', ()=> { openSavedSession(s.id); });
-    const delBtn = document.createElement('button'); delBtn.className='btn btn-ghost'; delBtn.style.color='var(--danger)'; delBtn.textContent = t('deleteBtn') || 'Slet'; delBtn.addEventListener('click', ()=> showConfirm(t('deleteSessionConfirm')||'Slet session?', ()=>{ sessions = sessions.filter(x=>x.id!==s.id); persistSessions(); renderSessions(); }));
+    const openBtn = document.createElement('button'); openBtn.className='btn btn-ghost'; openBtn.textContent='Åbn'; openBtn.addEventListener('click', ()=> openSavedSession(s.id));
+    const delBtn = document.createElement('button'); delBtn.className='btn btn-ghost'; delBtn.style.color='var(--danger)'; delBtn.textContent='Slet'; delBtn.addEventListener('click', ()=> showConfirm('Slet session?', ()=>{ sessions = sessions.filter(x=>x.id!==s.id); persistAll(); renderSessions(); }));
     div.appendChild(openBtn); if(isAdmin()||isPaid()) div.appendChild(delBtn);
     box.appendChild(div);
   });
 }
-
-/* open saved session */
 function openSavedSession(id){
-  const s = sessions.find(x=>x.id===id); if(!s) return alert('Session ikke fundet');
-  const box = $("session-items"); box.innerHTML = "";
-  s.items.forEach(iid=>{ const ex = exercises.find(e=>e.id===iid); if(!ex) return; const row = document.createElement('div'); row.className='exercise'; row.dataset.id=iid; row.style.marginBottom='6px'; row.innerHTML = `<div style="flex:1"><div style="font-weight:700">${escapeHtml(ex.title)}</div><div style="color:var(--muted)">${ex.duration}m • ${escapeHtml(ex.category)}</div></div><button class="btn btn-ghost remove-from-session" style="color:var(--danger)">${t('deleteBtn')||'Fjern'}</button>`; row.querySelector('button').addEventListener('click', ()=>{ row.remove(); recalcSession(); const cb = document.querySelector(`#list [data-id="${iid}"] input[type="checkbox"]`); if(cb) cb.checked = false; }); box.appendChild(row); });
+  const s = sessions.find(x=>x.id===id); if(!s){ alert('Session ikke fundet'); return; }
+  const box = $("session-items"); box.innerHTML=''; s.items.forEach(iid => { const ex = exercises.find(e=>e.id===iid); if(!ex) return; const r = document.createElement('div'); r.className='exercise'; r.dataset.id=iid; r.style.marginBottom='6px'; r.innerHTML = `<div style="flex:1"><div style="font-weight:700">${escapeHtml(ex.title)}</div><div style="color:var(--muted)">${ex.duration}m • ${escapeHtml(ex.category)}</div></div><button class="btn btn-ghost" style="color:var(--danger)">Fjern</button>`; r.querySelector('button').addEventListener('click', ()=>{ r.remove(); recalcSession(); const cb = document.querySelector(`#list [data-id="${iid}"] input[type="checkbox"]`); if(cb) cb.checked=false; }); box.appendChild(r); });
   recalcSession();
-  document.querySelectorAll('#list .exercise').forEach(r=>{ const cb = r.querySelector('input[type="checkbox"]'); if(cb) cb.checked = !!s.items.find(i=>i===r.dataset.id); });
-  updateSelectedCount();
+  document.querySelectorAll('#list .exercise').forEach(row => {
+    const cb = row.querySelector('input[type="checkbox"]');
+    if(!cb) return;
+    const id = row.dataset.id;
+    cb.checked = !!s.items.find(i => i === id);
+  });
+  // scroll into view on small screens
+  if(window.innerWidth < 900){
+    const rect = $("session-items").getBoundingClientRect();
+    window.scrollTo({ top: rect.top + window.scrollY - 80, behavior: 'smooth' });
+  }
 }
 
-/* confirm modal */
+/* ---------- CONFIRM MODAL ---------- */
 let _confirmCb = null;
-function showConfirm(message, cb){ _confirmCb = cb; $("confirm-message").textContent = message; $("confirm-modal").style.display = "flex"; }
-function closeConfirm(answer){ $("confirm-modal").style.display = "none"; if(answer && typeof _confirmCb === 'function') _confirmCb(); _confirmCb = null; }
+function showConfirm(message, cb){ _confirmCb = cb; $("confirm-message").textContent = message; $("confirm-modal").style.display='flex'; }
+function closeConfirm(answer){ $("confirm-modal").style.display='none'; if(answer && typeof _confirmCb === 'function') _confirmCb(); _confirmCb = null; }
 
-/* util */
-function updateSelectedCount(){ const boxes = document.querySelectorAll('#list input[type="checkbox"]'); let count=0; boxes.forEach(b=>{ if(b.checked) count++; }); $("selected-count").textContent = (count||0) + " valgt"; }
-function escapeHtml(s){ return (s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+/* ---------- BACKUP / RESTORE ---------- */
+function doBackup(){ if(!isAdmin() && !isPaid()){ alert('Admin eller Paid kræves'); return; } const payload = { exercises, sessions, categories, levels, intensities, players, exportedAt: new Date().toISOString() }; const blob = new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}); const url = URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=`lezgo_backup_${new Date().toISOString().slice(0,19).replace(/[:T]/g,'_')}.json`; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url); }
+function handleRestoreFile(ev){ if(!isAdmin() && !isPaid()){ alert('Admin eller Paid kræves'); return; } const file = ev.target.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = function(e){ try{ const data = JSON.parse(e.target.result); const mode = confirm("Tryk OK for MERGE (tilføj), Annuller for ERSTATTE (erstat alt)"); if(mode){ const addedE = mergeExercises(data.exercises||[]); const addedS = mergeSessions(data.sessions||[]); persistAll(); refreshUI(); alert(`Importeret. Øvelser: ${addedE}, sessioner: ${addedS}`); } else { exercises = data.exercises || []; sessions = data.sessions || []; categories = data.categories || DEFAULT_CATEGORIES; levels = data.levels || DEFAULT_LEVELS; intensities = data.intensities || DEFAULT_INT; players = data.players || DEFAULT_PLAYERS; persistAll(); populateSelects(); refreshUI(); alert('Data erstattet.'); } }catch(err){ alert('Kunne ikke læse fil: ' + err.message); } }; reader.readAsText(file); ev.target.value=''; }
+function mergeExercises(imported){ let added=0; (imported||[]).forEach(im=>{ const dup = exercises.some(e => (im.link && e.link === im.link) || (im.title && e.title && e.title.toLowerCase() === im.title.toLowerCase())); if(!dup){ exercises.push(im); added++; } }); return added; }
+function mergeSessions(imported){ let added=0; (imported||[]).forEach(im=>{ const dup = sessions.some(s => s.name && im.name && s.name.toLowerCase() === im.name.toLowerCase()); if(!dup){ sessions.push(im); added++; } }); return added; }
 
-/* ================= PERMISSIONS + UI ================= */
-function enforcePermissions(){
-  const bb = $("lezgo-bottom-bar"); if(bb) bb.style.display = (isAdmin()||isPaid()) ? 'flex' : 'none';
-  $("delete-all-btn").style.display = isAdmin() ? 'inline-block' : 'none';
-  $("save-session").style.display = (isAdmin()||isPaid()) ? 'inline-block' : 'none';
-  $("clear-session").style.display = (isAdmin()||isPaid()) ? 'inline-block' : 'none';
-  const badges = $("badges"); badges.innerHTML='';
-  if(isAdmin()){ const d=document.createElement('div'); d.className='badge'; d.textContent='ADMIN'; badges.appendChild(d); $("btn-logout").style.display='inline-flex'; } else $("btn-logout").style.display='none';
-  if(isPaid()){ const d=document.createElement('div'); d.className='badge'; d.textContent='PAID'; badges.appendChild(d); }
-  applyTranslationsToDOM();
-  renderList(true);
-  renderSessions();
-}
-
-/* ================= BACKUP / RESTORE ================= */
-function doBackup(){
-  if(!isAdmin() && !isPaid()){ alert('Admin or Paid required'); return; }
-  const payload = { exercises, sessions, categories, levels, intensities, players, exportedAt: new Date().toISOString() };
-  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href = url; a.download = `lezgo_backup_${new Date().toISOString().slice(0,19).replace(/[:T]/g,'_')}.json`; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
-}
-
-function handleRestoreFile(ev){
-  if(!isAdmin() && !isPaid()){ alert('Admin or Paid required'); return; }
-  const file = ev.target.files[0];
-  if(!file) return;
-  const reader = new FileReader();
-  reader.onload = function(e){
+/* ---------- ANALYZE VIDEO ---------- */
+async function fetchVideoMetadata(link){
+  try{
+    // youtube oembed attempt
     try{
-      const data = JSON.parse(e.target.result);
-      const mode = confirm("Tryk OK for MERGE (tilføj), Annuller for ERSTATTE (erstat alt)");
-      if(mode){
-        const addedEx = mergeExercises(data.exercises || []);
-        const addedSes = mergeSessions(data.sessions || []);
-        persistExercises(); persistSessions(); renderList(true); renderSessions();
-        alert(`Importeret (merge). Øvelser tilføjet: ${addedEx}, sessioner tilføjet: ${addedSes}`);
-      } else {
-        exercises = data.exercises || [];
-        sessions = data.sessions || [];
-        categories = data.categories || DEFAULT_CATEGORIES;
-        levels = data.levels || DEFAULT_LEVELS;
-        intensities = data.intensities || DEFAULT_INT;
-        players = data.players || DEFAULT_PLAYERS;
-        persistExercises(); persistSessions(); persistBase(); populateSelects(); renderList(true); renderSessions();
-        alert('Data erstattet fra fil.');
-      }
-    }catch(err){ alert('Kunne ikke læse fil: ' + err.message); }
-  };
-  reader.readAsText(file);
-  ev.target.value = '';
+      const oUrl = `https://noembed.com/embed?url=${encodeURIComponent(link)}`;
+      const r = await fetch(oUrl);
+      if(r.ok){ const j = await r.json(); if(j && (j.title || j.author_name)) return { title:j.title||'', description:j.author_name||'' }; }
+    }catch(e){ console.warn('noembed fail',e); }
+  }catch(e){ console.warn('fetchVideoMetadata error', e); }
+  return null;
+}
+async function analyzeLinkAction(){
+  const link = ($("link").value || "").trim();
+  if(!link){ alert('Indsæt et videolink først'); return; }
+  $("analyze-btn").textContent = 'Analyserer…'; $("analyze-btn").disabled = true;
+  try{
+    const meta = await fetchVideoMetadata(link);
+    if(meta){
+      if(meta.title) $("title").value = meta.title;
+      if(meta.description) $("description").value = meta.description;
+      alert('Analyse færdig — felter opdateret hvis metadata fundet.');
+    } else {
+      alert('Kunne ikke hente metadata. Prøv et YouTube-link eller tjek CORS.');
+    }
+  }catch(err){ console.error(err); alert('Fejl under analyse'); }
+  finally{ $("analyze-btn").textContent = '🔍 Analyser'; $("analyze-btn").disabled = false; }
 }
 
-function mergeExercises(imported){
-  let added = 0;
-  (imported||[]).forEach(im=>{
-    const dup = exercises.some(e => (im.link && e.link === im.link) || (im.title && e.title && e.title.toLowerCase() === im.title.toLowerCase()));
-    if(!dup){ exercises.push(im); added++; }
-  });
-  return added;
-}
-function mergeSessions(imported){
-  let added = 0;
-  (imported||[]).forEach(im=>{
-    const dup = sessions.some(s => s.name && im.name && s.name.toLowerCase() === im.name.toLowerCase());
-    if(!dup){ sessions.push(im); added++; }
-  });
-  return added;
-}
+/* ---------- UTILS ---------- */
+function escapeHtml(s){ return (s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function applyTheme(theme){ if(theme==='light'){ document.body.classList.add('light'); $("theme-toggle").textContent='🌞'; } else { document.body.classList.remove('light'); $("theme-toggle").textContent='🌙'; } localStorage.setItem(THEME_KEY, theme); }
+function applyPermissions(){ $("bottom-bar").style.display = (isAdmin()||isPaid()) ? 'flex' : 'none'; $("delete-all-btn").style.display = isAdmin() ? 'inline-flex' : 'none'; $("save-session").style.display = (isAdmin()||isPaid()) ? 'inline-flex' : 'none'; $("clear-session").style.display = (isAdmin()||isPaid()) ? 'inline-flex' : 'none'; const badges = $("badges"); badges.innerHTML=''; if(isAdmin()){ const d=document.createElement('div'); d.className='badge'; d.textContent='ADMIN'; badges.appendChild(d); $("btn-logout").style.display='inline-flex'; } else $("btn-logout").style.display='none'; if(isPaid()){ const d=document.createElement('div'); d.className='badge'; d.textContent='PAID'; badges.appendChild(d); } renderList(true); renderSessions(); }
+function refreshUI(){ populateSelects(); applyPermissions(); renderIndex=0; renderList(true); renderSessions(); }
 
-/* ================= START ================= */
-document.addEventListener('DOMContentLoaded', ()=> init());
+/* ---------- START ---------- */
+document.addEventListener('DOMContentLoaded', ()=>{ init(); });
+
 </script>
 </body>
 </html>
