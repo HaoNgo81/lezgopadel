@@ -9,18 +9,17 @@
   <link rel="icon" href="ICON-192x192.png" sizes="192x192">
 
   <style>
-    /* RESET + VARS */
+    /* ---------- RESET & THEME ---------- */
     *,*::before,*::after{box-sizing:border-box}
     html,body{height:100%;margin:0;padding:0;overflow-x:hidden}
-    body{font-family:Inter,system-ui,Arial,sans-serif;-webkit-font-smoothing:antialiased;transition:background .25s,color .25s; background: linear-gradient(180deg,#0f1720 0%,#071226 100%); color:#e6eef6; padding-bottom:220px;}
-    :root{ --panel:#0b1a25; --muted:#9aa7b3; --accent:#22c55e; --danger:#ef4444; --border-soft: rgba(255,255,255,.04); --max-w:1100px; }
-    body.light{ background: linear-gradient(180deg,#caced5 0%,#bfc3cb 100%); color:#0b1220; --panel:#d8dce3; --muted:#3c4652; --accent:#16a34a; --danger:#dc2626; }
+    body{font-family:Inter,system-ui,Arial,sans-serif;-webkit-font-smoothing:antialiased;transition:background .2s,color .2s;background:linear-gradient(180deg,#0f1720 0%,#071226 100%);color:#e6eef6;padding-bottom:220px}
+    :root{--panel:#0b1a25;--muted:#9aa7b3;--accent:#22c55e;--danger:#ef4444;--border-soft:rgba(255,255,255,.04);--max-w:1100px}
+    body.light{background:linear-gradient(180deg,#caced5 0%,#bfc3cb 100%);color:#0b1220}
 
     .container{max-width:var(--max-w);margin:14px auto;padding:12px;width:94%}
-    header{display:flex;flex-direction:column;align-items:center;gap:12px;margin-bottom:12px;padding-top:8px}
-    #logo{width:min(62vw,520px);max-height:26vh;height:auto;display:block;margin:0 auto;object-fit:contain}
+    header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+    #logo{height:36px}
 
-    .controls{display:flex;gap:12px;align-items:center;width:100%;justify-content:space-between;flex-wrap:wrap;padding:0 6px}
     .badges{display:flex;gap:8px;align-items:center}
     .badge{background:rgba(255,255,255,.04);padding:6px 10px;border-radius:8px;font-weight:700;color:var(--muted)}
 
@@ -38,75 +37,82 @@
     @media(max-width:680px){.grid{grid-template-columns:1fr}}
 
     .exercise{display:flex;gap:10px;padding:12px;border-radius:10px;border:1px solid var(--border-soft);align-items:flex-start;overflow:hidden}
-    .exercise .left{flex:1; min-width:0}
+    .exercise .left{flex:1;min-width:0}
     .exercise .meta{color:var(--muted);margin-top:8px}
     .tag{background:rgba(255,255,255,.03);padding:6px 8px;border-radius:8px;margin-right:8px;font-size:13px;display:inline-block;margin-top:8px}
 
-    /* wrap long text/urls */
+    /* wrap long words/urls */
     .exercise, .exercise a, .exercise div { overflow-wrap:anywhere; word-break:break-word; hyphens:auto; }
-    a { color: #2fa1ff; }
+    a { color:#2fa1ff; }
 
     .actions-small{display:flex;flex-direction:column;gap:8px;align-items:flex-end}
-    .actions-small .btn{white-space:nowrap}
+    .duplicate{border:2px solid var(--danger)!important;background:rgba(239,68,68,0.06)!important}
 
-    .duplicate { border: 2px solid var(--danger) !important; background: rgba(239,68,68,0.06) !important; }
+    /* bottom bar (admin/paid) - keeps above content */
+    #lezgo-bottom-bar{position:fixed;bottom:12px;left:12px;right:12px;max-width:calc(var(--max-w)-24px);margin:0 auto;display:none;gap:12px;justify-content:center;align-items:center;padding:10px;border-radius:12px;z-index:99999;box-shadow:0 10px 28px rgba(0,0,0,0.16);background:linear-gradient(180deg,rgba(0,0,0,0.06),rgba(0,0,0,0.02))}
+    #lezgo-bottom-bar .lezgo-btn{padding:.6rem .9rem;border-radius:10px;background:var(--accent);color:#05261a;font-weight:800;min-width:110px}
+    #lezgo-bottom-bar .lezgo-btn.restore{background:transparent;border:1px solid var(--border-soft);color:inherit}
 
-    /* bottom bar (admin/paid) */
-    #lezgo-bottom-bar{ position: fixed; bottom: 12px; left: 12px; right: 12px; max-width: calc(var(--max-w) - 24px); margin: 0 auto; display:none; gap:12px; justify-content:center; align-items:center; padding:10px; background: linear-gradient(180deg, rgba(0,0,0,0.06), rgba(0,0,0,0.02)); border-radius:12px; z-index:99999; box-shadow:0 10px 28px rgba(0,0,0,0.16); pointer-events:auto; }
-    #lezgo-bottom-bar .lezgo-btn{ padding:.6rem .9rem; border-radius:10px; background:var(--accent); color:#05261a; min-width:110px; text-align:center; font-weight:800}
-    #lezgo-bottom-bar .lezgo-btn.restore{ background:transparent; border:1px solid var(--border-soft); color:inherit; }
+    .load-more{display:block;margin:8px auto;padding:8px 12px;border-radius:8px;border:1px solid var(--border-soft);background:transparent;color:var(--muted)}
 
-    /* saved-links area inside aside */
-    #saved-links-list .link-row{ display:flex; gap:8px; align-items:center; justify-content:space-between; padding:8px; border-radius:8px; border:1px solid var(--border-soft); margin-top:8px; }
-    #saved-links-list .meta{ color:var(--muted); font-size:13px; overflow-wrap:anywhere }
-
-    /* confirm modal */
-    #confirm-modal{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; background: rgba(2,6,23,0.6); z-index:100000; }
-    #confirm-modal .modal{ background:var(--panel); padding:18px; border-radius:12px; max-width:420px; width:92%; box-shadow:0 20px 60px rgba(0,0,0,0.6) }
-    #confirm-modal .modal p{ margin:0 0 12px 0; color:var(--muted) }
-    #confirm-modal .row{ display:flex; gap:10px; justify-content:flex-end }
-
-    @media(max-width:520px){
-      .container{padding:10px 10px 260px}
-      #lezgo-bottom-bar{ left:10px; right:10px; }
-      .actions-small{align-items:flex-end}
-    }
+    @media(max-width:520px){ .container{padding:10px 10px 260px} #lezgo-bottom-bar{left:10px;right:10px} .actions-small{align-items:flex-end} }
   </style>
 </head>
 
 <body>
   <div class="container">
     <header>
-      <img id="logo" src="lezgo-logo.svg" alt="LezGo logo">
-      <div class="controls">
+      <div style="display:flex;gap:12px;align-items:center">
+        <img id="logo" src="lezgo-logo.svg" alt="LezGo logo">
         <div class="badges" id="badges"></div>
-        <div style="display:flex;gap:10px;align-items:center">
-          <select id="lang-select" style="padding:8px;border-radius:8px;border:1px solid var(--border-soft);background:transparent;color:inherit" aria-label="Language select">
-            <option value="da">Dansk</option>
-            <option value="en">English</option>
-          </select>
+      </div>
 
-          <button id="btn-buy" class="btn btn-primary">Køb adgang</button>
-          <button id="btn-admin" class="btn btn-ghost">Admin login</button>
-          <button id="btn-logout-header" class="btn btn-ghost" style="display:none;color:var(--danger)">Log ud</button>
-        </div>
+      <div style="display:flex;gap:10px;align-items:center">
+        <select id="lang-select" style="padding:8px;border-radius:8px;border:1px solid var(--border-soft);background:transparent;color:inherit" aria-label="Language select">
+          <option value="da">Dansk</option>
+          <option value="en">English</option>
+        </select>
+
+        <button id="btn-buy" class="btn btn-primary">Køb adgang</button>
+        <button id="btn-admin" class="btn btn-ghost">Admin login</button>
+        <button id="btn-logout-header" class="btn btn-ghost" style="display:none;color:var(--danger)">Log ud</button>
       </div>
     </header>
 
-    <!-- FORM -->
+    <!-- Add / Edit -->
     <section class="card">
       <h3 style="margin:0 0 10px 0;color:var(--muted)">Tilføj / Rediger øvelse (Padel)</h3>
+
       <form id="exercise-form" class="grid" onsubmit="return false;">
         <div style="grid-column:1/-1;">
           <label>Titel</label>
           <input id="title" type="text" placeholder="f.eks. Forehand topspin drill" autocomplete="off">
         </div>
 
-        <div><label>Kategori</label><select id="category"></select></div>
-        <div><label>Spillere</label><select id="players"></select></div>
-        <div><label>Varighed (min)</label><input id="duration" type="number" min="0" placeholder="20"></div>
-        <div><label>Niveau</label><select id="level"></select></div>
-        <div><label>Intensitet</label><select id="intensity"></select></div>
+        <div>
+          <label>Kategori</label>
+          <select id="category"></select>
+        </div>
+
+        <div>
+          <label>Spillere</label>
+          <select id="players"></select>
+        </div>
+
+        <div>
+          <label>Varighed (min)</label>
+          <input id="duration" type="number" min="0" placeholder="20">
+        </div>
+
+        <div>
+          <label>Niveau</label>
+          <select id="level"></select>
+        </div>
+
+        <div>
+          <label>Intensitet</label>
+          <select id="intensity"></select>
+        </div>
 
         <div style="grid-column:1/-1;">
           <label>Videolink (YouTube / Instagram / Facebook)</label>
@@ -116,11 +122,18 @@
           </div>
         </div>
 
-        <div style="grid-column:1/-1;"><label>Beskrivelse</label><textarea id="description"></textarea></div>
-        <div style="grid-column:1/-1;"><label>Tags (kommasepareret)</label><input id="tags" type="text" placeholder="fx Cross, Chiquita, Vibora"></div>
+        <div style="grid-column:1/-1;">
+          <label>Beskrivelse</label>
+          <textarea id="description" placeholder="Kort beskrivelse"></textarea>
+        </div>
 
-        <div class="actions-row" style="grid-column:1/-1;margin-top:8px;display:flex;justify-content:space-between;align-items:center">
-          <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <div style="grid-column:1/-1;">
+          <label>Tags (kommasepareret)</label>
+          <input id="tags" type="text" placeholder="fx Cross, Chiquita, Vibora">
+        </div>
+
+        <div style="grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+          <div style="display:flex;gap:10px">
             <button id="save-btn" class="btn btn-primary">➕ Gem øvelse</button>
             <button id="clear-btn" class="btn btn-ghost">Ryd</button>
           </div>
@@ -129,14 +142,14 @@
       </form>
     </section>
 
-    <!-- LIST + ASIDE -->
+    <!-- List + Session Builder -->
     <section class="card">
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;align-items:center">
         <input id="search" type="text" placeholder="Søg..." style="flex:1;padding:10px;border-radius:10px;border:1px solid var(--border-soft);background:transparent;color:inherit">
-        <div class="platform-filters">
-          <button data-platform="youtube" class="platform-btn" id="pf-y">YouTube</button>
-          <button data-platform="instagram" class="platform-btn" id="pf-i">Instagram</button>
-          <button data-platform="facebook" class="platform-btn" id="pf-f">Facebook</button>
+        <div>
+          <button id="pf-y" class="btn btn-ghost btn-small">YouTube</button>
+          <button id="pf-i" class="btn btn-ghost btn-small">Instagram</button>
+          <button id="pf-f" class="btn btn-ghost btn-small">Facebook</button>
         </div>
         <select id="filter-category" style="padding:10px;border-radius:10px;border:1px solid var(--border-soft);background:transparent;color:inherit"><option>ALL</option></select>
         <select id="filter-level" style="padding:10px;border-radius:10px;border:1px solid var(--border-soft);background:transparent;color:inherit"><option>ALL</option></select>
@@ -145,12 +158,13 @@
 
       <div class="two-column" style="display:grid;grid-template-columns:1fr 380px;gap:12px">
         <div>
-          <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap">
-            <button id="select-all" class="btn btn-ghost">Vælg alle</button>
-            <button id="add-selected" class="btn btn-primary">Tilføj til session</button>
+          <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+            <!-- Removed bulk add/select -->
             <div style="margin-left:auto" id="selected-count">0 valgt</div>
           </div>
-          <div id="list"></div>
+
+          <div id="list" style="min-height:120px"></div>
+          <button id="load-more" class="load-more" style="display:none">Vis flere</button>
         </div>
 
         <aside class="card">
@@ -176,40 +190,17 @@
             <button id="clear-session" class="btn btn-ghost" style="display:none">Ryd</button>
           </div>
 
-          <div id="session-lock-info" style="margin-top:14px;color:var(--muted);display:none">
+          <div id="session-lock-info" style="margin-top:14px;color:var(--muted);display:none;">
             Gratis brugere kan ikke gemme eller bygge sessioner. Køb adgang for at låse op.
           </div>
 
           <hr style="border:none;border-top:1px solid var(--border-soft);margin:14px 0">
           <h4 style="margin:0 0 6px 0;">Gemte sessioner</h4>
           <div id="sessions-list" style="max-height:160px;overflow:auto"></div>
-
-          <hr style="border:none;border-top:1px solid var(--border-soft);margin:14px 0">
-          <h4 style="margin:0 0 6px 0;">Gemte links</h4>
-          <div id="saved-links-list" style="max-height:220px;overflow:auto"></div>
         </aside>
       </div>
     </section>
   </div><!-- container end -->
-
-  <!-- Confirm modal -->
-  <div id="confirm-modal" role="dialog" aria-modal="true" style="display:none">
-    <div class="modal">
-      <h3 id="confirm-title">Bekræft</h3>
-      <p id="confirm-message">Er du sikker?</p>
-      <div class="row">
-        <button id="confirm-no" class="btn btn-ghost">Nej</button>
-        <button id="confirm-yes" class="btn btn-danger">Ja</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Bottom bar (Backup / Restore) - visible for Admin OR Paid -->
-  <div id="lezgo-bottom-bar" aria-hidden="true" style="display:none">
-    <button id="btn-backup" class="lezgo-btn">Backup</button>
-    <label for="file-restore" class="lezgo-btn restore" style="cursor:pointer">Restore</label>
-    <input id="file-restore" type="file" accept="application/json" />
-  </div>
 
   <!-- Admin modal -->
   <div id="admin-modal" style="position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:999">
@@ -223,309 +214,437 @@
     </div>
   </div>
 
+  <!-- Confirm modal -->
+  <div id="confirm-modal" style="display:none;position:fixed;inset:0;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);z-index:100000">
+    <div style="background:var(--panel);padding:18px;border-radius:12px;max-width:420px;width:92%;box-shadow:0 20px 60px rgba(0,0,0,0.6)">
+      <h3 id="confirm-title">Bekræft</h3>
+      <p id="confirm-message" style="color:var(--muted)">Er du sikker?</p>
+      <div style="display:flex;gap:10px;justify-content:flex-end">
+        <button id="confirm-no" class="btn btn-ghost">Nej</button>
+        <button id="confirm-yes" class="btn btn-danger">Ja</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom bar (Backup / Restore) -->
+  <div id="lezgo-bottom-bar" style="display:none">
+    <button id="btn-backup" class="lezgo-btn">Backup</button>
+    <label for="file-restore" class="lezgo-btn restore" style="cursor:pointer">Restore</label>
+    <input id="file-restore" type="file" accept="application/json" style="display:none" />
+  </div>
+
 <script>
-/* KONFIG */
+/* ---------------- CONFIG ---------------- */
 const ADMIN_PASSWORD = "admin123";
 const EX_KEY = "lezgo_exercises_v1";
+const SES_KEY = "lezgo_sessions_v1";
 const CAT_KEY = "lezgo_categories_v1";
 const LVL_KEY = "lezgo_levels_v1";
 const INT_KEY = "lezgo_intensities_v1";
 const PLR_KEY = "lezgo_players_v1";
-const SES_KEY = "lezgo_sessions_v1";
 
 const DEFAULT_CATEGORIES = ["Back wall","Bandeja","Chiquita","Defense","Double wall","Groundstroke","Lob","Serve","Smash","Vibora","Volley"].sort();
 const DEFAULT_LEVELS = ["Beginner","Intermediate","Advanced"];
 const DEFAULT_INT = ["Low","Medium","High"];
 const DEFAULT_PLAYERS = ["1","2","3","4","1-2","1-3","1-4","2-4","Any","Add new..."];
 
-let exercises = []; let categories = []; let levels = []; let intensities = []; let players = []; let sessions = [];
-let editingId = null; let selectedIds = new Set();
+let exercises = [], sessions = [], categories = [], levels = [], intensities = [], players = [];
+let editingId = null;
 const $ = id => document.getElementById(id);
 const uid = () => "id_" + Math.random().toString(36).slice(2,10);
 const isAdmin = () => localStorage.getItem("is_admin") === "1";
 const isPaid  = () => localStorage.getItem("is_paid") === "1";
-const platformState = new Set();
 
+/* Performance: batch render */
+const RENDER_BATCH = 100;
+let renderIndex = 0;
+
+/* ------------- STORAGE ------------- */
 function loadAll(){
   exercises = JSON.parse(localStorage.getItem(EX_KEY) || "[]");
+  sessions = JSON.parse(localStorage.getItem(SES_KEY) || "[]");
   categories = JSON.parse(localStorage.getItem(CAT_KEY) || "null") || DEFAULT_CATEGORIES;
   levels = JSON.parse(localStorage.getItem(LVL_KEY) || "null") || DEFAULT_LEVELS;
   intensities = JSON.parse(localStorage.getItem(INT_KEY) || "null") || DEFAULT_INT;
   players = JSON.parse(localStorage.getItem(PLR_KEY) || "null") || DEFAULT_PLAYERS;
-  sessions = JSON.parse(localStorage.getItem(SES_KEY) || "[]");
 }
-function persistExerciseList(){ localStorage.setItem(EX_KEY, JSON.stringify(exercises)); }
+function persistExercises(){ localStorage.setItem(EX_KEY, JSON.stringify(exercises)); }
 function persistSessions(){ localStorage.setItem(SES_KEY, JSON.stringify(sessions)); }
+function persistBase(){ localStorage.setItem(CAT_KEY, JSON.stringify(categories)); localStorage.setItem(LVL_KEY, JSON.stringify(levels)); localStorage.setItem(INT_KEY, JSON.stringify(intensities)); localStorage.setItem(PLR_KEY, JSON.stringify(players)); }
 
+/* ------------- INIT ------------- */
 function init(){
   loadAll();
-  populateCategories(); populateLevels(); populateIntensity(); populatePlayers();
+  populateSelects();
   bindEvents();
-  renderList(); renderSessions(); renderSavedLinks(); updateBadges(); enforcePermissions();
+  renderSessions();
+  renderList(true);
+  enforcePermissions();
+  registerSW();
+}
+function populateSelects(){
+  const sel = $("category"), filc = $("filter-category"), lvl = $("level"), fill = $("filter-level"), pl = $("players");
+  if(sel){ sel.innerHTML=''; categories.forEach(c=>{ const o=document.createElement('option'); o.value=c; o.textContent=c; sel.appendChild(o); }); const add=document.createElement('option'); add.value='__ADD__'; add.textContent='Add new category...'; sel.appendChild(add); }
+  if(filc){ filc.innerHTML=''; let a=document.createElement('option'); a.text='ALL'; a.value=''; filc.appendChild(a); categories.forEach(c=>{ const o=document.createElement('option'); o.value=c; o.text=c; filc.appendChild(o); }); }
+  if(lvl){ lvl.innerHTML=''; levels.forEach(c=>{ const o=document.createElement('option'); o.value=c; o.text=c; lvl.appendChild(o); }); const addL=document.createElement('option'); addL.value='__ADD__'; addL.text='Add new level...'; lvl.appendChild(addL); }
+  if(fill){ fill.innerHTML=''; let a=document.createElement('option'); a.text='ALL'; a.value=''; fill.appendChild(a); levels.forEach(c=>{ const o=document.createElement('option'); o.value=c; o.text=c; fill.appendChild(o); }); }
+  if(pl){ pl.innerHTML=''; players.forEach(p=>{ const o=document.createElement('option'); o.value=p; o.text=p; pl.appendChild(o); }); }
 }
 
-/* UI populate */
-function populateCategories(){ const sel=$("category"), fil=$("filter-category"); if(!sel||!fil) return; sel.innerHTML=''; fil.innerHTML=''; let optAll=document.createElement('option'); optAll.text='ALL'; optAll.value=''; fil.appendChild(optAll); categories.forEach(c=>{ let o=document.createElement('option'); o.value=c; o.text=c; sel.appendChild(o); let f=document.createElement('option'); f.value=c; f.text=c; fil.appendChild(f); }); let add=document.createElement('option'); add.value='__ADD__'; add.text='Add new category...'; sel.appendChild(add); }
-function populateLevels(){ const sel=$("level"), fil=$("filter-level"); if(!sel||!fil) return; sel.innerHTML=''; fil.innerHTML=''; let optAll=document.createElement('option'); optAll.text='ALL'; optAll.value=''; fil.appendChild(optAll); levels.forEach(c=>{ let o=document.createElement('option'); o.value=c; o.text=c; sel.appendChild(o); let f=document.createElement('option'); f.value=c; f.text=c; fil.appendChild(f); }); let add=document.createElement('option'); add.value='__ADD__'; add.text='Add new level...'; sel.appendChild(add); }
-function populateIntensity(){ const sel=$("intensity"); if(!sel) return; sel.innerHTML=''; intensities.forEach(c=>{ let o=document.createElement('option'); o.value=c; o.text=c; sel.appendChild(o); }); let add=document.createElement('option'); add.value='__ADD__'; add.text='Add new intensity...'; sel.appendChild(add); }
-function populatePlayers(){ const sel=$("players"); if(!sel) return; sel.innerHTML=''; players.forEach(c=>{ let o=document.createElement('option'); o.value=c; o.text=c; sel.appendChild(o); }); }
-
-/* EVENTS */
+/* ------------- BIND ------------- */
 function bindEvents(){
-  $("admin-submit").addEventListener("click", ()=>{ if($("admin-password").value===ADMIN_PASSWORD){ localStorage.setItem("is_admin","1"); $("admin-modal").style.display="none"; updateBadges(); enforcePermissions(); alert('Admin enabled'); } else alert("Forkert kode"); });
-  $("admin-cancel").addEventListener("click", ()=> $("admin-modal").style.display="none");
-  $("btn-admin").addEventListener("click", ()=> $("admin-modal").style.display="flex");
-  $("btn-logout-header").addEventListener("click", ()=>{ localStorage.removeItem("is_admin"); updateBadges(); enforcePermissions(); $("btn-logout-header").style.display="none"; alert('Logged out'); });
-
-  $("btn-buy").addEventListener("click", ()=>{ if(isPaid()){ if(confirm("Deaktiver betalt adgang?")){ localStorage.removeItem("is_paid"); updateBadges(); enforcePermissions(); } } else { if(confirm("Simuler køb?")){ localStorage.setItem("is_paid","1"); updateBadges(); enforcePermissions(); } }});
   $("save-btn").addEventListener("click", onSave);
   $("clear-btn").addEventListener("click", clearForm);
-  $("delete-all-btn").addEventListener("click", ()=>{ if(!isAdmin()){ alert('Admin adgang kræves'); return; } const pass = prompt('Admin kode for at bekræfte slet alle'); if(pass !== ADMIN_PASSWORD){ alert('Forkert kode'); return; } showConfirm('Slet ALLE øvelser?', ()=>{ exercises = []; persistExerciseList(); renderList(); renderSavedLinks(); }); });
+  $("delete-all-btn").addEventListener("click", ()=> {
+    if(!isAdmin()){ alert('Admin adgang kræves'); return; }
+    const pass = prompt('Admin kode for at bekræfte slet alle'); if(pass !== ADMIN_PASSWORD){ alert('Forkert kode'); return; }
+    if(confirm('Slet ALLE øvelser?')){ exercises=[]; persistExercises(); renderList(true); renderSessions(); }
+  });
 
-  $("search").addEventListener("input", renderList);
-  $("filter-category").addEventListener("change", renderList);
-  $("filter-level").addEventListener("change", renderList);
-  $("select-all").addEventListener("click", ()=>{ document.querySelectorAll(".select-item").forEach(ch=>ch.checked=true); updateSelectedSet(); });
-  $("add-selected").addEventListener("click", ()=>{ if(!isAdmin() && !isPaid()){ alert('Betalt adgang kræves.'); return; } addSelectedToSession(); });
+  $("search").addEventListener("input", ()=> { renderIndex=0; debounce(()=>renderList(true), 180); });
+  $("filter-category").addEventListener("change", ()=> { renderIndex=0; renderList(true); });
+  $("filter-level").addEventListener("change", ()=> { renderIndex=0; renderList(true); });
 
-  $("save-session").addEventListener("click", ()=>{ if(!isAdmin() && !isPaid()){ alert('Betalt adgang kræves.'); return; } saveSession(); });
-  $("clear-session").addEventListener("click", ()=>{ if(!isAdmin() && !isPaid()){ alert('Betalt adgang kræves.'); return; } clearSessionBuilder(); });
+  $("pf-y").addEventListener("click", ()=> togglePf('youtube',$('pf-y')));
+  $("pf-i").addEventListener("click", ()=> togglePf('instagram',$('pf-i')));
+  $("pf-f").addEventListener("click", ()=> togglePf('facebook',$('pf-f')));
 
-  $("pf-y").addEventListener("click", ()=> togglePlatform('youtube', $("pf-y")));
-  $("pf-i").addEventListener("click", ()=> togglePlatform('instagram', $("pf-i")));
-  $("pf-f").addEventListener("click", ()=> togglePlatform('facebook', $("pf-f")));
+  $("btn-admin").addEventListener("click", ()=> $("admin-modal").style.display="flex");
+  $("admin-cancel").addEventListener("click", ()=> $("admin-modal").style.display="none");
+  $("admin-submit").addEventListener("click", ()=> {
+    if($("admin-password").value===ADMIN_PASSWORD){ localStorage.setItem("is_admin","1"); $("admin-modal").style.display="none"; enforcePermissions(); alert('Admin enabled'); } else alert('Forkert kode');
+  });
+  $("btn-logout-header").addEventListener("click", ()=> { localStorage.removeItem('is_admin'); enforcePermissions(); });
 
-  $("analyze-btn").addEventListener("click", (ev)=>{ ev.preventDefault(); const link = $("link").value.trim(); if(!link){ alert("Indsæt et videolink først"); return; } alert('Analyse ikke aktiveret i demo'); });
+  $("btn-buy").addEventListener("click", ()=> {
+    if(isPaid()){ if(confirm('Deaktiver betalt adgang?')){ localStorage.removeItem('is_paid'); enforcePermissions(); } }
+    else { if(confirm('Simuler køb?')){ localStorage.setItem('is_paid','1'); enforcePermissions(); } }
+  });
 
-  // backup / restore
-  $("btn-backup").addEventListener("click", onBackup);
-  $("file-restore").addEventListener("change", onRestoreFile);
+  $("load-more").addEventListener("click", ()=> renderList(false));
 
-  // confirm modal
+  // confirm modal buttons
   $("confirm-no").addEventListener("click", ()=> closeConfirm(false));
   $("confirm-yes").addEventListener("click", ()=> closeConfirm(true));
+
+  // backup/restore
+  $("btn-backup").addEventListener("click", onBackup);
+  $("file-restore").addEventListener("change", onRestoreFile);
 }
 
-/* platform helpers */
-function togglePlatform(name, btn){
-  if(platformState.has(name)){ platformState.delete(name); btn.classList.remove('active'); } else { platformState.add(name); btn.classList.add('active'); }
-  renderList();
-}
-function linkPlatform(link){
-  if(!link) return null;
-  try{ const u = new URL(link); const h = u.hostname.toLowerCase(); if(h.includes('youtube')||h.includes('youtu.be')) return 'youtube'; if(h.includes('instagram')) return 'instagram'; if(h.includes('facebook')) return 'facebook'; }catch(e){} return null;
-}
+/* debounce */
+let debounceTimer = null;
+function debounce(fn, wait){ clearTimeout(debounceTimer); debounceTimer = setTimeout(fn, wait); }
 
-/* SAVE EXERCISE */
+/* platform state */
+const platformState = new Set();
+function togglePf(name, el){ if(platformState.has(name)){ platformState.delete(name); el.classList.remove('active'); } else { platformState.add(name); el.classList.add('active'); } renderIndex=0; renderList(true); }
+
+/* ------------- SAVE / DUP CHECK ------------- */
 function onSave(){
   const title = ($("title").value||"").trim();
   const link = ($("link").value||"").trim();
-  if(!title){ alert("Indtast titel"); return; }
+  if(!title){ alert('Indtast titel'); return; }
 
-  const titleLC = title.toLowerCase();
-  const dupByTitle = exercises.filter(e => (e.title||'').toLowerCase() === titleLC && e.id !== editingId);
-  const dupByLink = link ? exercises.filter(e => (e.link||'') === link && e.id !== editingId) : [];
-  document.querySelectorAll('.duplicate').forEach(n=>n.classList.remove('duplicate'));
-
-  if(dupByTitle.length || dupByLink.length){
-    const ids = new Set([...dupByTitle.map(x=>x.id), ...dupByLink.map(x=>x.id)]);
-    ids.forEach(id => { const node = document.querySelector(`.exercise[data-id="${id}"]`); if(node){ node.classList.add('duplicate'); node.scrollIntoView({behavior:'smooth', block:'center'}); }});
-    alert("Duplikat fundet: titel eller link findes allerede. De matchede elementer er markeret.");
+  // duplicates
+  const dupTitle = exercises.some(e => e.title && e.title.toLowerCase() === title.toLowerCase() && e.id !== editingId);
+  const dupLink = link ? exercises.some(e => e.link === link && e.id !== editingId) : false;
+  if(dupTitle || dupLink){
+    alert('Duplikat fundet: titel eller link findes allerede. Ret eller brug en anden titel/link.');
     return;
   }
 
-  const ex = { id: editingId || uid(), title, category: $("category").value, players: $("players").value, duration: Number($("duration").value||0), level: $("level").value, intensity: $("intensity").value, link, description: $("description").value||"", tags: ($("tags").value||"").trim(), createdAt: new Date().toISOString() };
-  if(editingId){ const idx = exercises.findIndex(e=>e.id===editingId); if(idx>-1) exercises[idx] = ex; } else exercises.unshift(ex);
-  persistExerciseList();
-  clearForm(); renderList(); renderSavedLinks();
+  const obj = { id: editingId || uid(), title, link, category: $("category").value, players: $("players").value, duration: Number($("duration").value||0), level: $("level").value, intensity: $("intensity").value, description: $("description").value||"", tags: ($("tags").value||"").trim(), createdAt: new Date().toISOString() };
+
+  if(editingId){
+    const idx = exercises.findIndex(x=>x.id===editingId);
+    if(idx>-1) exercises[idx] = obj;
+  } else {
+    exercises.unshift(obj);
+  }
+  persistExercises();
+  editingId = null;
+  clearForm();
+  renderIndex=0;
+  renderList(true);
+  renderSessions();
+}
+function clearForm(){
+  editingId=null;
+  $("title").value=""; $("link").value=""; if($("category")) $("category").selectedIndex=0;
+  if($("players")) $("players").selectedIndex=0; $("duration").value=""; if($("level")) $("level").selectedIndex=0;
+  if($("intensity")) $("intensity").selectedIndex=0; $("description").value=""; $("tags").value="";
 }
 
-function clearForm(){ editingId=null; $("title").value=""; if($("category")) $("category").selectedIndex=0; if($("players")) $("players").selectedIndex=0; $("duration").value=""; if($("level")) $("level").selectedIndex=0; if($("intensity")) $("intensity").selectedIndex=0; $("link").value=""; $("description").value=""; $("tags").value=""; }
+/* ------------- RENDER LIST (batched) ------------- */
+function renderList(reset=true){
+  const list = $("list");
+  if(!list) return;
+  if(reset){ renderIndex=0; list.innerHTML=""; }
 
-/* RENDER MAIN LIST */
-function renderList(){
-  document.querySelectorAll('.duplicate').forEach(n=>n.classList.remove('duplicate'));
   const q = ($("search").value||"").trim().toLowerCase();
   const fc = ($("filter-category").value||"");
   const fl = ($("filter-level").value||"");
-  const list = $("list"); if(!list) return; list.innerHTML = "";
   let items = exercises.slice();
 
+  // platform filter
   if(platformState.size>0){
-    items = items.filter(it => { const p = linkPlatform(it.link); return p && platformState.has(p); });
+    items = items.filter(it=>{
+      if(!it.link) return false;
+      try{
+        const host = new URL(it.link).hostname.toLowerCase();
+        if(host.includes('youtube')||host.includes('youtu.be')) return platformState.has('youtube');
+        if(host.includes('instagram')) return platformState.has('instagram');
+        if(host.includes('facebook')) return platformState.has('facebook');
+      }catch(e){ return false; }
+      return false;
+    });
   }
+
   if(fc) items = items.filter(x=>x.category===fc);
   if(fl) items = items.filter(x=>x.level===fl);
   if(q) items = items.filter(x => (x.title||"").toLowerCase().includes(q) || (x.description||"").toLowerCase().includes(q) || (x.tags||"").toLowerCase().includes(q));
-  if(items.length===0){ list.innerHTML = `<div style="color:var(--muted)">Ingen resultater</div>`; return; }
 
-  items.forEach(ex=>{
-    const row = document.createElement('div'); row.className='exercise'; row.dataset.id = ex.id;
-    const cb = document.createElement('input'); cb.type='checkbox'; cb.className='select-item'; cb.addEventListener('change', updateSelectedSet); row.appendChild(cb);
+  const total = items.length;
+  const start = renderIndex;
+  const end = Math.min(start + RENDER_BATCH, total);
+  const slice = items.slice(start, end);
+
+  const frag = document.createDocumentFragment();
+  slice.forEach(ex=>{
+    const row = document.createElement('div'); row.className='exercise'; row.dataset.id=ex.id;
+
+    // checkbox (kept for count only)
+    const cb = document.createElement('input'); cb.type='checkbox'; cb.style.marginRight='8px';
+    cb.addEventListener('change', ()=> updateSelectedCount());
+    row.appendChild(cb);
 
     const left = document.createElement('div'); left.className='left';
-    const ttitle = document.createElement('div'); ttitle.style.fontWeight='800'; ttitle.style.fontSize='15px'; ttitle.textContent = ex.title; left.appendChild(ttitle);
-    const meta = document.createElement('div'); meta.className='meta'; meta.textContent = `${ex.category} • ${ex.level} • ${ex.players || ''} • ${ex.duration}m`; left.appendChild(meta);
-    if(ex.link){
-      const a = document.createElement('a'); a.href = ex.link; a.target = '_blank'; a.textContent = ex.link; a.style.display='block'; a.style.marginTop='6px';
-      const p = linkPlatform(ex.link); if(p){ const sp = document.createElement('span'); sp.style.marginLeft='8px'; sp.style.color='var(--muted)'; sp.style.fontSize='12px'; sp.textContent = `(${p})`; a.appendChild(sp); }
-      left.appendChild(a);
-    }
-    if(ex.tags){
-      const tags = document.createElement('div'); tags.style.marginTop='8px'; ex.tags.split(',').forEach(tg=>{ const s=document.createElement('span'); s.className='tag'; s.textContent = tg.trim(); tags.appendChild(s); }); left.appendChild(tags);
-    }
+    const h = document.createElement('div'); h.style.fontWeight='800'; h.style.fontSize='15px'; h.textContent = ex.title;
+    left.appendChild(h);
+    const meta = document.createElement('div'); meta.className='meta'; meta.textContent = `${ex.category} • ${ex.level} • ${ex.players||''} • ${ex.duration}m`; left.appendChild(meta);
+    if(ex.link){ const a = document.createElement('a'); a.href = ex.link; a.target='_blank'; a.style.display='block'; a.style.marginTop='6px'; a.textContent = ex.link; left.appendChild(a); }
+    if(ex.tags){ const tbox = document.createElement('div'); tbox.style.marginTop='8px'; ex.tags.split(',').forEach(tg=>{ const s=document.createElement('span'); s.className='tag'; s.textContent = tg.trim(); tbox.appendChild(s); }); left.appendChild(tbox); }
     row.appendChild(left);
 
     const right = document.createElement('div'); right.className='actions-small';
 
-    // Add to session button (only admin or paid)
+    // per-item: Tilføj til Session Builder (ADMIN & PAID)
     if(isAdmin() || isPaid()){
-      const addBtn = document.createElement('button'); addBtn.className='btn btn-primary btn-small'; addBtn.textContent = 'Tilføj';
-      addBtn.title = 'Tilføj denne øvelse til session';
-      addBtn.addEventListener('click', ()=> addItemToSession(ex.id));
+      const addBtn = document.createElement('button'); addBtn.className='btn btn-primary btn-small'; addBtn.textContent='Tilføj';
+      addBtn.title = 'Tilføj til Session Builder';
+      addBtn.addEventListener('click', ()=> { addToSessionBuilder(ex.id); });
       right.appendChild(addBtn);
     }
 
-    // Edit (admin/paid)
+    // edit (admin/paid)
     if(isAdmin() || isPaid()){
-      const edit = document.createElement('button'); edit.className='btn btn-ghost'; edit.textContent = 'Rediger';
-      edit.addEventListener('click', ()=>{ if(!isAdmin() && !isPaid()){ alert('Betalt adgang kræves'); return; } editItem(ex.id); });
-      right.appendChild(edit);
+      const editBtn = document.createElement('button'); editBtn.className='btn btn-ghost'; editBtn.textContent='Rediger';
+      editBtn.addEventListener('click', ()=> { editingId = ex.id; populateFormForEdit(ex); window.scrollTo({top:0,behavior:'smooth'}); });
+      right.appendChild(editBtn);
     }
 
-    // Delete (admin/paid) with modal
+    // delete (admin/paid)
     if(isAdmin() || isPaid()){
-      const del = document.createElement('button'); del.className='btn btn-ghost'; del.style.color='var(--danger)'; del.textContent = 'Slet';
-      del.addEventListener('click', ()=>{ if(!isAdmin() && !isPaid()){ alert('Admin eller betalt adgang kræves'); return; } showConfirm('Slet denne øvelse?', ()=>{ exercises = exercises.filter(x=>x.id!==ex.id); persistExerciseList(); renderList(); renderSavedLinks(); }); });
-      right.appendChild(del);
+      const delBtn = document.createElement('button'); delBtn.className='btn btn-ghost'; delBtn.style.color='var(--danger)'; delBtn.textContent='Slet';
+      delBtn.addEventListener('click', ()=> showConfirm('Slet denne øvelse?', ()=>{ exercises = exercises.filter(x=>x.id!==ex.id); persistExercises(); renderList(true); renderSessions(); updateSelectedCount(); }));
+      right.appendChild(delBtn);
     }
 
     row.appendChild(right);
-    list.appendChild(row);
+    frag.appendChild(row);
   });
 
-  updateSelectedSet();
+  list.appendChild(frag);
+  renderIndex = end;
+
+  const loadMore = $("load-more");
+  if(renderIndex < total){ loadMore.style.display='block'; loadMore.textContent = `Vis flere (${total - renderIndex})`; }
+  else loadMore.style.display='none';
+
+  if(total === 0 && start===0){ list.innerHTML = `<div style="color:var(--muted)">Ingen resultater</div>`; }
+  updateSelectedCount();
 }
 
-/* EDIT */
-function editItem(id){ const ex = exercises.find(e=>e.id===id); if(!ex) return; editingId=id; $("title").value=ex.title; $("category").value=ex.category; $("players").value=ex.players; $("duration").value=ex.duration; $("level").value=ex.level; $("intensity").value=ex.intensity; $("link").value=ex.link; $("description").value=ex.description; $("tags").value=ex.tags; window.scrollTo({top:0,behavior:'smooth'}); }
+/* populate form for edit */
+function populateFormForEdit(ex){
+  $("title").value = ex.title || "";
+  $("link").value = ex.link || "";
+  if($("category")) $("category").value = ex.category || "";
+  if($("players")) $("players").value = ex.players || "";
+  $("duration").value = ex.duration || "";
+  if($("level")) $("level").value = ex.level || "";
+  if($("intensity")) $("intensity").value = ex.intensity || "";
+  $("description").value = ex.description || "";
+  $("tags").value = ex.tags || "";
+}
 
-/* ADD single to session */
-function addItemToSession(id){
+/* ------------- Session Builder actions ------------- */
+function addToSessionBuilder(id){
   if(!isAdmin() && !isPaid()){ alert('Betalt adgang kræves'); return; }
   const box = $("session-items");
-  if(box.querySelector(`[data-id="${id}"]`)) { alert('Redan tilføjet'); return; }
-  const ex = exercises.find(e=>e.id===id); if(!ex) return;
-  const row = document.createElement('div'); row.className='exercise'; row.dataset.id=id; row.innerHTML = `<div style="flex:1"><div style="font-weight:700">${ex.title}</div><div style="color:var(--muted)">${ex.duration}m • ${ex.category}</div></div><button class="btn btn-ghost" style="color:var(--danger)">Fjern</button>`;
-  row.querySelector('button').addEventListener('click', ()=>{ row.remove(); recalcSession(); });
+  if(box.querySelector(`[data-id="${id}"]`)){ // already in builder
+    // optionally flash / scroll
+    const node = box.querySelector(`[data-id="${id}"]`);
+    node.style.transition = 'box-shadow .2s'; node.style.boxShadow = '0 0 0 3px rgba(34,197,94,0.15)';
+    setTimeout(()=> node.style.boxShadow = '', 600);
+    node.scrollIntoView({behavior:'smooth', block:'center'});
+    return;
+  }
+  const ex = exercises.find(e=>e.id===id);
+  if(!ex) return;
+  const row = document.createElement('div'); row.className = 'exercise'; row.dataset.id = id; row.style.marginBottom='6px';
+  row.innerHTML = `<div style="flex:1"><div style="font-weight:700">${escapeHtml(ex.title)}</div><div style="color:var(--muted)">${ex.duration}m • ${escapeHtml(ex.category)}</div></div><button class="btn btn-ghost remove-from-session" style="color:var(--danger)">Fjern</button>`;
+  row.querySelector('button').addEventListener('click', ()=> { row.remove(); recalcSession(); });
   box.appendChild(row);
   recalcSession();
+  // scroll into view of session builder
+  const builder = $("session-items");
+  builder.scrollIntoView({behavior:'smooth', block:'center'});
 }
 
-/* BULK -> session */
-function updateSelectedSet(){ selectedIds.clear(); document.querySelectorAll(".select-item").forEach(cb=>{ if(cb.checked) selectedIds.add(cb.closest(".exercise").dataset.id); }); updateSelectedCount(); }
-function updateSelectedCount(){ if($("selected-count")) $("selected-count").textContent = (selectedIds.size||0) + " valgt"; }
-function addSelectedToSession(){ if(!isAdmin() && !isPaid()){ alert('Betalt adgang kræves'); return; } const box = $("session-items"); selectedIds.forEach(id=>{ if(box.querySelector(`[data-id="${id}"]`)) return; const ex = exercises.find(e=>e.id===id); if(!ex) return; const row = document.createElement('div'); row.className='exercise'; row.dataset.id=id; row.innerHTML = `<div style="flex:1"><div style="font-weight:700">${ex.title}</div><div style="color:var(--muted)">${ex.duration}m • ${ex.category}</div></div><button class="btn btn-ghost" style="color:var(--danger)">Fjern</button>`; row.querySelector('button').addEventListener('click', ()=>{ row.remove(); recalcSession(); }); box.appendChild(row); }); recalcSession(); }
+/* recalc session builder totals */
+function recalcSession(){
+  let total = 0, count = 0;
+  document.querySelectorAll("#session-items .exercise").forEach(r=>{
+    const id = r.dataset.id;
+    const ex = exercises.find(e=>e.id === id);
+    if(ex){ total += Number(ex.duration || 0); count++; }
+  });
+  $("session-total").textContent = total + " m";
+  $("session-count").textContent = count + " øvelser";
+}
 
-function recalcSession(){ let total=0,count=0; document.querySelectorAll("#session-items .exercise").forEach(row=>{ const ex = exercises.find(e=>e.id===row.dataset.id); if(ex){ total += Number(ex.duration||0); count++; }}); if($("session-total")) $("session-total").textContent = total + " m"; if($("session-count")) $("session-count").textContent = count + " øvelser"; }
-function clearSessionBuilder(){ if(!isAdmin() && !isPaid()){ alert('Betalt adgang kræves'); return; } if($("session-items")) $("session-items").innerHTML=''; if($("session-name")) $("session-name").value=''; if($("session-desc")) $("session-desc").value=''; recalcSession(); }
-function saveSession(){ if(!isAdmin() && !isPaid()){ alert('Betalt adgang kræves'); return; } const name = ($("session-name").value||"").trim(); if(!name){ alert('Tilføj et sessionsnavn'); return; } const ids = []; document.querySelectorAll("#session-items .exercise").forEach(r=>ids.push(r.dataset.id)); const total = ids.reduce((a,id)=>{ const ex = exercises.find(e=>e.id===id); return a + (ex?Number(ex.duration||0):0); },0); const ses = { id: uid(), name, description: $("session-desc").value||"", items: ids, total, createdAt: new Date().toISOString() }; sessions.unshift(ses); persistSessions(); renderSessions(); clearSessionBuilder(); }
+/* save session */
+function saveSession(){
+  if(!isAdmin() && !isPaid()){ alert('Betalt adgang kræves'); return; }
+  const name = ($("session-name").value||"").trim();
+  if(!name){ alert('Tilføj et sessionsnavn'); return; }
+  const ids = Array.from(document.querySelectorAll("#session-items .exercise")).map(r=>r.dataset.id);
+  const total = ids.reduce((a,id)=>{ const ex = exercises.find(e=>e.id===id); return a + (ex?Number(ex.duration||0):0); }, 0);
+  const s = { id: uid(), name, description: $("session-desc").value||"", items: ids, total, createdAt: new Date().toISOString() };
+  sessions.unshift(s);
+  persistSessions();
+  renderSessions();
+  alert('Session gemt');
+}
 
-/* SESSIONS RENDER */
+/* open saved session (populate builder) */
+function openSavedSession(id){
+  const s = sessions.find(x=>x.id === id);
+  if(!s) return alert('Session not found');
+  const box = $("session-items"); box.innerHTML = "";
+  s.items.forEach(iid=>{
+    const ex = exercises.find(e=>e.id === iid);
+    if(!ex) return;
+    const row = document.createElement('div'); row.className='exercise'; row.dataset.id = iid; row.style.marginBottom='6px';
+    row.innerHTML = `<div style="flex:1"><div style="font-weight:700">${escapeHtml(ex.title)}</div><div style="color:var(--muted)">${ex.duration}m • ${escapeHtml(ex.category)}</div></div><button class="btn btn-ghost remove-from-session" style="color:var(--danger)">Fjern</button>`;
+    row.querySelector('button').addEventListener('click', ()=> { row.remove(); recalcSession(); });
+    box.appendChild(row);
+  });
+  recalcSession();
+  // scroll to builder
+  $("session-items").scrollIntoView({behavior:'smooth', block:'center'});
+}
+
+/* render sessions list */
 function renderSessions(){
-  const box = $("sessions-list"); if(!box) return; box.innerHTML='';
+  const box = $("sessions-list"); box.innerHTML = "";
   if(!sessions.length){ box.innerHTML = `<div style="color:var(--muted)">Ingen gemte sessioner</div>`; return; }
   sessions.forEach(s=>{
-    const div = document.createElement('div'); div.className='exercise';
-    div.innerHTML = `<div style="flex:1"><div style="font-weight:800">${s.name}</div><div style="color:var(--muted)">${(s.items||[]).length} øvelser • ${s.total||0} m</div></div>`;
-    const btnOpen = document.createElement('button'); btnOpen.className='btn btn-ghost'; btnOpen.textContent='Åbn';
-    btnOpen.addEventListener('click', ()=>{ if(!isAdmin() && !isPaid()){ alert('Admin eller betalt adgang kræves'); return; } openSavedSession(s.id); });
-    const btnDelete = document.createElement('button'); btnDelete.className='btn btn-ghost'; btnDelete.style.color='var(--danger)'; btnDelete.textContent='Slet';
-    btnDelete.addEventListener('click', ()=>{ if(!isAdmin() && !isPaid()){ alert('Admin eller betalt adgang kræves'); return; } showConfirm('Slet denne session?', ()=>{ sessions = sessions.filter(x=>x.id!==s.id); persistSessions(); renderSessions(); }); });
-    div.appendChild(btnOpen);
-    if(isAdmin() || isPaid()) div.appendChild(btnDelete);
+    const div = document.createElement('div'); div.className='exercise'; div.style.marginBottom='8px';
+    div.innerHTML = `<div style="flex:1"><div style="font-weight:800">${escapeHtml(s.name)}</div><div style="color:var(--muted)">${(s.items||[]).length} øvelser • ${s.total||0} m</div></div>`;
+    const openBtn = document.createElement('button'); openBtn.className='btn btn-ghost'; openBtn.textContent='Åbn';
+    openBtn.addEventListener('click', ()=> openSavedSession(s.id));
+    const delBtn = document.createElement('button'); delBtn.className='btn btn-ghost'; delBtn.style.color='var(--danger)'; delBtn.textContent='Slet';
+    delBtn.addEventListener('click', ()=> showConfirm('Slet denne session?', ()=>{ sessions = sessions.filter(x=>x.id!==s.id); persistSessions(); renderSessions(); }));
+    div.appendChild(openBtn);
+    if(isAdmin() || isPaid()) div.appendChild(delBtn);
     box.appendChild(div);
   });
 }
 
-/* SAVED LINKS - under Saved sessions */
-function renderSavedLinks(){
-  const box = $("saved-links-list"); if(!box) return; box.innerHTML='';
-  const links = exercises.filter(e => e.link && e.link.trim() !== '');
-  if(!links.length){ box.innerHTML = `<div style="color:var(--muted)">Ingen gemte links</div>`; return; }
-  links.forEach(ex=>{
-    const row = document.createElement('div'); row.className='link-row';
-    const left = document.createElement('div'); left.style.flex='1';
-    const title = document.createElement('div'); title.style.fontWeight='700'; title.textContent = ex.title;
-    const meta = document.createElement('div'); meta.className='meta'; meta.textContent = ex.link;
-    left.appendChild(title); left.appendChild(meta);
-    const right = document.createElement('div'); right.style.display='flex'; right.style.gap='8px';
-    if(isAdmin() || isPaid()){
-      const btn = document.createElement('button'); btn.className='btn btn-primary btn-small'; btn.textContent='Tilføj';
-      btn.addEventListener('click', ()=> addItemToSession(ex.id));
-      right.appendChild(btn);
-    }
-    row.appendChild(left); row.appendChild(right); box.appendChild(row);
-  });
-}
-
-/* CONFIRM modal */
-let _confirmResolver = null;
-function showConfirm(message, onYes){
-  const modal = $("confirm-modal"); $("confirm-message").textContent = message; modal.style.display='flex';
-  _confirmResolver = (ok) => { modal.style.display='none'; if(ok && typeof onYes === 'function') onYes(); _confirmResolver = null; };
-}
-function closeConfirm(result){ if(typeof _confirmResolver === 'function') _confirmResolver(result); }
-
-/* BACKUP & RESTORE (download + restore merge) */
+/* ------------- Backups / Restore ------------- */
 function onBackup(){
   if(!(isAdmin() || isPaid())){ alert('Admin eller betalt adgang kræves for backup'); return; }
   try {
-    const payload = { meta: { createdAt: new Date().toISOString() }, data: { exercises, sessions, categories, levels, intensities, players } };
-    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `lezgo-backup-${new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')}.json`; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
-    alert('Backup downloadet (lokal fil).');
-  } catch(e){ console.error(e); alert('Backup fejlede'); }
+    const payload = { meta:{createdAt:new Date().toISOString()}, data:{ exercises, sessions, categories, levels, intensities, players } };
+    const blob = new Blob([JSON.stringify(payload,null,2)], { type:'application/json' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `lezgo-backup-${new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')}.json`; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(a.href);
+    alert('Backup downloadet.');
+  } catch(err){ console.error(err); alert('Backup fejlede'); }
 }
 async function onRestoreFile(ev){
   if(!(isAdmin() || isPaid())){ alert('Admin eller betalt adgang kræves for restore'); ev.target.value=''; return; }
   const file = ev.target.files && ev.target.files[0]; if(!file) return;
   try{
-    const text = await file.text(); const parsed = JSON.parse(text); if(!parsed || !parsed.data) throw new Error('Ugyldigt backup-format');
-    const incomingExercises = Array.isArray(parsed.data.exercises)?parsed.data.exercises:[]; const exById = new Map((exercises||[]).map(e=>[e.id,e])); incomingExercises.forEach(e=>{ if(!e.id) e.id = uid(); exById.set(e.id,e); }); exercises = Array.from(exById.values());
-    const incomingSessions = Array.isArray(parsed.data.sessions)?parsed.data.sessions:[]; const sesById = new Map((sessions||[]).map(s=>[s.id,s])); incomingSessions.forEach(s=>{ if(!s.id) s.id = uid(); sesById.set(s.id,s); }); sessions = Array.from(sesById.values());
-    categories = Array.from(new Set([...(categories||[]), ...(parsed.data.categories||[])]));
-    levels = Array.from(new Set([...(levels||[]), ...(parsed.data.levels||[])]));
-    intensities = Array.from(new Set([...(intensities||[]), ...(parsed.data.intensities||[])]));
-    players = Array.from(new Set([...(players||[]), ...(parsed.data.players||[])]));
-    persistExerciseList(); persistSessions(); renderList(); renderSessions(); renderSavedLinks();
+    const text = await file.text(); const parsed = JSON.parse(text);
+    if(!parsed || !parsed.data) throw new Error('Ugyldigt backup-format');
+    // merge
+    const inc = parsed.data;
+    const exMap = new Map((exercises||[]).map(e=>[e.id,e]));
+    (inc.exercises||[]).forEach(e=>{ if(!e.id) e.id=uid(); exMap.set(e.id,e); });
+    exercises = Array.from(exMap.values());
+    const sesMap = new Map((sessions||[]).map(s=>[s.id,s]));
+    (inc.sessions||[]).forEach(s=>{ if(!s.id) s.id=uid(); sesMap.set(s.id,s); });
+    sessions = Array.from(sesMap.values());
+    categories = Array.from(new Set([...(categories||[]), ...(inc.categories||[])]));
+    levels = Array.from(new Set([...(levels||[]), ...(inc.levels||[])]));
+    intensities = Array.from(new Set([...(intensities||[]), ...(inc.intensities||[])]));
+    players = Array.from(new Set([...(players||[]), ...(inc.players||[])]));
+    persistExercises(); persistSessions(); persistBase();
+    renderList(true); renderSessions();
     alert('Restore gennemført — data er flettet.');
   } catch(err){ console.error(err); alert('Restore fejlede: ' + (err.message||err)); } finally { ev.target.value=''; }
 }
 
-/* BADGES & PERMISSIONS */
-function updateBadges(){
-  $("badges").innerHTML='';
-  if(isAdmin()){ const d=document.createElement('div'); d.className='badge'; d.textContent='ADMIN'; $("badges").appendChild(d); $("btn-logout-header").style.display='inline-flex'; } else { $("btn-logout-header").style.display='none'; }
-  if(isPaid()){ const d=document.createElement('div'); d.className='badge'; d.textContent='PAID'; $("badges").appendChild(d); }
+/* ------------- Helpers: confirm modal, utilities ------------- */
+let _confirmCb = null;
+function showConfirm(message, cb){
+  _confirmCb = cb;
+  $("confirm-message").textContent = message;
+  $("confirm-modal").style.display = "flex";
 }
-function enforcePermissions(){
-  const bb = $("lezgo-bottom-bar");
-  if(bb){ if(isAdmin() || isPaid()){ bb.style.display='flex'; bb.setAttribute('aria-hidden','false'); } else { bb.style.display='none'; bb.setAttribute('aria-hidden','true'); } }
-  if($("delete-all-btn")) $("delete-all-btn").style.display = isAdmin() ? 'inline-block' : 'none';
-  if(isAdmin() || isPaid()){
-    if($("save-session")) $("save-session").style.display='inline-block';
-    if($("clear-session")) $("clear-session").style.display='inline-block';
-  } else {
-    if($("save-session")) $("save-session").style.display='none';
-    if($("clear-session")) $("clear-session").style.display='none';
-  }
-  renderList(); renderSessions(); renderSavedLinks(); updateBadges();
+function closeConfirm(answer){
+  $("confirm-modal").style.display = "none";
+  if(answer && typeof _confirmCb === 'function') _confirmCb();
+  _confirmCb = null;
 }
 
-/* START */
-if(document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', ()=>{ init(); }); } else { init(); }
-if('serviceWorker' in navigator){ window.addEventListener('load', ()=>{ navigator.serviceWorker.register('./service-worker.js').catch(()=>{}); }); }
+function updateSelectedCount(){
+  const boxes = document.querySelectorAll('#list input[type="checkbox"]');
+  let count = 0;
+  boxes.forEach(b=>{ if(b.checked) count++; });
+  $("selected-count").textContent = (count || 0) + " valgt";
+}
+
+function escapeHtml(str){ return (str||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+/* enforce UI/permissions */
+function enforcePermissions(){
+  // bottom bar
+  const bb = $("lezgo-bottom-bar");
+  if(bb) bb.style.display = (isAdmin() || isPaid()) ? 'flex' : 'none';
+  // delete-all btn only admin
+  if($("delete-all-btn")) $("delete-all-btn").style.display = isAdmin() ? 'inline-block' : 'none';
+  // save/clear session visible for admin/paid
+  if($("save-session")) $("save-session").style.display = (isAdmin() || isPaid()) ? 'inline-block' : 'none';
+  if($("clear-session")) $("clear-session").style.display = (isAdmin() || isPaid()) ? 'inline-block' : 'none';
+  // badges
+  const b = $("badges"); b.innerHTML = '';
+  if(isAdmin()){ const d=document.createElement('div'); d.className='badge'; d.textContent='ADMIN'; b.appendChild(d); $("btn-logout-header").style.display='inline-flex'; } else $("btn-logout-header").style.display='none';
+  if(isPaid()){ const d=document.createElement('div'); d.className='badge'; d.textContent='PAID'; b.appendChild(d); }
+}
+
+/* ------------- Service worker register ------------- */
+function registerSW(){
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.register('./service-worker.js').then(reg=>{ console.log('SW registered', reg.scope); }).catch(()=>{ console.warn('SW register failed'); });
+  }
+}
+
+/* ------------- START ------------- */
+document.addEventListener('DOMContentLoaded', ()=> { init(); });
 
 </script>
 </body>
