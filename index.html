@@ -38,11 +38,11 @@
     @media(max-width:680px){.grid{grid-template-columns:1fr}}
 
     .exercise{display:flex;gap:10px;padding:12px;border-radius:10px;border:1px solid var(--border-soft);align-items:flex-start;overflow:hidden}
-    .exercise .left{flex:1; min-width:0} /* important for text wrap in flex */
+    .exercise .left{flex:1; min-width:0}
     .exercise .meta{color:var(--muted);margin-top:8px}
     .tag{background:rgba(255,255,255,.03);padding:6px 8px;border-radius:8px;margin-right:8px;font-size:13px;display:inline-block;margin-top:8px}
 
-    /* force long words/urls to wrap on mobile */
+    /* wrap long text/urls */
     .exercise, .exercise a, .exercise div { overflow-wrap:anywhere; word-break:break-word; hyphens:auto; }
     a { color: #2fa1ff; }
 
@@ -51,7 +51,7 @@
 
     .duplicate { border: 2px solid var(--danger) !important; background: rgba(239,68,68,0.06) !important; }
 
-    /* bottom bar (admin/paid) - sits above page content (non-overlapping due to body padding-bottom) */
+    /* bottom bar (admin/paid) */
     #lezgo-bottom-bar{ position: fixed; bottom: 12px; left: 12px; right: 12px; max-width: calc(var(--max-w) - 24px); margin: 0 auto; display:none; gap:12px; justify-content:center; align-items:center; padding:10px; background: linear-gradient(180deg, rgba(0,0,0,0.06), rgba(0,0,0,0.02)); border-radius:12px; z-index:99999; box-shadow:0 10px 28px rgba(0,0,0,0.16); pointer-events:auto; }
     #lezgo-bottom-bar .lezgo-btn{ padding:.6rem .9rem; border-radius:10px; background:var(--accent); color:#05261a; min-width:110px; text-align:center; font-weight:800}
     #lezgo-bottom-bar .lezgo-btn.restore{ background:transparent; border:1px solid var(--border-soft); color:inherit; }
@@ -60,10 +60,6 @@
     #saved-links-list .link-row{ display:flex; gap:8px; align-items:center; justify-content:space-between; padding:8px; border-radius:8px; border:1px solid var(--border-soft); margin-top:8px; }
     #saved-links-list .meta{ color:var(--muted); font-size:13px; overflow-wrap:anywhere }
 
-    /* saved-files area (backups) */
-    #saved-files-list .file-row{ display:flex; gap:8px; align-items:center; justify-content:space-between; padding:8px; border-radius:8px; border:1px solid var(--border-soft); margin-top:8px; }
-    #saved-files-list .meta{ color:var(--muted); font-size:13px }
-
     /* confirm modal */
     #confirm-modal{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; background: rgba(2,6,23,0.6); z-index:100000; }
     #confirm-modal .modal{ background:var(--panel); padding:18px; border-radius:12px; max-width:420px; width:92%; box-shadow:0 20px 60px rgba(0,0,0,0.6) }
@@ -71,7 +67,7 @@
     #confirm-modal .row{ display:flex; gap:10px; justify-content:flex-end }
 
     @media(max-width:520px){
-      .container{padding:10px 10px 260px} /* ekstra bundplads så bottom bar ikke overlapper indhold */
+      .container{padding:10px 10px 260px}
       #lezgo-bottom-bar{ left:10px; right:10px; }
       .actions-small{align-items:flex-end}
     }
@@ -191,10 +187,6 @@
           <hr style="border:none;border-top:1px solid var(--border-soft);margin:14px 0">
           <h4 style="margin:0 0 6px 0;">Gemte links</h4>
           <div id="saved-links-list" style="max-height:220px;overflow:auto"></div>
-
-          <hr style="border:none;border-top:1px solid var(--border-soft);margin:14px 0">
-          <h4 style="margin:0 0 6px 0;">Saved files (backups)</h4>
-          <div id="saved-files-list"></div>
         </aside>
       </div>
     </section>
@@ -240,14 +232,13 @@ const LVL_KEY = "lezgo_levels_v1";
 const INT_KEY = "lezgo_intensities_v1";
 const PLR_KEY = "lezgo_players_v1";
 const SES_KEY = "lezgo_sessions_v1";
-const BACKUPS_KEY = "lezgo_backups_v1";
 
 const DEFAULT_CATEGORIES = ["Back wall","Bandeja","Chiquita","Defense","Double wall","Groundstroke","Lob","Serve","Smash","Vibora","Volley"].sort();
 const DEFAULT_LEVELS = ["Beginner","Intermediate","Advanced"];
 const DEFAULT_INT = ["Low","Medium","High"];
 const DEFAULT_PLAYERS = ["1","2","3","4","1-2","1-3","1-4","2-4","Any","Add new..."];
 
-let exercises = []; let categories = []; let levels = []; let intensities = []; let players = []; let sessions = []; let backups = [];
+let exercises = []; let categories = []; let levels = []; let intensities = []; let players = []; let sessions = [];
 let editingId = null; let selectedIds = new Set();
 const $ = id => document.getElementById(id);
 const uid = () => "id_" + Math.random().toString(36).slice(2,10);
@@ -262,20 +253,18 @@ function loadAll(){
   intensities = JSON.parse(localStorage.getItem(INT_KEY) || "null") || DEFAULT_INT;
   players = JSON.parse(localStorage.getItem(PLR_KEY) || "null") || DEFAULT_PLAYERS;
   sessions = JSON.parse(localStorage.getItem(SES_KEY) || "[]");
-  backups = JSON.parse(localStorage.getItem(BACKUPS_KEY) || "[]");
 }
 function persistExerciseList(){ localStorage.setItem(EX_KEY, JSON.stringify(exercises)); }
 function persistSessions(){ localStorage.setItem(SES_KEY, JSON.stringify(sessions)); }
-function persistBackups(){ localStorage.setItem(BACKUPS_KEY, JSON.stringify(backups)); }
 
 function init(){
   loadAll();
   populateCategories(); populateLevels(); populateIntensity(); populatePlayers();
   bindEvents();
-  renderList(); renderSessions(); renderSavedLinks(); renderSavedFiles(); updateBadges(); enforcePermissions();
+  renderList(); renderSessions(); renderSavedLinks(); updateBadges(); enforcePermissions();
 }
 
-/* UI population */
+/* UI populate */
 function populateCategories(){ const sel=$("category"), fil=$("filter-category"); if(!sel||!fil) return; sel.innerHTML=''; fil.innerHTML=''; let optAll=document.createElement('option'); optAll.text='ALL'; optAll.value=''; fil.appendChild(optAll); categories.forEach(c=>{ let o=document.createElement('option'); o.value=c; o.text=c; sel.appendChild(o); let f=document.createElement('option'); f.value=c; f.text=c; fil.appendChild(f); }); let add=document.createElement('option'); add.value='__ADD__'; add.text='Add new category...'; sel.appendChild(add); }
 function populateLevels(){ const sel=$("level"), fil=$("filter-level"); if(!sel||!fil) return; sel.innerHTML=''; fil.innerHTML=''; let optAll=document.createElement('option'); optAll.text='ALL'; optAll.value=''; fil.appendChild(optAll); levels.forEach(c=>{ let o=document.createElement('option'); o.value=c; o.text=c; sel.appendChild(o); let f=document.createElement('option'); f.value=c; f.text=c; fil.appendChild(f); }); let add=document.createElement('option'); add.value='__ADD__'; add.text='Add new level...'; sel.appendChild(add); }
 function populateIntensity(){ const sel=$("intensity"); if(!sel) return; sel.innerHTML=''; intensities.forEach(c=>{ let o=document.createElement('option'); o.value=c; o.text=c; sel.appendChild(o); }); let add=document.createElement('option'); add.value='__ADD__'; add.text='Add new intensity...'; sel.appendChild(add); }
@@ -291,7 +280,7 @@ function bindEvents(){
   $("btn-buy").addEventListener("click", ()=>{ if(isPaid()){ if(confirm("Deaktiver betalt adgang?")){ localStorage.removeItem("is_paid"); updateBadges(); enforcePermissions(); } } else { if(confirm("Simuler køb?")){ localStorage.setItem("is_paid","1"); updateBadges(); enforcePermissions(); } }});
   $("save-btn").addEventListener("click", onSave);
   $("clear-btn").addEventListener("click", clearForm);
-  $("delete-all-btn").addEventListener("click", ()=>{ if(!isAdmin()){ alert('Admin adgang kræves'); return; } const pass = prompt('Admin kode for at bekræfte slet alle'); if(pass !== ADMIN_PASSWORD){ alert('Forkert kode'); return; } showConfirm('Slet ALLE øvelser?', ()=>{ exercises = []; persistExerciseList(); renderList(); }); });
+  $("delete-all-btn").addEventListener("click", ()=>{ if(!isAdmin()){ alert('Admin adgang kræves'); return; } const pass = prompt('Admin kode for at bekræfte slet alle'); if(pass !== ADMIN_PASSWORD){ alert('Forkert kode'); return; } showConfirm('Slet ALLE øvelser?', ()=>{ exercises = []; persistExerciseList(); renderList(); renderSavedLinks(); }); });
 
   $("search").addEventListener("input", renderList);
   $("filter-category").addEventListener("change", renderList);
@@ -304,18 +293,20 @@ function bindEvents(){
 
   $("pf-y").addEventListener("click", ()=> togglePlatform('youtube', $("pf-y")));
   $("pf-i").addEventListener("click", ()=> togglePlatform('instagram', $("pf-i")));
-  $("pf-f").addEventListener("click", ()=> togglePlatform('facebook', $("pf-f)));
+  $("pf-f").addEventListener("click", ()=> togglePlatform('facebook', $("pf-f")));
 
   $("analyze-btn").addEventListener("click", (ev)=>{ ev.preventDefault(); const link = $("link").value.trim(); if(!link){ alert("Indsæt et videolink først"); return; } alert('Analyse ikke aktiveret i demo'); });
 
+  // backup / restore
   $("btn-backup").addEventListener("click", onBackup);
   $("file-restore").addEventListener("change", onRestoreFile);
 
+  // confirm modal
   $("confirm-no").addEventListener("click", ()=> closeConfirm(false));
   $("confirm-yes").addEventListener("click", ()=> closeConfirm(true));
 }
 
-/* PLATFORM HELPERS */
+/* platform helpers */
 function togglePlatform(name, btn){
   if(platformState.has(name)){ platformState.delete(name); btn.classList.remove('active'); } else { platformState.add(name); btn.classList.add('active'); }
   renderList();
@@ -457,10 +448,9 @@ function renderSessions(){
   });
 }
 
-/* SAVED LINKS (NY) - viser øvelser med link under Saved sessions */
+/* SAVED LINKS - under Saved sessions */
 function renderSavedLinks(){
   const box = $("saved-links-list"); if(!box) return; box.innerHTML='';
-  // find exercises with link
   const links = exercises.filter(e => e.link && e.link.trim() !== '');
   if(!links.length){ box.innerHTML = `<div style="color:var(--muted)">Ingen gemte links</div>`; return; }
   links.forEach(ex=>{
@@ -470,13 +460,11 @@ function renderSavedLinks(){
     const meta = document.createElement('div'); meta.className='meta'; meta.textContent = ex.link;
     left.appendChild(title); left.appendChild(meta);
     const right = document.createElement('div'); right.style.display='flex'; right.style.gap='8px';
-    // Add to session (admin/paid)
     if(isAdmin() || isPaid()){
       const btn = document.createElement('button'); btn.className='btn btn-primary btn-small'; btn.textContent='Tilføj';
       btn.addEventListener('click', ()=> addItemToSession(ex.id));
       right.appendChild(btn);
     }
-    // Restore / Delete of link as separate actions are handled in main list; in saved-links we only show add
     row.appendChild(left); row.appendChild(right); box.appendChild(row);
   });
 }
@@ -489,16 +477,14 @@ function showConfirm(message, onYes){
 }
 function closeConfirm(result){ if(typeof _confirmResolver === 'function') _confirmResolver(result); }
 
-/* BACKUP & RESTORE */
+/* BACKUP & RESTORE (download + restore merge) */
 function onBackup(){
   if(!(isAdmin() || isPaid())){ alert('Admin eller betalt adgang kræves for backup'); return; }
   try {
     const payload = { meta: { createdAt: new Date().toISOString() }, data: { exercises, sessions, categories, levels, intensities, players } };
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `lezgo-backup-${new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')}.json`; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
-    const id = uid(); backups.unshift({ id, name: `backup-${new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')}.json`, timestamp: new Date().toISOString(), payload });
-    persistBackups(); renderSavedFiles();
-    alert('Backup gemt lokalt og downloadet.');
+    alert('Backup downloadet (lokal fil).');
   } catch(e){ console.error(e); alert('Backup fejlede'); }
 }
 async function onRestoreFile(ev){
@@ -515,31 +501,6 @@ async function onRestoreFile(ev){
     persistExerciseList(); persistSessions(); renderList(); renderSessions(); renderSavedLinks();
     alert('Restore gennemført — data er flettet.');
   } catch(err){ console.error(err); alert('Restore fejlede: ' + (err.message||err)); } finally { ev.target.value=''; }
-}
-
-/* SAVED FILES RENDER */
-function renderSavedFiles(){
-  const box = $("saved-files-list"); if(!box) return; box.innerHTML='';
-  if(!backups.length){ box.innerHTML = `<div style="color:var(--muted)">Ingen backups gemt</div>`; return; }
-  backups.forEach(b=>{
-    const row = document.createElement('div'); row.className='file-row';
-    const left = document.createElement('div'); left.style.flex='1';
-    const name = document.createElement('div'); name.style.fontWeight='700'; name.textContent = b.name;
-    const meta = document.createElement('div'); meta.className='meta'; meta.textContent = new Date(b.timestamp).toLocaleString();
-    left.appendChild(name); left.appendChild(meta);
-    const right = document.createElement('div'); right.style.display='flex'; right.style.gap='8px';
-    if(isAdmin() || isPaid()){
-      const rbtn = document.createElement('button'); rbtn.className='btn btn-ghost'; rbtn.textContent='Restore';
-      rbtn.addEventListener('click', ()=> { if(!confirm('Genskab denne backup?')) return; try{ const parsed = b.payload; if(parsed && parsed.data){ const incomingExercises = Array.isArray(parsed.data.exercises)?parsed.data.exercises:[]; const exById = new Map((exercises||[]).map(e=>[e.id,e])); incomingExercises.forEach(e=>{ if(!e.id) e.id = uid(); exById.set(e.id,e); }); exercises = Array.from(exById.values()); const incomingSessions = Array.isArray(parsed.data.sessions)?parsed.data.sessions:[]; const sesById = new Map((sessions||[]).map(s=>[s.id,s])); incomingSessions.forEach(s=>{ if(!s.id) s.id = uid(); sesById.set(s.id,s); }); sessions = Array.from(sesById.values()); categories = Array.from(new Set([...(categories||[]), ...(parsed.data.categories||[])])); levels = Array.from(new Set([...(levels||[]), ...(parsed.data.levels||[])])); intensities = Array.from(new Set([...(intensities||[]), ...(parsed.data.intensities||[])])); players = Array.from(new Set([...(players||[]), ...(parsed.data.players||[])])); persistExerciseList(); persistSessions(); renderList(); renderSessions(); renderSavedLinks(); alert('Restore fra lokal backup gennemført.'); } else alert('Backup-data mangler.'); }catch(e){ console.error(e); alert('Restore fejlede'); } });
-      right.appendChild(rbtn);
-    }
-    if(isAdmin()){
-      const dbtn = document.createElement('button'); dbtn.className='btn btn-ghost'; dbtn.style.color='var(--danger)'; dbtn.textContent='Slet';
-      dbtn.addEventListener('click', ()=> { showConfirm('Slet denne backup-fil?', ()=>{ backups = backups.filter(x=>x.id!==b.id); persistBackups(); renderSavedFiles(); }); });
-      right.appendChild(dbtn);
-    }
-    row.appendChild(left); row.appendChild(right); box.appendChild(row);
-  });
 }
 
 /* BADGES & PERMISSIONS */
@@ -559,7 +520,7 @@ function enforcePermissions(){
     if($("save-session")) $("save-session").style.display='none';
     if($("clear-session")) $("clear-session").style.display='none';
   }
-  renderList(); renderSessions(); renderSavedLinks(); renderSavedFiles(); updateBadges();
+  renderList(); renderSessions(); renderSavedLinks(); updateBadges();
 }
 
 /* START */
