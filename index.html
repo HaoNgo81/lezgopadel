@@ -6,7 +6,6 @@
   <title>LezGo Padel — Training Bank</title>
   <meta name="theme-color" content="#0f1720" id="meta-theme-color" />
   <style>
-    /* RESET + THEME + TYPO */
     *,*::before,*::after{box-sizing:border-box}
     html,body{height:100%;margin:0;padding:0;overflow-x:hidden;font-family:Inter,system-ui,Arial,sans-serif;-webkit-font-smoothing:antialiased}
     :root{
@@ -19,39 +18,17 @@
 
     .container{max-width:1100px;margin:10px auto;padding:8px;width:94%}
 
-    /* Header: 3-col grid so logo stays centered */
-    header{
-      display:grid;
-      grid-template-columns: 1fr auto 1fr;
-      align-items:center;
-      gap:8px;
-      padding-top:env(safe-area-inset-top,12px);
-      margin-bottom:8px;
-      position:relative;
-    }
+    header{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;padding-top:env(safe-area-inset-top,12px);margin-bottom:8px;position:relative}
     #logo-line{grid-column:2/3;display:flex;justify-content:center;align-items:center;margin:0}
     #logo{height:50px;max-width:95%}
 
-    /* TOP CONTROLS: compact - short labels for language */
-    #top-controls{
-      grid-column: 3 / 4;
-      justify-self:end;
-      display:flex;
-      gap:8px;
-      align-items:center;
-      z-index:40;
-      white-space:nowrap;
-    }
-    #top-controls .theme-btn{
-      display:inline-flex;align-items:center;justify-content:center;min-width:36px;height:36px;border-radius:9px;background:var(--panel);border:1px solid var(--border-soft);box-shadow:0 6px 14px rgba(0,0,0,.22);cursor:pointer;font-size:var(--small-font)
-    }
-    /* use short labels DA/EN so it never wraps; keep aria-label for accessibility */
+    #top-controls{grid-column:3/4;justify-self:end;display:flex;gap:8px;align-items:center;z-index:40;white-space:nowrap}
+    #top-controls .theme-btn{display:inline-flex;align-items:center;justify-content:center;min-width:36px;height:36px;border-radius:9px;background:var(--panel);border:1px solid var(--border-soft);box-shadow:0 6px 14px rgba(0,0,0,.22);cursor:pointer;font-size:var(--small-font)}
     #top-controls select{padding:6px 8px;border-radius:9px;border:1px solid var(--border-soft);background:transparent;color:var(--text);min-width:54px;font-weight:700;font-size:var(--small-font)}
 
     .header-row{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:10px}
     .badge{background:rgba(255,255,255,.04);padding:6px 10px;border-radius:8px;font-weight:700;color:var(--muted);font-size:var(--small-font)}
 
-    /* Buttons smaller */
     .btn{border:0;padding:8px 12px;border-radius:10px;font-weight:800;cursor:pointer;background:transparent;color:var(--text);display:inline-flex;align-items:center;gap:6px;font-size:var(--small-font)}
     .btn-primary{background:var(--accent);color:#05261a}
     .btn-ghost{background:transparent;border:1px solid var(--border-soft);color:var(--muted);padding:6px 10px;border-radius:10px}
@@ -59,9 +36,7 @@
 
     .platform-btn{border-radius:8px;padding:6px 8px;border:1px solid var(--border-soft);background:transparent;color:var(--muted);cursor:pointer;font-size:var(--small-font)}
     .platform-btn.active{background:var(--accent);color:#05261a;border-color:transparent;box-shadow:0 6px 18px rgba(0,0,0,.12)}
-    .platform-btn:focus{outline:2px solid rgba(255,255,255,0.06);outline-offset:3px}
 
-    /* Cards */
     .card{background:var(--panel);border-radius:12px;padding:12px;margin-bottom:12px;box-shadow:0 10px 28px rgba(2,6,23,.6)}
     label{display:block;font-size:var(--small-font);color:var(--muted);margin-bottom:6px}
     input[type=text],input[type=url],input[type=number],select,textarea{width:100%;padding:10px;border-radius:8px;border:1px solid var(--border-soft);background:transparent;color:var(--text);font-size:var(--small-font)}
@@ -70,26 +45,28 @@
     .two-col{display:grid;grid-template-columns:1fr 400px;gap:12px}
     @media(max-width:980px){.two-col{grid-template-columns:1fr}}
 
-    /* List: compact so more items fit */
+    /* LIST & TAGS - improved layout */
     .exercise{display:flex;gap:10px;padding:8px;border-radius:10px;border:1px solid var(--border-soft);align-items:flex-start;overflow:hidden}
-    .exercise .left{flex:1;min-width:0}
+    .exercise .left{flex:1 1 auto;min-width:0}
     .exercise .left .title{font-weight:800;font-size:14px;line-height:1.15}
     .exercise .left .meta{color:var(--muted);margin-top:6px;font-size:var(--tiny-font)}
     .exercise a.link-label{color:#2fa1ff;text-decoration:underline;font-size:var(--small-font);word-break:break-word;display:inline-block;margin-top:6px}
 
-    /* tags smaller */
-    .tag{display:inline-block;margin-right:8px;padding:5px 7px;border-radius:8px;background:rgba(255,255,255,0.03);font-size:var(--tiny-font);color:var(--text)}
+    .tag-wrap{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;align-items:center}
+    .tag{display:inline-block;padding:5px 8px;border-radius:10px;background:rgba(255,255,255,0.03);font-size:11px;color:var(--text);white-space:nowrap;max-width:100%}
+    /* make tags smaller on small screens */
+    @media(max-width:480px){ .tag{font-size:10px;padding:4px 6px} }
 
-    /* List tallness */
+    .actions-small{flex:0 0 auto;display:flex;flex-direction:column;gap:8px;align-items:flex-end}
+    .actions-small button{font-size:var(--tiny-font)}
+
     #list{max-height:560px;overflow:auto}
     #session-items{max-height:300px;overflow:auto}
 
-    /* Sessions list compact */
     #sessions-list .exercise{padding:7px;border-radius:8px}
     #sessions-list .exercise .title{font-size:13px}
     #sessions-list .exercise .meta{font-size:var(--tiny-font);color:var(--muted)}
 
-    /* bottom bar */
     #bottom-bar{position:fixed;bottom:12px;left:12px;right:12px;max-width:calc(1100px - 24px);margin:0 auto;display:flex;gap:12px;justify-content:center;align-items:center;padding:8px;border-radius:12px;z-index:9999;box-shadow:0 10px 28px rgba(0,0,0,0.16);background:linear-gradient(180deg,rgba(0,0,0,0.04),rgba(0,0,0,0.02))}
     .bottom-btn{padding:8px 12px;border-radius:10px;background:var(--accent);color:#05261a;font-weight:800;font-size:var(--small-font)}
     .bottom-btn.restore{background:transparent;border:1px solid var(--border-soft);color:var(--text)}
@@ -97,7 +74,6 @@
     .search-row{display:flex;gap:8px;align-items:center}
     .search-row input[type=text]{flex:1;min-width:0;padding:10px;border-radius:10px}
 
-    /* small screens fine-tuning */
     @media(max-width:480px){
       :root{--base-font:13px;--small-font:11px;--tiny-font:10px}
       #logo{height:46px}
@@ -116,7 +92,7 @@
 <body>
   <div class="container">
     <header>
-      <div><!-- left spacer --></div>
+      <div></div>
 
       <div id="logo-line">
         <img id="logo" src="lezgo-logo.svg" alt="LEZGO">
@@ -124,7 +100,6 @@
 
       <div id="top-controls" aria-hidden="false">
         <button id="theme-toggle" class="theme-btn" title="Skift tema" aria-pressed="false">🌙</button>
-        <!-- Short labels, full language kept in aria-label -->
         <select id="lang-select" aria-label="Vælg sprog (Dansk / English)">
           <option value="da">DA</option>
           <option value="en">EN</option>
@@ -136,14 +111,14 @@
       <div id="badges" style="display:flex;gap:8px;align-items:center"></div>
 
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-        <button id="btn-buy" class="btn btn-primary">Køb</button>
-        <button id="btn-admin" class="btn btn-ghost">Admin</button>
-        <button id="btn-logout" class="btn btn-ghost" style="display:none;color:var(--danger)">Log ud</button>
+        <button id="btn-buy" class="btn btn-primary" data-i18n="buy">Køb</button>
+        <button id="btn-admin" class="btn btn-ghost" data-i18n="admin">Admin</button>
+        <button id="btn-logout" class="btn btn-ghost" style="display:none;color:var(--danger)" data-i18n="logout">Log ud</button>
       </div>
     </div>
 
     <section class="card">
-      <h3 style="margin:0 0 10px 0;color:var(--muted);font-size:var(--small-font)">Tilføj / Rediger øvelse (Padel)</h3>
+      <h3 id="form-title" style="margin:0 0 10px 0;color:var(--muted);font-size:var(--small-font)" data-i18n="formTitle">Tilføj / Rediger øvelse (Padel)</h3>
       <form id="exercise-form" onsubmit="return false;" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
         <div style="grid-column:1/-1">
           <label>Titel</label>
@@ -195,20 +170,21 @@
 
         <div style="grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;margin-top:6px">
           <div style="display:flex;gap:8px;align-items:center">
-            <button id="save-btn" class="btn btn-primary">Gem</button>
-            <button id="clear-btn" class="btn btn-ghost">Ryd</button>
+            <button id="save-btn" class="btn btn-primary" data-i18n="save">Gem</button>
+            <button id="clear-btn" class="btn btn-ghost" data-i18n="clear">Ryd</button>
+            <!-- Cancel-edit button: hidden by default, shown only in edit mode -->
+            <button id="cancel-edit-btn" class="btn btn-ghost" style="display:none" data-i18n="cancel">Annuller</button>
           </div>
-          <button id="delete-all-btn" class="btn btn-ghost" style="display:none;color:var(--danger)">Slet alle</button>
+          <button id="delete-all-btn" class="btn btn-ghost" style="display:none;color:var(--danger)" data-i18n="deleteAll">Slet alle</button>
         </div>
       </form>
     </section>
 
     <div class="two-col">
-      <!-- left: filters + list -->
       <div class="card">
         <div style="display:flex;flex-direction:column;gap:10px">
           <div class="search-row">
-            <input id="search" type="text" placeholder="Søg..." aria-label="Søg">
+            <input id="search" type="text" placeholder="Søg..." aria-label="Søg" data-i18n-placeholder="search">
             <div style="display:flex;gap:6px">
               <button type="button" id="pf-y" class="platform-btn" data-platform="youtube" aria-pressed="false">YT</button>
               <button type="button" id="pf-i" class="platform-btn" data-platform="instagram" aria-pressed="false">IG</button>
@@ -228,17 +204,16 @@
         </div>
       </div>
 
-      <!-- right: session builder -->
       <aside class="card">
-        <h4 style="margin:0 0 10px 0;font-size:var(--small-font)">Training Session Builder</h4>
+        <h4 style="margin:0 0 10px 0;font-size:var(--small-font)" data-i18n="sessionBuilderTitle">Training Session Builder</h4>
 
-        <label>Sessionsnavn</label>
+        <label data-i18n="sessionName">Sessionsnavn</label>
         <input id="session-name" type="text">
 
-        <label style="margin-top:8px">Sessionsbeskrivelse</label>
+        <label style="margin-top:8px" data-i18n="sessionDesc">Sessionsbeskrivelse</label>
         <input id="session-desc" type="text">
 
-        <label style="margin-top:8px">Øvelser</label>
+        <label style="margin-top:8px" data-i18n="exercisesLabel">Øvelser</label>
         <div id="session-items" style="max-height:300px;overflow:auto"></div>
 
         <div style="display:flex;gap:8px;align-items:center;margin-top:10px">
@@ -248,14 +223,14 @@
         </div>
 
         <div style="display:flex;gap:8px;margin-top:8px">
-          <button id="save-session" class="btn btn-primary">Gem</button>
-          <button id="clear-session" class="btn btn-ghost">Ryd</button>
+          <button id="save-session" class="btn btn-primary" data-i18n="saveSession">Gem</button>
+          <button id="clear-session" class="btn btn-ghost" data-i18n="clearSession">Ryd</button>
         </div>
 
         <div id="session-lock-info" style="margin-top:12px;color:var(--muted);display:none;font-size:var(--tiny-font)">Gratis brugere kan ikke gemme eller bygge sessioner. Køb adgang for at låse op.</div>
 
         <hr style="border:none;border-top:1px solid var(--border-soft);margin:12px 0;">
-        <h4 style="margin:0 0 8px 0;font-size:var(--small-font)">Gemte sessioner</h4>
+        <h4 style="margin:0 0 8px 0;font-size:var(--small-font)" data-i18n="savedSessions">Gemte sessioner</h4>
         <div id="sessions-list" style="max-height:340px;overflow:auto"></div>
       </aside>
     </div>
@@ -285,7 +260,6 @@
     </div>
   </div>
 
-  <!-- bottom bar for backup/restore -->
   <div id="bottom-bar" style="display:none">
     <button id="backup-btn" class="bottom-btn">Backup</button>
     <button id="restore-btn" class="bottom-btn restore">Restore</button>
@@ -314,9 +288,76 @@ const uid = () => "id_" + Math.random().toString(36).slice(2,10);
 const isAdmin = () => localStorage.getItem("is_admin") === "1";
 const isPaid  = () => localStorage.getItem("is_paid") === "1";
 
+/* ---------- i18n (simple) ---------- */
+const I18 = {
+  da: {
+    buy: "Køb",
+    admin: "Admin",
+    logout: "Log ud",
+    save: "Gem",
+    clear: "Ryd",
+    cancel: "Annuller",
+    deleteAll: "Slet alle",
+    formTitle: "Tilføj / Rediger øvelse (Padel)",
+    sessionBuilderTitle: "Training Session Builder",
+    sessionName: "Sessionsnavn",
+    sessionDesc: "Sessionsbeskrivelse",
+    exercisesLabel: "Øvelser",
+    saveSession: "Gem",
+    clearSession: "Ryd",
+    savedSessions: "Gemte sessioner",
+    search: "Søg..."
+  },
+  en: {
+    buy: "Buy",
+    admin: "Admin",
+    logout: "Sign out",
+    save: "Save",
+    clear: "Clear",
+    cancel: "Cancel",
+    deleteAll: "Delete all",
+    formTitle: "Add / Edit exercise (Padel)",
+    sessionBuilderTitle: "Training Session Builder",
+    sessionName: "Session name",
+    sessionDesc: "Session description",
+    exercisesLabel: "Exercises",
+    saveSession: "Save",
+    clearSession: "Clear",
+    savedSessions: "Saved sessions",
+    search: "Search..."
+  }
+};
+
+function applyLanguage(lang){
+  const map = I18[lang] || I18.da;
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const key = el.getAttribute('data-i18n');
+    if(map[key]!==undefined) el.textContent = map[key];
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{
+    const key = el.getAttribute('data-i18n-placeholder');
+    if(map[key]!==undefined) el.placeholder = map[key];
+  });
+  // some individual ids
+  $('form-title').textContent = map.formTitle;
+  $('save-btn').textContent = map.save;
+  $('clear-btn').textContent = map.clear;
+  $('cancel-edit-btn').textContent = map.cancel;
+  $('delete-all-btn').textContent = map.deleteAll;
+  $('btn-buy').textContent = map.buy;
+  $('btn-admin').textContent = map.admin;
+  $('btn-logout').textContent = map.logout;
+  $('save-session').textContent = map.saveSession;
+  $('clear-session').textContent = map.clearSession;
+  // placeholder search
+  if($('search')) $('search').placeholder = map.search;
+  localStorage.setItem(LANG_KEY, lang);
+}
+
 /* ---------- STATE ---------- */
 let exercises = [], sessions = [], categories = [], levels = [], intensities = [], players = [];
 let editingId = null;
+let editingSessionId = null; // for session editing
 let renderIndex = 0;
 const BATCH = 100;
 const platformState = new Set();
@@ -335,9 +376,9 @@ function persistAll(){ localStorage.setItem(EX_KEY, JSON.stringify(exercises)); 
 /* ---------- INIT ---------- */
 function init(){
   applyTheme(localStorage.getItem(THEME_KEY) || 'dark');
-  // keep language full value but show compact labels (DA/EN) in select
   const lang = localStorage.getItem(LANG_KEY) || 'da';
   $("lang-select").value = lang;
+  applyLanguage(lang);
   loadAll(); populateSelects(); bindEvents(); refreshUI();
 }
 
@@ -353,33 +394,28 @@ function populateSelects(){
 }
 
 function bindEvents(){
-  // theme toggle
   $("theme-toggle").addEventListener('click', ()=> applyTheme(localStorage.getItem(THEME_KEY) === 'light' ? 'dark' : 'light'));
+  $("lang-select").addEventListener('change', e => { applyLanguage(e.target.value); });
 
-  // lang select: store full code but showing short labels
-  $("lang-select").addEventListener('change', e => { localStorage.setItem(LANG_KEY, e.target.value); });
-
-  // add new dropdowns
   $("category").addEventListener('change', e => { if(e.target.value==='__ADD__'){ const n = prompt('Ny kategori:'); if(n){ categories.push(n.trim()); persistAll(); populateSelects(); } }});
   $("level").addEventListener('change', e => { if(e.target.value==='__ADD__'){ const n = prompt('Nyt niveau:'); if(n){ levels.push(n.trim()); persistAll(); populateSelects(); } }});
   $("intensity").addEventListener('change', e => { if(e.target.value==='__ADD__'){ const n = prompt('Ny intensitet:'); if(n){ intensities.push(n.trim()); persistAll(); populateSelects(); } }});
   $("players").addEventListener('change', e => { if(e.target.value==='__ADD__' || e.target.value==='Add new...'){ const n = prompt('Tilføj ny spiller-range:'); if(n){ players.push(n.trim()); persistAll(); populateSelects(); } }});
 
-  // form
   $("save-btn").addEventListener('click', onSaveExercise);
   $("clear-btn").addEventListener('click', clearForm);
+  $("cancel-edit-btn").addEventListener('click', (e)=>{ e.preventDefault(); cancelEditMode(); });
+
   $("delete-all-btn").addEventListener('click', ()=> {
     if(!isAdmin()){ alert('Admin kræves'); return; }
     const pass = prompt('Admin kode:'); if(pass !== ADMIN_PASSWORD){ alert('Forkert kode'); return; }
     if(confirm('Slet ALLE øvelser?')){ exercises=[]; persistAll(); refreshUI(); }
   });
 
-  // search & filters
   $("search").addEventListener('input', ()=> { renderIndex=0; renderList(true); });
   $("filter-category").addEventListener('change', ()=> { renderIndex=0; renderList(true); });
   $("filter-level").addEventListener('change', ()=> { renderIndex=0; renderList(true); });
 
-  // platform buttons
   document.querySelectorAll('.platform-btn').forEach(btn => {
     btn.addEventListener('click', (e)=>{
       const platform = btn.getAttribute('data-platform');
@@ -390,7 +426,6 @@ function bindEvents(){
     });
   });
 
-  // admin modal
   $("btn-admin").addEventListener('click', ()=> $("admin-modal").style.display='flex');
   $("admin-cancel").addEventListener('click', ()=> $("admin-modal").style.display='none');
   $("admin-submit").addEventListener('click', ()=> {
@@ -398,33 +433,25 @@ function bindEvents(){
   });
   $("btn-logout").addEventListener('click', ()=> { localStorage.removeItem('is_admin'); applyPermissions(); });
 
-  // buy access
   $("btn-buy").addEventListener('click', ()=> {
     if(isPaid()){ if(confirm('Deaktiver paid mode?')){ localStorage.removeItem('is_paid'); applyPermissions(); } }
     else { if(confirm('Aktiver paid mode?')){ localStorage.setItem('is_paid','1'); applyPermissions(); } }
   });
 
-  // load more
   $("load-more").addEventListener('click', ()=> renderList(false));
-
-  // session actions
   $("save-session").addEventListener('click', saveSession);
   $("clear-session").addEventListener('click', clearSessionBuilder);
-
-  // analyze
   $("analyze-btn").addEventListener('click', (ev)=>{ ev.preventDefault(); analyzeLinkAction(); });
 
-  // backup/restore
   $("backup-btn").addEventListener('click', doBackup);
   $("restore-btn").addEventListener('click', ()=> $("restore-file").click());
   $("restore-file").addEventListener('change', handleRestoreFile);
 
-  // confirm modal
   $("confirm-no").addEventListener('click', ()=> closeConfirm(false));
   $("confirm-yes").addEventListener('click', ()=> closeConfirm(true));
 }
 
-/* ---------- RENDER LIST (platform-aware, link label conversion) ---------- */
+/* ---------- LINKS LABEL ---------- */
 function getLinkLabel(link){
   try{
     const host = new URL(link).hostname.toLowerCase();
@@ -435,6 +462,7 @@ function getLinkLabel(link){
   }catch(e){ return 'Link'; }
 }
 
+/* ---------- RENDER LIST ---------- */
 function renderList(reset = true){
   const list = $("list");
   if(!list) return;
@@ -482,23 +510,18 @@ function renderList(reset = true){
     row.appendChild(cb);
 
     const left = document.createElement('div'); left.className='left';
-    const title = document.createElement('div'); title.className='title'; title.textContent = ex.title; left.appendChild(title);
+    const title = document.createElement('div'); title.className='title'; title.textContent = ex.title || "(no title)"; left.appendChild(title);
     const meta = document.createElement('div'); meta.className='meta'; meta.textContent = `${ex.category || ''} • ${ex.level || ''} • ${ex.players || ''} • ${ex.duration || 0}m`; left.appendChild(meta);
 
     if(ex.link){
-      const a = document.createElement('a');
-      a.href = ex.link;
-      a.target = '_blank';
-      a.rel = 'noopener noreferrer';
-      a.className = 'link-label';
-      a.textContent = getLinkLabel(ex.link);
-      a.title = ex.link; // full url visible on hover
+      const a = document.createElement('a'); a.href = ex.link; a.target = '_blank'; a.rel = 'noopener noreferrer'; a.className = 'link-label';
+      a.textContent = getLinkLabel(ex.link); a.title = ex.link;
       left.appendChild(a);
     }
 
     if(ex.tags){
-      const tagWrap = document.createElement('div'); tagWrap.style.marginTop='8px';
-      ex.tags.split(',').forEach(tg => {
+      const tagWrap = document.createElement('div'); tagWrap.className='tag-wrap';
+      ex.tags.split(',').slice(0,20).forEach(tg => {
         const s = document.createElement('span'); s.className='tag'; s.textContent = tg.trim();
         tagWrap.appendChild(s);
       });
@@ -510,7 +533,7 @@ function renderList(reset = true){
     const right = document.createElement('div'); right.className='actions-small';
     if(isAdmin() || isPaid()){
       const editBtn = document.createElement('button'); editBtn.className='btn btn-ghost'; editBtn.textContent = 'Rediger';
-      editBtn.addEventListener('click', ()=> { editingId = ex.id; populateFormForEdit(ex); window.scrollTo({top:0,behavior:'smooth'}); });
+      editBtn.addEventListener('click', ()=> { editingId = ex.id; populateFormForEdit(ex); enterEditMode(); window.scrollTo({top:0,behavior:'smooth'}); });
       right.appendChild(editBtn);
 
       const delBtn = document.createElement('button'); delBtn.className='btn btn-ghost'; delBtn.style.color='var(--danger)'; delBtn.textContent='Slet';
@@ -528,20 +551,39 @@ function renderList(reset = true){
   if(total === 0 && start === 0){ list.innerHTML = `<div style="color:var(--muted);font-size:var(--small-font)">Ingen resultater</div>`; }
 }
 
+/* ---------- FORM EDIT MODE ---------- */
+function enterEditMode(){
+  $("cancel-edit-btn").style.display = 'inline-flex';
+  $("save-btn").textContent = (localStorage.getItem(LANG_KEY) === 'en' ? 'Update' : 'Opdater') || 'Opdater';
+  // visual hint (optional): border
+  document.querySelector('.card').style.boxShadow = '0 10px 28px rgba(34,197,94,0.06)';
+}
+function cancelEditMode(){
+  editingId = null;
+  clearForm();
+  $("cancel-edit-btn").style.display = 'none';
+  applyLanguage(localStorage.getItem(LANG_KEY) || 'da');
+  // remove hint
+  document.querySelector('.card').style.boxShadow = '0 10px 28px rgba(2,6,23,.6)';
+}
+
 /* ---------- FORM HANDLERS ---------- */
 function onSaveExercise(){
   const title = ($("title").value || "").trim();
-  if(!title){ alert('Indtast titel'); return; }
+  if(!title){ alert((localStorage.getItem(LANG_KEY)==='en') ? 'Enter a title' : 'Indtast titel'); return; }
   const link = ($("link").value || "").trim();
   const dupTitle = exercises.some(e => e.title && e.title.toLowerCase() === title.toLowerCase() && e.id !== editingId);
   const dupLink = link ? exercises.some(e => e.link === link && e.id !== editingId) : false;
-  if(dupTitle || dupLink){ alert('Duplikat fundet: titel eller link findes allerede'); return; }
+  if(dupTitle || dupLink){ alert((localStorage.getItem(LANG_KEY)==='en') ? 'Duplicate found: title or link exists' : 'Duplikat fundet: titel eller link findes allerede'); return; }
   const item = { id: editingId || uid(), title, link, category: $("category").value, players: $("players").value, duration: Number($("duration").value||0), level: $("level").value, intensity: $("intensity").value, description: $("description").value||"", tags: ($("tags").value||"").trim(), createdAt: new Date().toISOString() };
   if(editingId){ const idx = exercises.findIndex(x => x.id === editingId); if(idx>-1) exercises[idx] = item; } else exercises.unshift(item);
   persistAll(); editingId = null; clearForm(); refreshUI();
+  // exit edit UI
+  $("cancel-edit-btn").style.display = 'none';
+  applyLanguage(localStorage.getItem(LANG_KEY) || 'da');
+  document.querySelector('.card').style.boxShadow = '0 10px 28px rgba(2,6,23,.6)';
 }
-function clearForm(){ editingId=null; $("title").value=''; $("link").value=''; if($("category")) $("category").selectedIndex=0; if($("players")) $("players").selectedIndex=0; $("duration").value=''; if($("level")) $("level").selectedIndex=0; if($("intensity")) $("intensity").selectedIndex=0; $("description").value=''; $("tags").value=''; }
-function populateFormForEdit(ex){ $("title").value = ex.title||''; $("link").value = ex.link||''; if($("category")) $("category").value = ex.category||''; if($("players")) $("players").value = ex.players||''; $("duration").value = ex.duration||''; if($("level")) $("level").value = ex.level||''; if($("intensity")) $("intensity").value= ex.intensity||''; $("description").value = ex.description||''; $("tags").value = ex.tags||''; }
+function clearForm(){ editingId=null; $("title").value=''; $("link").value=''; if($("category")) $("category").selectedIndex=0; if($("players")) $("players").selectedIndex=0; $("duration").value=''; if($("level")) $("level").selectedIndex=0; if($("intensity")) $("intensity").selectedIndex=0; $("description").value=''; $("tags").value=''; $("cancel-edit-btn").style.display='none'; }
 
 /* ---------- SESSION BUILDER ---------- */
 function addToSessionBuilder(id){
@@ -556,35 +598,82 @@ function addToSessionBuilder(id){
 }
 function removeFromSessionBuilder(id){ const box = $("session-items"); const node = box.querySelector(`[data-id="${id}"]`); if(node) node.remove(); recalcSession(); }
 function recalcSession(){ let total=0,count=0; document.querySelectorAll("#session-items .exercise").forEach(r => { const ex = exercises.find(e => e.id === r.dataset.id); if(ex){ total += Number(ex.duration||0); count++; }}); $("session-total").textContent = total + " m"; $("session-count").textContent = count + " øvelser"; }
-function clearSessionBuilder(){ if($("session-items")) $("session-items").innerHTML=''; if($("session-name")) $("session-name").value=''; if($("session-desc")) $("session-desc").value=''; recalcSession(); }
-function saveSession(){ if(!isAdmin() && !isPaid()){ alert('Betalt adgang kræves.'); return; } const name = ($("session-name").value||'').trim(); if(!name){ alert('Tilføj et sessionsnavn'); return; } const ids = Array.from(document.querySelectorAll('#session-items .exercise')).map(r=>r.dataset.id); const total = ids.reduce((a,id)=>{ const ex = exercises.find(e=>e.id===id); return a + (ex?Number(ex.duration||0):0); },0); const s = { id: uid(), name, description: $("session-desc").value||'', items: ids, total, createdAt: new Date().toISOString() }; sessions.unshift(s); persistAll(); renderSessions(); alert('Session gemt'); }
+function clearSessionBuilder(){ if($("session-items")) $("session-items").innerHTML=''; if($("session-name")) $("session-name").value=''; if($("session-desc")) $("session-desc").value=''; recalcSession(); editingSessionId = null; }
+function saveSession(){
+  if(!isAdmin() && !isPaid()){ alert('Betalt adgang kræves.'); return; }
+  const name = ($("session-name").value||'').trim(); if(!name){ alert('Tilføj et sessionsnavn'); return; }
+  const ids = Array.from(document.querySelectorAll('#session-items .exercise')).map(r=>r.dataset.id);
+  const total = ids.reduce((a,id)=>{ const ex = exercises.find(e=>e.id===id); return a + (ex?Number(ex.duration||0):0); },0);
+  if(editingSessionId){
+    const idx = sessions.findIndex(s=>s.id===editingSessionId);
+    if(idx>-1){ sessions[idx].name = name; sessions[idx].description = $("session-desc").value||''; sessions[idx].items = ids; sessions[idx].total = total; }
+  } else {
+    const s = { id: uid(), name, description: $("session-desc").value||'', items: ids, total, createdAt: new Date().toISOString() };
+    sessions.unshift(s);
+  }
+  persistAll(); renderSessions(); alert('Session gemt'); editingSessionId = null;
+}
 
-/* ---------- RENDER SESSIONS ---------- */
+/* ---------- RENDER SESSIONS (with Rediger + Åbn) ---------- */
 function renderSessions(){
   const box = $("sessions-list"); box.innerHTML=''; if(!sessions.length){ box.innerHTML = `<div style="color:var(--muted);font-size:var(--small-font)">Ingen gemte sessioner</div>`; return; }
   sessions.forEach(s => {
     const div = document.createElement('div'); div.className='exercise'; div.style.marginBottom='8px';
     div.innerHTML = `<div style="flex:1"><div style="font-weight:800">${escapeHtml(s.name)}</div><div style="color:var(--muted);font-size:var(--tiny-font)">${(s.items||[]).length} øvelser • ${s.total||0} m</div></div>`;
-    const openBtn = document.createElement('button'); openBtn.className='btn btn-ghost'; openBtn.textContent='Åbn'; openBtn.addEventListener('click', ()=> openSavedSession(s.id));
-    const delBtn = document.createElement('button'); delBtn.className='btn btn-ghost'; delBtn.style.color='var(--danger)'; delBtn.textContent='Slet'; delBtn.addEventListener('click', ()=> showConfirm('Slet session?', ()=>{ sessions = sessions.filter(x=>x.id!==s.id); persistAll(); renderSessions(); }));
-    div.appendChild(openBtn); if(isAdmin()||isPaid()) div.appendChild(delBtn);
+    // "Rediger" (load into builder for editing)
+    const editBtn = document.createElement('button'); editBtn.className='btn btn-ghost'; editBtn.textContent='Rediger';
+    editBtn.addEventListener('click', ()=> { editingSessionId = s.id; loadSessionToBuilder(s.id); window.scrollTo({top:0,behavior:'smooth'}); });
+    // "Åbn" opens new window/tab with links (user requested)
+    const openBtn = document.createElement('button'); openBtn.className='btn btn-ghost'; openBtn.textContent='Åbn';
+    openBtn.addEventListener('click', ()=> openSessionInNewWindow(s.id));
+    // "Slet"
+    const delBtn = document.createElement('button'); delBtn.className='btn btn-ghost'; delBtn.style.color='var(--danger)'; delBtn.textContent='Slet';
+    delBtn.addEventListener('click', ()=> showConfirm('Slet session?', ()=>{ sessions = sessions.filter(x=>x.id!==s.id); persistAll(); renderSessions(); }));
+    div.appendChild(editBtn); div.appendChild(openBtn); if(isAdmin()||isPaid()) div.appendChild(delBtn);
     box.appendChild(div);
   });
 }
-function openSavedSession(id){
-  const s = sessions.find(x=>x.id===id); if(!s){ alert('Session ikke fundet'); return; }
-  const box = $("session-items"); box.innerHTML=''; s.items.forEach(iid => { const ex = exercises.find(e=>e.id===iid); if(!ex) return; const r = document.createElement('div'); r.className='exercise'; r.dataset.id=iid; r.style.marginBottom='6px'; r.innerHTML = `<div style="flex:1"><div style="font-weight:700">${escapeHtml(ex.title)}</div><div style="color:var(--muted);font-size:var(--tiny-font)">${ex.duration}m • ${escapeHtml(ex.category)}</div></div><button class="btn btn-ghost" style="color:var(--danger);font-size:var(--small-font)">Fjern</button>`; r.querySelector('button').addEventListener('click', ()=>{ r.remove(); recalcSession(); const cb = document.querySelector(`#list [data-id="${iid}"] input[type="checkbox"]`); if(cb) cb.checked=false; }); box.appendChild(r); });
+function loadSessionToBuilder(id){
+  const s = sessions.find(x=>x.id===id); if(!s) return;
+  const box = $("session-items"); box.innerHTML='';
+  s.items.forEach(iid => {
+    const ex = exercises.find(e=>e.id===iid); if(!ex) return;
+    const r = document.createElement('div'); r.className='exercise'; r.dataset.id=iid; r.style.marginBottom='6px';
+    r.innerHTML = `<div style="flex:1"><div style="font-weight:700">${escapeHtml(ex.title)}</div><div style="color:var(--muted);font-size:var(--tiny-font)">${ex.duration}m • ${escapeHtml(ex.category)}</div></div><button class="btn btn-ghost" style="color:var(--danger);font-size:var(--small-font)">Fjern</button>`;
+    r.querySelector('button').addEventListener('click', ()=>{ r.remove(); recalcSession(); const cb = document.querySelector(`#list [data-id="${iid}"] input[type="checkbox"]`); if(cb) cb.checked=false; });
+    box.appendChild(r);
+  });
+  $("session-name").value = s.name||'';
+  $("session-desc").value = s.description||'';
   recalcSession();
+  // mark checkboxes
   document.querySelectorAll('#list .exercise').forEach(row => {
     const cb = row.querySelector('input[type="checkbox"]');
     if(!cb) return;
     const id = row.dataset.id;
     cb.checked = !!s.items.find(i => i === id);
   });
-  if(window.innerWidth < 900){
-    const rect = $("session-items").getBoundingClientRect();
-    window.scrollTo({ top: rect.top + window.scrollY - 80, behavior: 'smooth' });
-  }
+}
+function openSessionInNewWindow(id){
+  const s = sessions.find(x=>x.id===id); if(!s) return alert('Session not found');
+  // create html content with clickable links (Video/Link label). open new window and write content
+  let html = `<!doctype html><html><head><meta charset="utf-8"><title>${escapeHtml(s.name)}</title><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="font-family:sans-serif;padding:18px;background:#071226;color:#e6eef6">`;
+  html += `<h2 style="color:#fff">${escapeHtml(s.name)}</h2>`;
+  if(s.description) html += `<p style="color:#9aa7b3">${escapeHtml(s.description)}</p>`;
+  html += "<ul>";
+  (s.items||[]).forEach(id=>{
+    const ex = exercises.find(e=>e.id===id);
+    if(!ex) return;
+    const label = ex.link ? getLinkLabel(ex.link) : 'No link';
+    const href = ex.link ? ex.link : '#';
+    html += `<li style="margin:10px 0;padding:8px;border-radius:8px;background:rgba(255,255,255,0.03)"><strong>${escapeHtml(ex.title)}</strong><div style="margin-top:6px"><a href="${href}" target="_blank" rel="noopener noreferrer" style="color:#7dd3fc;text-decoration:underline">${label}</a></div></li>`;
+  });
+  html += "</ul></body></html>";
+  const w = window.open();
+  if(!w) return alert('Pop-up blokeret — tillad popups for dette site for at åbne session i nyt vindue.');
+  w.document.open();
+  w.document.write(html);
+  w.document.close();
 }
 
 /* ---------- CONFIRM, BACKUP, RESTORE, ANALYZE, UTILS ---------- */
@@ -599,11 +688,9 @@ function mergeSessions(imported){ let added=0; (imported||[]).forEach(im=>{ cons
 
 async function fetchVideoMetadata(link){
   try{
-    try{
-      const oUrl = `https://noembed.com/embed?url=${encodeURIComponent(link)}`;
-      const r = await fetch(oUrl);
-      if(r.ok){ const j = await r.json(); if(j && (j.title || j.author_name)) return { title:j.title||'', description:j.author_name||'' }; }
-    }catch(e){ console.warn('noembed fail',e); }
+    const oUrl = `https://noembed.com/embed?url=${encodeURIComponent(link)}`;
+    const r = await fetch(oUrl);
+    if(r.ok){ const j = await r.json(); if(j && (j.title || j.author_name)) return { title:j.title||'', description:j.author_name||'' }; }
   }catch(e){ console.warn('fetchVideoMetadata error', e); }
   return null;
 }
@@ -626,7 +713,16 @@ async function analyzeLinkAction(){
 
 function escapeHtml(s){ return (s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function applyTheme(theme){ if(theme==='light'){ document.body.classList.add('light'); $("theme-toggle").textContent='🌞'; } else { document.body.classList.remove('light'); $("theme-toggle").textContent='🌙'; } localStorage.setItem(THEME_KEY, theme); }
-function applyPermissions(){ $("bottom-bar").style.display = (isAdmin()||isPaid()) ? 'flex' : 'none'; $("delete-all-btn").style.display = isAdmin() ? 'inline-flex' : 'none'; $("save-session").style.display = (isAdmin()||isPaid()) ? 'inline-flex' : 'none'; $("clear-session").style.display = (isAdmin()||isPaid()) ? 'inline-flex' : 'none'; const badges = $("badges"); badges.innerHTML=''; if(isAdmin()){ const d=document.createElement('div'); d.className='badge'; d.textContent='ADMIN'; badges.appendChild(d); $("btn-logout").style.display='inline-flex'; } else $("btn-logout").style.display='none'; if(isPaid()){ const d=document.createElement('div'); d.className='badge'; d.textContent='PAID'; badges.appendChild(d); } renderList(true); renderSessions(); }
+function applyPermissions(){
+  $("bottom-bar").style.display = (isAdmin()||isPaid()) ? 'flex' : 'none';
+  $("delete-all-btn").style.display = isAdmin() ? 'inline-flex' : 'none';
+  $("save-session").style.display = (isAdmin()||isPaid()) ? 'inline-flex' : 'none';
+  $("clear-session").style.display = (isAdmin()||isPaid()) ? 'inline-flex' : 'none';
+  const badges = $("badges"); badges.innerHTML='';
+  if(isAdmin()){ const d=document.createElement('div'); d.className='badge'; d.textContent='ADMIN'; badges.appendChild(d); $("btn-logout").style.display='inline-flex'; } else $("btn-logout").style.display='none';
+  if(isPaid()){ const d=document.createElement('div'); d.className='badge'; d.textContent='PAID'; badges.appendChild(d); }
+  renderList(true); renderSessions();
+}
 function refreshUI(){ populateSelects(); applyPermissions(); renderIndex=0; renderList(true); renderSessions(); }
 
 document.addEventListener('DOMContentLoaded', ()=>{ init(); });
