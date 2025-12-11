@@ -45,7 +45,6 @@
     .two-col{display:grid;grid-template-columns:1fr 400px;gap:12px}
     @media(max-width:980px){.two-col{grid-template-columns:1fr}}
 
-    /* LIST & TAGS - improved layout */
     .exercise{display:flex;gap:10px;padding:8px;border-radius:10px;border:1px solid var(--border-soft);align-items:flex-start;overflow:hidden}
     .exercise .left{flex:1 1 auto;min-width:0}
     .exercise .left .title{font-weight:800;font-size:14px;line-height:1.15}
@@ -54,7 +53,6 @@
 
     .tag-wrap{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;align-items:center}
     .tag{display:inline-block;padding:5px 8px;border-radius:10px;background:rgba(255,255,255,0.03);font-size:11px;color:var(--text);white-space:nowrap;max-width:100%}
-    /* make tags smaller on small screens */
     @media(max-width:480px){ .tag{font-size:10px;padding:4px 6px} }
 
     .actions-small{flex:0 0 auto;display:flex;flex-direction:column;gap:8px;align-items:flex-end}
@@ -225,6 +223,8 @@
         <div style="display:flex;gap:8px;margin-top:8px">
           <button id="save-session" class="btn btn-primary" data-i18n="saveSession">Gem</button>
           <button id="clear-session" class="btn btn-ghost" data-i18n="clearSession">Ryd</button>
+          <!-- Cancel session edit (Fortryd) -->
+          <button id="cancel-session-edit" class="btn btn-ghost" style="display:none">Fortryd</button>
         </div>
 
         <div id="session-lock-info" style="margin-top:12px;color:var(--muted);display:none;font-size:var(--tiny-font)">Gratis brugere kan ikke gemme eller bygge sessioner. Køb adgang for at låse op.</div>
@@ -236,7 +236,6 @@
     </div>
   </div>
 
-  <!-- admin modal -->
   <div id="admin-modal" style="position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:999">
     <div style="background:var(--panel);padding:12px;border-radius:10px;max-width:420px;width:92%">
       <h3 style="margin-top:0">Admin login</h3>
@@ -248,7 +247,6 @@
     </div>
   </div>
 
-  <!-- confirm modal -->
   <div id="confirm-modal" style="display:none;position:fixed;inset:0;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);z-index:1000">
     <div style="background:var(--panel);padding:14px;border-radius:12px;max-width:420px;width:92%">
       <h3 id="confirm-title">Bekræft</h3>
@@ -291,54 +289,21 @@ const isPaid  = () => localStorage.getItem("is_paid") === "1";
 /* ---------- i18n (simple) ---------- */
 const I18 = {
   da: {
-    buy: "Køb",
-    admin: "Admin",
-    logout: "Log ud",
-    save: "Gem",
-    clear: "Ryd",
-    cancel: "Annuller",
-    deleteAll: "Slet alle",
-    formTitle: "Tilføj / Rediger øvelse (Padel)",
-    sessionBuilderTitle: "Training Session Builder",
-    sessionName: "Sessionsnavn",
-    sessionDesc: "Sessionsbeskrivelse",
-    exercisesLabel: "Øvelser",
-    saveSession: "Gem",
-    clearSession: "Ryd",
-    savedSessions: "Gemte sessioner",
+    buy: "Køb", admin: "Admin", logout: "Log ud", save: "Gem", clear: "Ryd", cancel: "Annuller", deleteAll: "Slet alle",
+    formTitle: "Tilføj / Rediger øvelse (Padel)", sessionBuilderTitle: "Training Session Builder", sessionName: "Sessionsnavn",
+    sessionDesc: "Sessionsbeskrivelse", exercisesLabel: "Øvelser", saveSession: "Gem", clearSession: "Ryd", savedSessions: "Gemte sessioner",
     search: "Søg..."
   },
   en: {
-    buy: "Buy",
-    admin: "Admin",
-    logout: "Sign out",
-    save: "Save",
-    clear: "Clear",
-    cancel: "Cancel",
-    deleteAll: "Delete all",
-    formTitle: "Add / Edit exercise (Padel)",
-    sessionBuilderTitle: "Training Session Builder",
-    sessionName: "Session name",
-    sessionDesc: "Session description",
-    exercisesLabel: "Exercises",
-    saveSession: "Save",
-    clearSession: "Clear",
-    savedSessions: "Saved sessions",
+    buy: "Buy", admin: "Admin", logout: "Sign out", save: "Save", clear: "Clear", cancel: "Cancel", deleteAll: "Delete all",
+    formTitle: "Add / Edit exercise (Padel)", sessionBuilderTitle: "Training Session Builder", sessionName: "Session name",
+    sessionDesc: "Session description", exercisesLabel: "Exercises", saveSession: "Save", clearSession: "Clear", savedSessions: "Saved sessions",
     search: "Search..."
   }
 };
 
 function applyLanguage(lang){
   const map = I18[lang] || I18.da;
-  document.querySelectorAll('[data-i18n]').forEach(el=>{
-    const key = el.getAttribute('data-i18n');
-    if(map[key]!==undefined) el.textContent = map[key];
-  });
-  document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{
-    const key = el.getAttribute('data-i18n-placeholder');
-    if(map[key]!==undefined) el.placeholder = map[key];
-  });
-  // some individual ids
   $('form-title').textContent = map.formTitle;
   $('save-btn').textContent = map.save;
   $('clear-btn').textContent = map.clear;
@@ -349,7 +314,6 @@ function applyLanguage(lang){
   $('btn-logout').textContent = map.logout;
   $('save-session').textContent = map.saveSession;
   $('clear-session').textContent = map.clearSession;
-  // placeholder search
   if($('search')) $('search').placeholder = map.search;
   localStorage.setItem(LANG_KEY, lang);
 }
@@ -357,7 +321,8 @@ function applyLanguage(lang){
 /* ---------- STATE ---------- */
 let exercises = [], sessions = [], categories = [], levels = [], intensities = [], players = [];
 let editingId = null;
-let editingSessionId = null; // for session editing
+let editingSessionId = null;
+let originalSessionSnapshot = null; // store original copy when editing a session so we can "fortryd"
 let renderIndex = 0;
 const BATCH = 100;
 const platformState = new Set();
@@ -441,6 +406,8 @@ function bindEvents(){
   $("load-more").addEventListener('click', ()=> renderList(false));
   $("save-session").addEventListener('click', saveSession);
   $("clear-session").addEventListener('click', clearSessionBuilder);
+  $("cancel-session-edit").addEventListener('click', (e)=>{ e.preventDefault(); cancelSessionEdit(); });
+
   $("analyze-btn").addEventListener('click', (ev)=>{ ev.preventDefault(); analyzeLinkAction(); });
 
   $("backup-btn").addEventListener('click', doBackup);
@@ -533,6 +500,7 @@ function renderList(reset = true){
     const right = document.createElement('div'); right.className='actions-small';
     if(isAdmin() || isPaid()){
       const editBtn = document.createElement('button'); editBtn.className='btn btn-ghost'; editBtn.textContent = 'Rediger';
+      // CALL populateFormForEdit (now defined below)
       editBtn.addEventListener('click', ()=> { editingId = ex.id; populateFormForEdit(ex); enterEditMode(); window.scrollTo({top:0,behavior:'smooth'}); });
       right.appendChild(editBtn);
 
@@ -555,7 +523,6 @@ function renderList(reset = true){
 function enterEditMode(){
   $("cancel-edit-btn").style.display = 'inline-flex';
   $("save-btn").textContent = (localStorage.getItem(LANG_KEY) === 'en' ? 'Update' : 'Opdater') || 'Opdater';
-  // visual hint (optional): border
   document.querySelector('.card').style.boxShadow = '0 10px 28px rgba(34,197,94,0.06)';
 }
 function cancelEditMode(){
@@ -563,8 +530,23 @@ function cancelEditMode(){
   clearForm();
   $("cancel-edit-btn").style.display = 'none';
   applyLanguage(localStorage.getItem(LANG_KEY) || 'da');
-  // remove hint
   document.querySelector('.card').style.boxShadow = '0 10px 28px rgba(2,6,23,.6)';
+}
+
+/* ---------- populateFormForEdit (fix) ---------- */
+function populateFormForEdit(ex){
+  if(!ex) return;
+  $("title").value = ex.title||'';
+  $("link").value = ex.link||'';
+  if($("category")) $("category").value = ex.category||'';
+  if($("players")) $("players").value = ex.players||'';
+  $("duration").value = ex.duration||'';
+  if($("level")) $("level").value = ex.level||'';
+  if($("intensity")) $("intensity").value= ex.intensity||'';
+  $("description").value = ex.description||'';
+  $("tags").value = ex.tags||'';
+  // editingId set by caller
+  enterEditMode();
 }
 
 /* ---------- FORM HANDLERS ---------- */
@@ -578,7 +560,6 @@ function onSaveExercise(){
   const item = { id: editingId || uid(), title, link, category: $("category").value, players: $("players").value, duration: Number($("duration").value||0), level: $("level").value, intensity: $("intensity").value, description: $("description").value||"", tags: ($("tags").value||"").trim(), createdAt: new Date().toISOString() };
   if(editingId){ const idx = exercises.findIndex(x => x.id === editingId); if(idx>-1) exercises[idx] = item; } else exercises.unshift(item);
   persistAll(); editingId = null; clearForm(); refreshUI();
-  // exit edit UI
   $("cancel-edit-btn").style.display = 'none';
   applyLanguage(localStorage.getItem(LANG_KEY) || 'da');
   document.querySelector('.card').style.boxShadow = '0 10px 28px rgba(2,6,23,.6)';
@@ -598,7 +579,7 @@ function addToSessionBuilder(id){
 }
 function removeFromSessionBuilder(id){ const box = $("session-items"); const node = box.querySelector(`[data-id="${id}"]`); if(node) node.remove(); recalcSession(); }
 function recalcSession(){ let total=0,count=0; document.querySelectorAll("#session-items .exercise").forEach(r => { const ex = exercises.find(e => e.id === r.dataset.id); if(ex){ total += Number(ex.duration||0); count++; }}); $("session-total").textContent = total + " m"; $("session-count").textContent = count + " øvelser"; }
-function clearSessionBuilder(){ if($("session-items")) $("session-items").innerHTML=''; if($("session-name")) $("session-name").value=''; if($("session-desc")) $("session-desc").value=''; recalcSession(); editingSessionId = null; }
+function clearSessionBuilder(){ if($("session-items")) $("session-items").innerHTML=''; if($("session-name")) $("session-name").value=''; if($("session-desc")) $("session-desc").value=''; recalcSession(); editingSessionId = null; originalSessionSnapshot = null; $("cancel-session-edit").style.display='none'; }
 function saveSession(){
   if(!isAdmin() && !isPaid()){ alert('Betalt adgang kræves.'); return; }
   const name = ($("session-name").value||'').trim(); if(!name){ alert('Tilføj et sessionsnavn'); return; }
@@ -611,7 +592,24 @@ function saveSession(){
     const s = { id: uid(), name, description: $("session-desc").value||'', items: ids, total, createdAt: new Date().toISOString() };
     sessions.unshift(s);
   }
-  persistAll(); renderSessions(); alert('Session gemt'); editingSessionId = null;
+  persistAll(); renderSessions(); alert('Session gemt'); editingSessionId = null; originalSessionSnapshot = null; $("cancel-session-edit").style.display='none';
+}
+
+/* ---------- SESSION EDIT / FORTRYD ---------- */
+function cancelSessionEdit(){
+  if(!editingSessionId || !originalSessionSnapshot) { clearSessionBuilder(); return; }
+  // restore the original session in sessions[] (do not overwrite if user had already saved other changes)
+  const idx = sessions.findIndex(s=>s.id===editingSessionId);
+  if(idx>-1){
+    sessions[idx] = JSON.parse(JSON.stringify(originalSessionSnapshot));
+    persistAll();
+  }
+  // load original back to builder
+  loadSessionToBuilder(originalSessionSnapshot.id);
+  editingSessionId = null;
+  originalSessionSnapshot = null;
+  $("cancel-session-edit").style.display='none';
+  alert('Redigering annulleret — session gendannet.');
 }
 
 /* ---------- RENDER SESSIONS (with Rediger + Åbn) ---------- */
@@ -620,19 +618,17 @@ function renderSessions(){
   sessions.forEach(s => {
     const div = document.createElement('div'); div.className='exercise'; div.style.marginBottom='8px';
     div.innerHTML = `<div style="flex:1"><div style="font-weight:800">${escapeHtml(s.name)}</div><div style="color:var(--muted);font-size:var(--tiny-font)">${(s.items||[]).length} øvelser • ${s.total||0} m</div></div>`;
-    // "Rediger" (load into builder for editing)
     const editBtn = document.createElement('button'); editBtn.className='btn btn-ghost'; editBtn.textContent='Rediger';
-    editBtn.addEventListener('click', ()=> { editingSessionId = s.id; loadSessionToBuilder(s.id); window.scrollTo({top:0,behavior:'smooth'}); });
-    // "Åbn" opens new window/tab with links (user requested)
+    editBtn.addEventListener('click', ()=> { editingSessionId = s.id; originalSessionSnapshot = JSON.parse(JSON.stringify(s)); loadSessionToBuilder(s.id); $("cancel-session-edit").style.display='inline-flex'; window.scrollTo({top:0,behavior:'smooth'}); });
     const openBtn = document.createElement('button'); openBtn.className='btn btn-ghost'; openBtn.textContent='Åbn';
     openBtn.addEventListener('click', ()=> openSessionInNewWindow(s.id));
-    // "Slet"
     const delBtn = document.createElement('button'); delBtn.className='btn btn-ghost'; delBtn.style.color='var(--danger)'; delBtn.textContent='Slet';
     delBtn.addEventListener('click', ()=> showConfirm('Slet session?', ()=>{ sessions = sessions.filter(x=>x.id!==s.id); persistAll(); renderSessions(); }));
     div.appendChild(editBtn); div.appendChild(openBtn); if(isAdmin()||isPaid()) div.appendChild(delBtn);
     box.appendChild(div);
   });
 }
+
 function loadSessionToBuilder(id){
   const s = sessions.find(x=>x.id===id); if(!s) return;
   const box = $("session-items"); box.innerHTML='';
@@ -646,7 +642,6 @@ function loadSessionToBuilder(id){
   $("session-name").value = s.name||'';
   $("session-desc").value = s.description||'';
   recalcSession();
-  // mark checkboxes
   document.querySelectorAll('#list .exercise').forEach(row => {
     const cb = row.querySelector('input[type="checkbox"]');
     if(!cb) return;
@@ -654,9 +649,10 @@ function loadSessionToBuilder(id){
     cb.checked = !!s.items.find(i => i === id);
   });
 }
+
+/* ---------- OPEN SESSION IN NEW WINDOW ---------- */
 function openSessionInNewWindow(id){
   const s = sessions.find(x=>x.id===id); if(!s) return alert('Session not found');
-  // create html content with clickable links (Video/Link label). open new window and write content
   let html = `<!doctype html><html><head><meta charset="utf-8"><title>${escapeHtml(s.name)}</title><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="font-family:sans-serif;padding:18px;background:#071226;color:#e6eef6">`;
   html += `<h2 style="color:#fff">${escapeHtml(s.name)}</h2>`;
   if(s.description) html += `<p style="color:#9aa7b3">${escapeHtml(s.description)}</p>`;
