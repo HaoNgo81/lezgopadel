@@ -1,24 +1,25 @@
 <!doctype html>
-<html lang="en">
+<html lang="da">
 <head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Offline — LezGo Padel</title>
-  <meta name="theme-color" content="#071226">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>LezGo Padel — Offline</title>
   <style>
-    body{margin:0;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#071226 0%,#04111a 100%);color:#e6eef6;font-family:system-ui,Arial;padding:20px}
-    .box{text-align:center;max-width:720px}
-    img{max-width:220px;margin:0 auto 16px auto;display:block}
-    h1{margin:0 0 8px 0}
-    p{color:#9aa7b3}
-    a.btn{display:inline-block;padding:10px 14px;border-radius:10px;background:#22c55e;color:#05261a;text-decoration:none;font-weight:700;margin-top:12px}
+    body{font-family:Inter,system-ui,Arial,sans-serif;background:#071226;color:#e6eef6;margin:0;display:flex;align-items:center;justify-content:center;height:100vh;padding:20px}
+    .card{max-width:760px;background:#0f1720;padding:24px;border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,0.6);text-align:center}
+    h1{margin:0 0 10px;font-size:20px;letter-spacing:1px}
+    p{color:#9aa7b3;margin:8px 0 16px}
+    a{display:inline-block;padding:10px 14px;border-radius:10px;background:#22c55e;color:#05261a;font-weight:800;text-decoration:none}
+    small{display:block;margin-top:12px;color:#7b8893}
   </style>
 </head>
 <body>
-  <div class="box">
-    <img src="/lezgo-logo.svg" alt="LezGo logo">
-    <h1>You are offline</h1>
-    <p>LezGo Padel app is currently offline. Some features (external video links) require network. You can still view cached items.</p>
-    <a class="btn" href="/index.html">Try reload</a>
+  <div class="card">
+    <img src="/lezgopade/lezgo-logo.svg" alt="LEZGO" style="height:44px;margin-bottom:14px" />
+    <h1>Du er offline</h1>
+    <p>Det ser ud til, at du mangler netværksforbindelse. Du kan stadig se gemte sider og øvelser. Prøv igen når du er online.</p>
+    <a href="/lezgopade/">Gå til app</a>
+    <small>Hvis linket ikke virker, genindlæs siden når du har netværk.</small>
   </div>
 </body>
 </html>
