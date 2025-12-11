@@ -2,18 +2,21 @@
 const CACHE_VERSION = 'v2';
 const PRECACHE = `lezgo-precache-${CACHE_VERSION}`;
 const RUNTIME = `lezgo-runtime-${CACHE_VERSION}`;
-const OFFLINE_URL = '/lezgopade/offline.html'; // Sørg for at denne sti matcher manifest og filplacering
+
+// JUSTER DISSE STIER EFTER HVOR DU HOSTER (match manifest.start_url / scope)
+const BASE_PATH = '/lezgopade'; // <- ændr til '' hvis du hoster i root
+const OFFLINE_URL = `${BASE_PATH}/offline.html`;
 
 // Liste over statiske assets til precache (opdatér efter behov)
 const PRECACHE_URLS = [
-  '/lezgopade/',
-  '/lezgopade/index.html',
-  '/lezgopade/lezgo-logo.svg',
-  '/lezgopade/ICON-192x192.png',
-  '/lezgopade/ICON-512x512.png',
-  '/lezgopade/apple-touch-icon.png',
-  '/lezgopade/manifest.json',
-  '/lezgopade/offline.html'
+  `${BASE_PATH}/`,
+  `${BASE_PATH}/index.html`,
+  `${BASE_PATH}/lezgo-logo.svg`,
+  `${BASE_PATH}/ICON-192x192.png`,
+  `${BASE_PATH}/ICON-512x512.png`,
+  `${BASE_PATH}/apple-touch-icon.png`,
+  `${BASE_PATH}/manifest.json`,
+  `${BASE_PATH}/offline.html`
 ];
 
 // INSTALL: præcache app-shell
@@ -50,7 +53,7 @@ self.addEventListener('fetch', event => {
 
   const url = new URL(req.url);
 
-  // Static asset cache-first
+  // Static asset cache-first (same-origin)
   if (url.origin === self.location.origin && /\.(?:png|jpg|jpeg|svg|gif|css|js|json|woff2?)$/i.test(url.pathname)) {
     event.respondWith(
       caches.match(req).then(cached => cached || fetch(req).then(res => {
@@ -58,10 +61,7 @@ self.addEventListener('fetch', event => {
           cache.put(req, res.clone());
           return res;
         });
-      })).catch(() => {
-        // hvis fallback ønskes for images, returner evt en placeholder her
-        return caches.match(OFFLINE_URL);
-      })
+      })).catch(() => caches.match(OFFLINE_URL))
     );
     return;
   }
@@ -87,18 +87,17 @@ self.addEventListener('fetch', event => {
     caches.match(req).then(cached => {
       if (cached) return cached;
       return fetch(req).then(res => {
-        // valgfrit: cache cross-origin images kun hvis CORS tillader (type 'basic')
+        // valgfrit: cache basic same-origin responses
         if (res && res.status === 200 && res.type === 'basic') {
           const copy = res.clone();
           caches.open(RUNTIME).then(cache => cache.put(req, copy));
         }
         return res;
       }).catch(() => {
-        // fallback for images eller return offline side for html
+        // fallback for html
         if (req.headers.get('accept') && req.headers.get('accept').includes('text/html')) {
           return caches.match(OFFLINE_URL);
         }
-        // ellers return en tom response (eller en data-uri placeholder)
         return new Response('', {status: 404, statusText: 'offline'});
       });
     })
