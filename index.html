@@ -9,23 +9,64 @@
     /* RESET + THEME */
     *,*::before,*::after{box-sizing:border-box}
     html,body{height:100%;margin:0;padding:0;overflow-x:hidden;font-family:Inter,system-ui,Arial,sans-serif;-webkit-font-smoothing:antialiased}
-    /* Slightly lightened panel for dark mode so "felterne i dark mode" er en anelse lysere */
-    :root{--bg-top:#0f1720;--bg-bottom:#071226;--panel:#12202a;--muted:#9aa7b3;--text:#e6eef6;--accent:#22c55e;--accent-dark:#0b4428;--danger:#ef4444;--border-soft:rgba(255,255,255,.04)}
-    body.light{--bg-top:#caced5;--bg-bottom:#bfc3cb;--panel:#d8dce3;--muted:#3c4652;--text:#0b1220;--accent:#16a34a;--accent-dark:#106b37;--danger:#dc2626}
+    :root{--bg-top:#0f1720;--bg-bottom:#071226;--panel:#12202a;--muted:#9aa7b3;--text:#e6eef6;--accent:#22c55e;--danger:#ef4444;--border-soft:rgba(255,255,255,.04)}
+    body.light{--bg-top:#caced5;--bg-bottom:#bfc3cb;--panel:#d8dce3;--muted:#3c4652;--text:#0b1220;--accent:#16a34a;--danger:#dc2626}
     body{background:linear-gradient(180deg,var(--bg-top) 0%,var(--bg-bottom) 100%);color:var(--text);padding-bottom:160px;transition:background .2s,color .2s}
 
     .container{max-width:1100px;margin:12px auto;padding:8px;width:94%}
 
-    /* Header tweaks: logo centered, controls absolute top-right on same line */
-    header{position:relative;margin-bottom:6px}
-    #logo-line{display:flex;justify-content:center;align-items:center;margin-bottom:8px}
-    #logo{height:54px}
+    /* Header layout: 3-col grid (left | center | right) så logo altid centreret */
+    header{
+      display:grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items:center;
+      gap:8px;
+      padding-top:env(safe-area-inset-top,14px);
+      margin-bottom:6px;
+      position:relative;
+    }
 
-    /* top-right controls placed absolute so logo stays perfectly centered */
-    #top-controls{position:absolute;right:8px;top:8px;display:flex;gap:8px;align-items:center;z-index:50}
-    #top-controls .btn{padding:8px 10px;border-radius:10px}
-    /* make language select compact */
-    #top-controls select{padding:6px 8px;border-radius:8px;border:1px solid var(--border-soft);background:transparent;color:var(--text);min-width:84px;width:auto;font-weight:700}
+    /* logo midt i midterkolonnen */
+    #logo-line{
+      grid-column: 2 / 3;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      margin:0;
+    }
+    #logo{ height:54px; max-width:95%; }
+
+    /* top controls i højre kolonne (ikke absolut længere) */
+    #top-controls{
+      grid-column: 3 / 4;
+      justify-self:end;
+      display:flex;
+      gap:8px;
+      align-items:center;
+      z-index:30;
+    }
+
+    /* småjusteringer til knappen + select */
+    #top-controls .theme-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width:40px;
+      height:40px;
+      border-radius:10px;
+      background:var(--panel);
+      border:1px solid var(--border-soft);
+      box-shadow:0 6px 16px rgba(0,0,0,0.25);
+      cursor:pointer;
+    }
+    #top-controls select{
+      padding:6px 10px;
+      border-radius:10px;
+      border:1px solid var(--border-soft);
+      background:transparent;
+      color:var(--text);
+      min-width:74px;
+    }
 
     .header-row{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:8px}
     .badge{background:rgba(255,255,255,.04);padding:6px 10px;border-radius:8px;font-weight:700;color:var(--muted)}
@@ -39,6 +80,7 @@
     .platform-btn.active{background:var(--accent);color:#05261a;border-color:transparent;box-shadow:0 6px 18px rgba(0,0,0,.12)}
     .platform-btn:focus{outline:2px solid rgba(255,255,255,0.06);outline-offset:3px}
 
+    /* Cards */
     .card{background:var(--panel);border-radius:12px;padding:14px;margin-bottom:14px;box-shadow:0 10px 28px rgba(2,6,23,.6)}
     label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
     input[type=text],input[type=url],input[type=number],select,textarea{width:100%;padding:12px;border-radius:10px;border:1px solid var(--border-soft);background:transparent;color:var(--text)}
@@ -47,60 +89,71 @@
     .two-col{display:grid;grid-template-columns:1fr 420px;gap:12px}
     @media(max-width:980px){.two-col{grid-template-columns:1fr}}
 
-    .exercise{display:flex;gap:12px;padding:12px;border-radius:10px;border:1px solid var(--border-soft);align-items:flex-start;overflow:hidden}
-    .left{flex:1;min-width:0}
-    .meta{color:var(--muted);margin-top:6px}
-    .tag{background:rgba(255,255,255,.03);padding:6px 8px;border-radius:8px;margin-right:8px;font-size:13px;display:inline-block;margin-top:8px}
-    .actions-small{display:flex;flex-direction:column;gap:6px;align-items:flex-end}
-    .exercise .left div, .exercise .left a { white-space:normal !important; word-break:break-word !important; overflow-wrap:anywhere !important; hyphens:auto !important }
-    .exercise a{color:#2fa1ff;text-decoration:underline}
+    /* Exercises list compact styling for mobile: reduce padding & font-size so more items fit */
+    .exercise{display:flex;gap:12px;padding:10px;border-radius:10px;border:1px solid var(--border-soft);align-items:flex-start;overflow:hidden}
+    .exercise .left{flex:1;min-width:0}
+    .exercise .left .title{font-weight:800;font-size:15px;line-height:1.15}
+    .exercise .left .meta{color:var(--muted);margin-top:6px;font-size:13px}
+    .exercise a{color:#2fa1ff;text-decoration:underline;font-size:13px;word-break:break-word}
 
-    #list{max-height:420px;overflow:auto}
-    #session-items{max-height:260px;overflow:auto}
+    /* Make the list area taller on mobile so filters and links get more space */
+    #list{max-height:520px;overflow:auto}
+    #session-items{max-height:320px;overflow:auto}
 
+    /* Sessions list smaller text & less padding so we can see more saved sessions on screen */
+    #sessions-list .exercise{padding:8px;border-radius:8px}
+    #sessions-list .exercise .title{font-size:14px}
+    #sessions-list .exercise .meta{font-size:12px;color:var(--muted)}
+
+    /* bottom bar */
     #bottom-bar{position:fixed;bottom:12px;left:12px;right:12px;max-width:calc(1100px - 24px);margin:0 auto;display:flex;gap:12px;justify-content:center;align-items:center;padding:10px;border-radius:12px;z-index:9999;box-shadow:0 10px 28px rgba(0,0,0,0.16);background:linear-gradient(180deg,rgba(0,0,0,0.04),rgba(0,0,0,0.02))}
     .bottom-btn{padding:10px 14px;border-radius:10px;background:var(--accent);color:#05261a;font-weight:800}
     .bottom-btn.restore{background:transparent;border:1px solid var(--border-soft);color:var(--text)}
 
     .search-row{display:flex;gap:8px;align-items:center}
-    .search-row input[type=text]{flex:1;min-width:0}
+    .search-row input[type=text]{flex:1;min-width:0;padding:12px;border-radius:10px}
 
-    /* small screens: ensure top-controls shrink and logo remains centered */
+    /* small screens */
     @media(max-width:480px){
       #logo{height:48px}
-      #top-controls{right:6px;top:6px;gap:6px}
-      #top-controls select{min-width:70px}
-      #top-controls .btn {padding:6px 8px;font-size:14px}
+      #top-controls{gap:6px}
+      #top-controls select{min-width:74px}
+      #top-controls .theme-btn {min-width:36px; height:36px}
+      .exercise{padding:8px;gap:8px}
+      .exercise .left .title{font-size:14px}
+      .exercise .left .meta{font-size:12px}
+      #list{max-height:620px}
+      #sessions-list{max-height:360px}
     }
   </style>
 </head>
 <body>
   <div class="container">
     <header>
-      <div id="logo-line"><img id="logo" src="lezgo-logo.svg" alt="LEZGO"></div>
+      <div><!-- venstre kolonne (tom, holder plads) --></div>
 
-      <!-- TOP-RIGHT CONTROLS (moved here so logo stays centered on same horizontal line) -->
+      <div id="logo-line">
+        <img id="logo" src="lezgo-logo.svg" alt="LEZGO">
+      </div>
+
       <div id="top-controls" aria-hidden="false">
-        <button id="theme-toggle" class="btn btn-ghost" title="Toggle theme">🌓</button>
+        <button id="theme-toggle" class="theme-btn" title="Skift tema" aria-pressed="false">🌙</button>
         <select id="lang-select" aria-label="Sprog">
           <option value="da">Dansk</option><option value="en">English</option>
         </select>
       </div>
-
-      <!-- original header-row kept below (badges + larger actions) -->
-      <div class="header-row">
-        <div id="badges" style="display:flex;gap:8px;align-items:center"></div>
-
-        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-          <!-- Køb/Admin/log ud osv. (uændret) -->
-          <button id="btn-buy" class="btn btn-primary">Køb adgang</button>
-          <button id="btn-admin" class="btn btn-ghost">Admin login</button>
-          <button id="btn-logout" class="btn btn-ghost" style="display:none;color:var(--danger)">Log ud</button>
-        </div>
-      </div>
     </header>
 
-    <!-- form -->
+    <div class="header-row">
+      <div id="badges" style="display:flex;gap:8px;align-items:center"></div>
+
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <button id="btn-buy" class="btn btn-primary">Køb adgang</button>
+        <button id="btn-admin" class="btn btn-ghost">Admin login</button>
+        <button id="btn-logout" class="btn btn-ghost" style="display:none;color:var(--danger)">Log ud</button>
+      </div>
+    </div>
+
     <section class="card">
       <h3 style="margin:0 0 12px 0;color:var(--muted)">Tilføj / Rediger øvelse (Padel)</h3>
       <form id="exercise-form" onsubmit="return false;" style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
@@ -169,7 +222,6 @@
           <div class="search-row">
             <input id="search" type="text" placeholder="Søg..." aria-label="Search">
 
-            <!-- PLATFORM BUTTONS: data-platform attribute used by script -->
             <div style="display:flex;gap:6px">
               <button type="button" id="pf-y" class="platform-btn" data-platform="youtube" aria-pressed="false">YouTube</button>
               <button type="button" id="pf-i" class="platform-btn" data-platform="instagram" aria-pressed="false">Instagram</button>
@@ -178,8 +230,8 @@
           </div>
 
           <div style="display:flex;gap:8px">
-            <select id="filter-category" style="flex:1;padding:10px;border-radius:10px;border:1px solid var(--border-soft);background:transparent;color:var(--text)"><option>ALL</option></select>
-            <select id="filter-level" style="flex:1;padding:10px;border-radius:10px;border:1px solid var(--border-soft);background:transparent;color:var(--text)"><option>ALL</option></select>
+            <select id="filter-category" style="flex:1;padding:12px;border-radius:10px;border:1px solid var(--border-soft);background:transparent;color:var(--text)"><option>ALL</option></select>
+            <select id="filter-level" style="flex:1;padding:12px;border-radius:10px;border:1px solid var(--border-soft);background:transparent;color:var(--text)"><option>ALL</option></select>
           </div>
 
           <div style="color:var(--muted);font-size:13px">Filtre er her — Session Builder er til højre. På small skærme stables de lodret.</div>
@@ -189,7 +241,7 @@
         </div>
       </div>
 
-      <!-- right: session builder -->
+      <!-- right: session builder (taller + kompakt) -->
       <aside class="card">
         <h4 style="margin:0 0 12px 0">Training Session Builder</h4>
 
@@ -200,7 +252,7 @@
         <input id="session-desc" type="text">
 
         <label style="margin-top:8px">Øvelser</label>
-        <div id="session-items"></div>
+        <div id="session-items" style="max-height:320px;overflow:auto"></div>
 
         <div style="display:flex;gap:10px;align-items:center;margin-top:10px">
           <div>Total:</div>
@@ -217,7 +269,7 @@
 
         <hr style="border:none;border-top:1px solid var(--border-soft);margin:12px 0;">
         <h4 style="margin:0 0 8px 0">Gemte sessioner</h4>
-        <div id="sessions-list" style="max-height:180px;overflow:auto"></div>
+        <div id="sessions-list" style="max-height:360px;overflow:auto"></div>
       </aside>
     </div>
   </div>
@@ -254,7 +306,7 @@
   </div>
 
 <script>
-/* ---------- CONFIG ---------- */
+/* ---------- CONFIG & helpers ---------- */
 
 const ADMIN_PASSWORD = "admin123";
 const EX_KEY = "lezgo_exercises_v3";
@@ -281,7 +333,7 @@ let exercises = [], sessions = [], categories = [], levels = [], intensities = [
 let editingId = null;
 let renderIndex = 0;
 const BATCH = 100;
-const platformState = new Set(); // holds 'youtube','instagram','facebook'
+const platformState = new Set();
 
 /* ---------- STORAGE ---------- */
 function loadAll(){
@@ -384,7 +436,7 @@ function bindEvents(){
   $("confirm-yes").addEventListener('click', ()=> closeConfirm(true));
 }
 
-/* ---------- RENDER LIST (platform-aware) ---------- */
+/* ---------- RENDER LIST (same logic) ---------- */
 function renderList(reset = true){
   const list = $("list");
   if(!list) return;
@@ -394,7 +446,6 @@ function renderList(reset = true){
   const fl = ($("filter-level").value||"");
   let items = exercises.slice();
 
-  // platform filter: if any platform selected, only accept items matching one of selected
   if(platformState.size > 0){
     items = items.filter(it => {
       if(!it.link) return false;
@@ -433,10 +484,10 @@ function renderList(reset = true){
     row.appendChild(cb);
 
     const left = document.createElement('div'); left.className='left';
-    const title = document.createElement('div'); title.style.fontWeight='800'; title.style.fontSize='15px'; title.textContent = ex.title; left.appendChild(title);
+    const title = document.createElement('div'); title.className='title'; title.textContent = ex.title; left.appendChild(title);
     const meta = document.createElement('div'); meta.className='meta'; meta.textContent = `${ex.category || ''} • ${ex.level || ''} • ${ex.players || ''} • ${ex.duration || 0}m`; left.appendChild(meta);
     if(ex.link){ const a = document.createElement('a'); a.href = ex.link; a.target = '_blank'; a.style.display='block'; a.style.marginTop='6px'; a.textContent = ex.link; left.appendChild(a); }
-    if(ex.tags){ const tagWrap = document.createElement('div'); tagWrap.style.marginTop='8px'; ex.tags.split(',').forEach(tg => { const s = document.createElement('span'); s.className='tag'; s.textContent = tg.trim(); tagWrap.appendChild(s); }); left.appendChild(tagWrap); }
+    if(ex.tags){ const tagWrap = document.createElement('div'); tagWrap.style.marginTop='8px'; ex.tags.split(',').forEach(tg => { const s = document.createElement('span'); s.className='tag'; s.style.marginRight='8px'; s.style.display='inline-block'; s.style.padding='6px 8px'; s.style.borderRadius='8px'; s.style.background='rgba(255,255,255,0.03)'; s.textContent = tg.trim(); tagWrap.appendChild(s); }); left.appendChild(tagWrap); }
     row.appendChild(left);
 
     const right = document.createElement('div'); right.className='actions-small';
@@ -513,28 +564,24 @@ function openSavedSession(id){
     const id = row.dataset.id;
     cb.checked = !!s.items.find(i => i === id);
   });
-  // scroll into view on small screens
   if(window.innerWidth < 900){
     const rect = $("session-items").getBoundingClientRect();
     window.scrollTo({ top: rect.top + window.scrollY - 80, behavior: 'smooth' });
   }
 }
 
-/* ---------- CONFIRM MODAL ---------- */
+/* ---------- CONFIRM, BACKUP, ANALYZE, UTILS (som før) ---------- */
 let _confirmCb = null;
 function showConfirm(message, cb){ _confirmCb = cb; $("confirm-message").textContent = message; $("confirm-modal").style.display='flex'; }
 function closeConfirm(answer){ $("confirm-modal").style.display='none'; if(answer && typeof _confirmCb === 'function') _confirmCb(); _confirmCb = null; }
 
-/* ---------- BACKUP / RESTORE ---------- */
 function doBackup(){ if(!isAdmin() && !isPaid()){ alert('Admin eller Paid kræves'); return; } const payload = { exercises, sessions, categories, levels, intensities, players, exportedAt: new Date().toISOString() }; const blob = new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}); const url = URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=`lezgo_backup_${new Date().toISOString().slice(0,19).replace(/[:T]/g,'_')}.json`; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url); }
 function handleRestoreFile(ev){ if(!isAdmin() && !isPaid()){ alert('Admin eller Paid kræves'); return; } const file = ev.target.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = function(e){ try{ const data = JSON.parse(e.target.result); const mode = confirm("Tryk OK for MERGE (tilføj), Annuller for ERSTATTE (erstat alt)"); if(mode){ const addedE = mergeExercises(data.exercises||[]); const addedS = mergeSessions(data.sessions||[]); persistAll(); refreshUI(); alert(`Importeret. Øvelser: ${addedE}, sessioner: ${addedS}`); } else { exercises = data.exercises || []; sessions = data.sessions || []; categories = data.categories || DEFAULT_CATEGORIES; levels = data.levels || DEFAULT_LEVELS; intensities = data.intensities || DEFAULT_INT; players = data.players || DEFAULT_PLAYERS; persistAll(); populateSelects(); refreshUI(); alert('Data erstattet.'); } }catch(err){ alert('Kunne ikke læse fil: ' + err.message); } }; reader.readAsText(file); ev.target.value=''; }
 function mergeExercises(imported){ let added=0; (imported||[]).forEach(im=>{ const dup = exercises.some(e => (im.link && e.link === im.link) || (im.title && e.title && e.title.toLowerCase() === im.title.toLowerCase())); if(!dup){ exercises.push(im); added++; } }); return added; }
 function mergeSessions(imported){ let added=0; (imported||[]).forEach(im=>{ const dup = sessions.some(s => s.name && im.name && s.name.toLowerCase() === im.name.toLowerCase()); if(!dup){ sessions.push(im); added++; } }); return added; }
 
-/* ---------- ANALYZE VIDEO ---------- */
 async function fetchVideoMetadata(link){
   try{
-    // youtube oembed attempt
     try{
       const oUrl = `https://noembed.com/embed?url=${encodeURIComponent(link)}`;
       const r = await fetch(oUrl);
@@ -560,15 +607,12 @@ async function analyzeLinkAction(){
   finally{ $("analyze-btn").textContent = '🔍 Analyser'; $("analyze-btn").disabled = false; }
 }
 
-/* ---------- UTILS ---------- */
 function escapeHtml(s){ return (s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function applyTheme(theme){ if(theme==='light'){ document.body.classList.add('light'); $("theme-toggle").textContent='🌞'; } else { document.body.classList.remove('light'); $("theme-toggle").textContent='🌙'; } localStorage.setItem(THEME_KEY, theme); }
 function applyPermissions(){ $("bottom-bar").style.display = (isAdmin()||isPaid()) ? 'flex' : 'none'; $("delete-all-btn").style.display = isAdmin() ? 'inline-flex' : 'none'; $("save-session").style.display = (isAdmin()||isPaid()) ? 'inline-flex' : 'none'; $("clear-session").style.display = (isAdmin()||isPaid()) ? 'inline-flex' : 'none'; const badges = $("badges"); badges.innerHTML=''; if(isAdmin()){ const d=document.createElement('div'); d.className='badge'; d.textContent='ADMIN'; badges.appendChild(d); $("btn-logout").style.display='inline-flex'; } else $("btn-logout").style.display='none'; if(isPaid()){ const d=document.createElement('div'); d.className='badge'; d.textContent='PAID'; badges.appendChild(d); } renderList(true); renderSessions(); }
 function refreshUI(){ populateSelects(); applyPermissions(); renderIndex=0; renderList(true); renderSessions(); }
 
-/* ---------- START ---------- */
 document.addEventListener('DOMContentLoaded', ()=>{ init(); });
-
 </script>
 </body>
 </html>
