@@ -1,50 +1,22 @@
-// service-worker.js
-const CACHE_NAME = 'lezgo-padle-v1';
-const ASSETS = [
-  './',
-  './index.html',
-  './manifest.json',
-  './ICON-192x192.png',
-  // tilføj flere assets efter behov (logo, css, js, evt lokale billeder)
-];
-
-self.addEventListener('install', (ev) => {
-  ev.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS))
-  );
-  self.skipWaiting();
-});
-
-self.addEventListener('activate', (ev) => {
-  ev.waitUntil(
-    caches.keys().then(keys => Promise.all(
-      keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
-    ))
-  );
-  self.clients.claim();// versioned cache names
+// service-worker.js - LezGo Padel (clean, versioned)
 const CACHE_VERSION = 'v2';
 const PRECACHE = `lezgo-precache-${CACHE_VERSION}`;
 const RUNTIME = `lezgo-runtime-${CACHE_VERSION}`;
+const OFFLINE_URL = '/lezgopade/offline.html'; // Sørg for at denne sti matcher manifest og filplacering
 
-const OFFLINE_URL = '/lezgopade/offline.html';
-
-// Files to precache (app shell)
-// Add any additional local assets you want cached on installation.
+// Liste over statiske assets til precache (opdatér efter behov)
 const PRECACHE_URLS = [
-  '/lezgopade/',                // index (preferably)
+  '/lezgopade/',
   '/lezgopade/index.html',
   '/lezgopade/lezgo-logo.svg',
   '/lezgopade/ICON-192x192.png',
   '/lezgopade/ICON-512x512.png',
   '/lezgopade/apple-touch-icon.png',
   '/lezgopade/manifest.json',
-  '/lezgopade/offline.html',
-  // fonts or CSS/JS if local:
-  // '/lezgopade/styles.css',
-  // '/lezgopade/app.js'
+  '/lezgopade/offline.html'
 ];
 
-// Install - precache app shell
+// INSTALL: præcache app-shell
 self.addEventListener('install', event => {
   self.skipWaiting();
   event.waitUntil(
@@ -54,34 +26,31 @@ self.addEventListener('install', event => {
   );
 });
 
-// Activate - cleanup old caches
+// ACTIVATE: slet gamle caches
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keys => {
       return Promise.all(
-        keys.filter(k => (k !== PRECACHE && k !== RUNTIME))
-            .map(k => caches.delete(k))
+        keys.filter(k => (k !== PRECACHE && k !== RUNTIME)).map(k => caches.delete(k))
       );
     }).then(() => self.clients.claim())
   );
 });
 
-// Utility: is navigation request?
+// Hjælpefunktion: er det en navigation request?
 function isNavigationRequest(req) {
-  return req.mode === 'navigate' || (req.method === 'GET' && req.headers.get('accept') && req.headers.get('accept').includes('text/html'));
+  return req.mode === 'navigate' ||
+         (req.method === 'GET' && req.headers.get('accept') && req.headers.get('accept').includes('text/html'));
 }
 
-// Fetch handler
+// FETCH: cache-first for statiske assets (png, css, js...), network-first for navigation
 self.addEventListener('fetch', event => {
   const req = event.request;
-
-  // Always try to serve precached assets first for static files
   if (req.method !== 'GET') return;
 
-  // Serve app shell / static resources from cache-first
   const url = new URL(req.url);
 
-  // If request is for same-origin static asset (png, svg, css, js, json, html) -> cache-first
+  // Static asset cache-first
   if (url.origin === self.location.origin && /\.(?:png|jpg|jpeg|svg|gif|css|js|json|woff2?)$/i.test(url.pathname)) {
     event.respondWith(
       caches.match(req).then(cached => cached || fetch(req).then(res => {
@@ -89,82 +58,56 @@ self.addEventListener('fetch', event => {
           cache.put(req, res.clone());
           return res;
         });
-      }).catch(() => {
-        // fallback to offline page for HTML requests; otherwise nothing
-        if (req.headers.get('accept') && req.headers.get('accept').includes('text/html')) {
-          return caches.match(OFFLINE_URL);
-        }
-      }))
+      })).catch(() => {
+        // hvis fallback ønskes for images, returner evt en placeholder her
+        return caches.match(OFFLINE_URL);
+      })
     );
     return;
   }
 
-  // Navigation requests (pages): network-first, fallback to cache/offline
+  // Navigation requests: network-first then cache, så offline fallback
   if (isNavigationRequest(req)) {
     event.respondWith(
       fetch(req).then(resp => {
-        // put a copy in runtime cache
+        // gem en kopi i runtime cache
         const copy = resp.clone();
         caches.open(RUNTIME).then(cache => cache.put(req, copy));
         return resp;
       }).catch(() => {
-        // network failed -> try cache -> fallback to offline.html
+        // hvis netværk fejler, prøv at finde i cache, ellers offline.html
         return caches.match(req).then(cacheResp => cacheResp || caches.match(OFFLINE_URL));
       })
     );
     return;
   }
 
-  // For other requests (e.g. cross-origin images like youtube thumbnails), try cache then network
+  // Andet: prøv cache først, ellers netværk
   event.respondWith(
     caches.match(req).then(cached => {
       if (cached) return cached;
       return fetch(req).then(res => {
-        // optionally cache cross-origin images (beware CORS)
+        // valgfrit: cache cross-origin images kun hvis CORS tillader (type 'basic')
         if (res && res.status === 200 && res.type === 'basic') {
           const copy = res.clone();
           caches.open(RUNTIME).then(cache => cache.put(req, copy));
         }
         return res;
       }).catch(() => {
-        // final fallback for images - could return a placeholder data-uri or offline image
-        if (req.destination === 'image') {
-          return new Response('', {status: 404, statusText: 'offline'});
+        // fallback for images eller return offline side for html
+        if (req.headers.get('accept') && req.headers.get('accept').includes('text/html')) {
+          return caches.match(OFFLINE_URL);
         }
+        // ellers return en tom response (eller en data-uri placeholder)
+        return new Response('', {status: 404, statusText: 'offline'});
       });
     })
   );
 });
 
-// Message listener to allow skipWaiting from the page
+// Lyt efter beskeder fra siden (fx for at aktivere ny SW straks)
 self.addEventListener('message', event => {
   if (event.data && event.data.type === 'SKIP_WAITING') {
     self.skipWaiting();
   }
-});
-
-});
-
-self.addEventListener('fetch', (ev) => {
-  const req = ev.request;
-  // navigation tries network first then cache fallback
-  if (req.mode === 'navigate') {
-    ev.respondWith(
-      fetch(req).then(res => {
-        const cloned = res.clone();
-        caches.open(CACHE_NAME).then(cache => cache.put(req, cloned));
-        return res;
-      }).catch(() => caches.match('./index.html'))
-    );
-    return;
-  }
-  // other requests: cache-first
-  ev.respondWith(
-    caches.match(req).then(cached => cached || fetch(req).then(res => {
-      return caches.open(CACHE_NAME).then(cache => {
-        cache.put(req, res.clone());
-        return res;
-      });
-    })).catch(() => caches.match('./index.html'))
-  );
 });
