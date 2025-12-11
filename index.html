@@ -834,5 +834,36 @@ function refreshUI(){ populateSelects(); applyPermissions(); renderIndex=0; rend
 /* ---------- BOOT ---------- */
 document.addEventListener('DOMContentLoaded', ()=>{ init(); });
 </script>
+
+<!-- ========================================================= -->
+<!--  🔥  NYT: AUTOMATISK SERVICE WORKER REGISTRERING + UPDATE  -->
+<!-- ========================================================= -->
+
+<script>
+/*
+  Din app ligger på GitHub Pages: https://haongo81.github.io/lezgopadel/
+  Derfor registrerer vi service-worker via /lezgopadel/service-worker.js
+  Hvis du senere flytter til root, skift til '/service-worker.js'
+*/
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/lezgopadel/service-worker.js')
+    .then(reg => {
+
+      // Hvis en ny SW allerede ligger waiting → aktiver den straks
+      if (reg.waiting) {
+        reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+      }
+
+      // Når controllerchange sker (ny SW tager kontrol), reload for at få ny version
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        window.location.reload();
+      });
+
+    })
+    .catch(err => console.warn('SW registration failed:', err));
+}
+</script>
+
 </body>
 </html>
