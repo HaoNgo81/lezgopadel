@@ -9,15 +9,25 @@
     /* RESET + THEME */
     *,*::before,*::after{box-sizing:border-box}
     html,body{height:100%;margin:0;padding:0;overflow-x:hidden;font-family:Inter,system-ui,Arial,sans-serif;-webkit-font-smoothing:antialiased}
-    :root{--bg-top:#0f1720;--bg-bottom:#071226;--panel:#0b1a25;--muted:#9aa7b3;--text:#e6eef6;--accent:#22c55e;--accent-dark:#0b4428;--danger:#ef4444;--border-soft:rgba(255,255,255,.04)}
+    /* Slightly lightened panel for dark mode so "felterne i dark mode" er en anelse lysere */
+    :root{--bg-top:#0f1720;--bg-bottom:#071226;--panel:#12202a;--muted:#9aa7b3;--text:#e6eef6;--accent:#22c55e;--accent-dark:#0b4428;--danger:#ef4444;--border-soft:rgba(255,255,255,.04)}
     body.light{--bg-top:#caced5;--bg-bottom:#bfc3cb;--panel:#d8dce3;--muted:#3c4652;--text:#0b1220;--accent:#16a34a;--accent-dark:#106b37;--danger:#dc2626}
     body{background:linear-gradient(180deg,var(--bg-top) 0%,var(--bg-bottom) 100%);color:var(--text);padding-bottom:160px;transition:background .2s,color .2s}
 
     .container{max-width:1100px;margin:12px auto;padding:8px;width:94%}
-    #logo-line{display:flex;justify-content:center;margin-bottom:8px}
+
+    /* Header tweaks: logo centered, controls absolute top-right on same line */
+    header{position:relative;margin-bottom:6px}
+    #logo-line{display:flex;justify-content:center;align-items:center;margin-bottom:8px}
     #logo{height:54px}
 
-    .header-row{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+    /* top-right controls placed absolute so logo stays perfectly centered */
+    #top-controls{position:absolute;right:8px;top:8px;display:flex;gap:8px;align-items:center;z-index:50}
+    #top-controls .btn{padding:8px 10px;border-radius:10px}
+    /* make language select compact */
+    #top-controls select{padding:6px 8px;border-radius:8px;border:1px solid var(--border-soft);background:transparent;color:var(--text);min-width:84px;width:auto;font-weight:700}
+
+    .header-row{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:8px}
     .badge{background:rgba(255,255,255,.04);padding:6px 10px;border-radius:8px;font-weight:700;color:var(--muted)}
 
     .btn{border:0;padding:10px 14px;border-radius:12px;font-weight:800;cursor:pointer;background:transparent;color:var(--text);display:inline-flex;align-items:center;gap:8px}
@@ -54,6 +64,14 @@
 
     .search-row{display:flex;gap:8px;align-items:center}
     .search-row input[type=text]{flex:1;min-width:0}
+
+    /* small screens: ensure top-controls shrink and logo remains centered */
+    @media(max-width:480px){
+      #logo{height:48px}
+      #top-controls{right:6px;top:6px;gap:6px}
+      #top-controls select{min-width:70px}
+      #top-controls .btn {padding:6px 8px;font-size:14px}
+    }
   </style>
 </head>
 <body>
@@ -61,14 +79,20 @@
     <header>
       <div id="logo-line"><img id="logo" src="lezgo-logo.svg" alt="LEZGO"></div>
 
+      <!-- TOP-RIGHT CONTROLS (moved here so logo stays centered on same horizontal line) -->
+      <div id="top-controls" aria-hidden="false">
+        <button id="theme-toggle" class="btn btn-ghost" title="Toggle theme">🌓</button>
+        <select id="lang-select" aria-label="Sprog">
+          <option value="da">Dansk</option><option value="en">English</option>
+        </select>
+      </div>
+
+      <!-- original header-row kept below (badges + larger actions) -->
       <div class="header-row">
         <div id="badges" style="display:flex;gap:8px;align-items:center"></div>
 
         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-          <button id="theme-toggle" class="btn btn-ghost" title="Toggle theme">🌓</button>
-          <select id="lang-select" style="padding:8px;border-radius:8px;border:1px solid var(--border-soft);background:transparent;color:var(--text)">
-            <option value="da">Dansk</option><option value="en">English</option>
-          </select>
+          <!-- Køb/Admin/log ud osv. (uændret) -->
           <button id="btn-buy" class="btn btn-primary">Køb adgang</button>
           <button id="btn-admin" class="btn btn-ghost">Admin login</button>
           <button id="btn-logout" class="btn btn-ghost" style="display:none;color:var(--danger)">Log ud</button>
@@ -231,6 +255,7 @@
 
 <script>
 /* ---------- CONFIG ---------- */
+
 const ADMIN_PASSWORD = "admin123";
 const EX_KEY = "lezgo_exercises_v3";
 const SES_KEY = "lezgo_sessions_v3";
@@ -448,7 +473,7 @@ function onSaveExercise(){
   persistAll(); editingId = null; clearForm(); refreshUI();
 }
 function clearForm(){ editingId=null; $("title").value=''; $("link").value=''; if($("category")) $("category").selectedIndex=0; if($("players")) $("players").selectedIndex=0; $("duration").value=''; if($("level")) $("level").selectedIndex=0; if($("intensity")) $("intensity").selectedIndex=0; $("description").value=''; $("tags").value=''; }
-function populateFormForEdit(ex){ $("title").value = ex.title||''; $("link").value = ex.link||''; if($("category")) $("category").value = ex.category||''; if($("players")) $("players").value = ex.players||''; $("duration").value = ex.duration||''; if($("level")) $("level").value = ex.level||''; if($("intensity")) $("intensity").value = ex.intensity||''; $("description").value = ex.description||''; $("tags").value = ex.tags||''; }
+function populateFormForEdit(ex){ $("title").value = ex.title||''; $("link").value = ex.link||''; if($("category")) $("category").value = ex.category||''; if($("players")) $("players").value = ex.players||''; $("duration").value = ex.duration||''; if($("level")) $("level").value = ex.level||''; if($("intensity")) $("intensity").value= ex.intensity||''; $("description").value = ex.description||''; $("tags").value = ex.tags||''; }
 
 /* ---------- SESSION BUILDER ---------- */
 function addToSessionBuilder(id){
