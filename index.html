@@ -197,8 +197,6 @@
           <div style="display:flex;gap:8px;align-items:center">
             <button id="save-btn" class="btn btn-primary">Gem</button>
             <button id="clear-btn" class="btn btn-ghost">Ryd</button>
-            <!-- Cancel-edit button: hidden by default, shown only in edit mode -->
-            <button id="cancel-edit-btn" class="btn btn-ghost" style="display:none">Annuller</button>
           </div>
           <button id="delete-all-btn" class="btn btn-ghost" style="display:none;color:var(--danger)">Slet alle</button>
         </div>
@@ -370,9 +368,6 @@ function bindEvents(){
   // form
   $("save-btn").addEventListener('click', onSaveExercise);
   $("clear-btn").addEventListener('click', clearForm);
-  // cancel edit button handler
-  $("cancel-edit-btn").addEventListener('click', (e) => { e.preventDefault(); cancelEditMode(); });
-
   $("delete-all-btn").addEventListener('click', ()=> {
     if(!isAdmin()){ alert('Admin kræves'); return; }
     const pass = prompt('Admin kode:'); if(pass !== ADMIN_PASSWORD){ alert('Forkert kode'); return; }
@@ -533,21 +528,7 @@ function renderList(reset = true){
   if(total === 0 && start === 0){ list.innerHTML = `<div style="color:var(--muted);font-size:var(--small-font)">Ingen resultater</div>`; }
 }
 
-/* ---------- FORM HANDLERS + EDIT MODE ---------- */
-function enterEditMode(ex){
-  // show cancel button and change save text
-  $("cancel-edit-btn").style.display = 'inline-flex';
-  $("save-btn").textContent = 'Opdater';
-  // optionally highlight form or scroll into view
-}
-
-function cancelEditMode(){
-  editingId = null;
-  clearForm();
-  $("cancel-edit-btn").style.display = 'none';
-  $("save-btn").textContent = 'Gem';
-}
-
+/* ---------- FORM HANDLERS ---------- */
 function onSaveExercise(){
   const title = ($("title").value || "").trim();
   if(!title){ alert('Indtast titel'); return; }
@@ -556,33 +537,11 @@ function onSaveExercise(){
   const dupLink = link ? exercises.some(e => e.link === link && e.id !== editingId) : false;
   if(dupTitle || dupLink){ alert('Duplikat fundet: titel eller link findes allerede'); return; }
   const item = { id: editingId || uid(), title, link, category: $("category").value, players: $("players").value, duration: Number($("duration").value||0), level: $("level").value, intensity: $("intensity").value, description: $("description").value||"", tags: ($("tags").value||"").trim(), createdAt: new Date().toISOString() };
-  if(editingId){
-    const idx = exercises.findIndex(x => x.id === editingId);
-    if(idx>-1) exercises[idx] = item;
-  } else {
-    exercises.unshift(item);
-  }
+  if(editingId){ const idx = exercises.findIndex(x => x.id === editingId); if(idx>-1) exercises[idx] = item; } else exercises.unshift(item);
   persistAll(); editingId = null; clearForm(); refreshUI();
-  // exit edit mode UI
-  $("cancel-edit-btn").style.display = 'none';
-  $("save-btn").textContent = 'Gem';
 }
-
-function clearForm(){ editingId=null; $("title").value=''; $("link").value=''; if($("category")) $("category").selectedIndex=0; if($("players")) $("players").selectedIndex=0; $("duration").value=''; if($("level")) $("level").selectedIndex=0; if($("intensity")) $("intensity").selectedIndex=0; $("description").value=''; $("tags").value=''; $("cancel-edit-btn").style.display='none'; $("save-btn").textContent='Gem'; }
-
-function populateFormForEdit(ex){
-  $("title").value = ex.title||'';
-  $("link").value = ex.link||'';
-  if($("category")) $("category").value = ex.category||'';
-  if($("players")) $("players").value = ex.players||'';
-  $("duration").value = ex.duration||'';
-  if($("level")) $("level").value = ex.level||'';
-  if($("intensity")) $("intensity").value= ex.intensity||'';
-  $("description").value = ex.description||'';
-  $("tags").value = ex.tags||'';
-  // set editingId already done by caller
-  enterEditMode(ex);
-}
+function clearForm(){ editingId=null; $("title").value=''; $("link").value=''; if($("category")) $("category").selectedIndex=0; if($("players")) $("players").selectedIndex=0; $("duration").value=''; if($("level")) $("level").selectedIndex=0; if($("intensity")) $("intensity").selectedIndex=0; $("description").value=''; $("tags").value=''; }
+function populateFormForEdit(ex){ $("title").value = ex.title||''; $("link").value = ex.link||''; if($("category")) $("category").value = ex.category||''; if($("players")) $("players").value = ex.players||''; $("duration").value = ex.duration||''; if($("level")) $("level").value = ex.level||''; if($("intensity")) $("intensity").value= ex.intensity||''; $("description").value = ex.description||''; $("tags").value = ex.tags||''; }
 
 /* ---------- SESSION BUILDER ---------- */
 function addToSessionBuilder(id){
@@ -667,7 +626,7 @@ async function analyzeLinkAction(){
 
 function escapeHtml(s){ return (s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function applyTheme(theme){ if(theme==='light'){ document.body.classList.add('light'); $("theme-toggle").textContent='🌞'; } else { document.body.classList.remove('light'); $("theme-toggle").textContent='🌙'; } localStorage.setItem(THEME_KEY, theme); }
-function applyPermissions(){ $("bottom-bar").style.display = (isAdmin()||isPaid()) ? 'flex' : 'none'; $("delete-all-btn").style.display = isAdmin() ? 'inline-flex' : 'none'; $("save-session").style.display = (isAdmin()||isPaid()) ? 'inline-flex' : 'none'; $("clear-session").style.display = (isAdmin()||isPaid()) ? 'inline-flex' : 'none'; const badges = $("badges'); badges.innerHTML=''; if(isAdmin()){ const d=document.createElement('div'); d.className='badge'; d.textContent='ADMIN'; badges.appendChild(d); $("btn-logout").style.display='inline-flex'; } else $("btn-logout").style.display='none'; if(isPaid()){ const d=document.createElement('div'); d.className='badge'; d.textContent='PAID'; badges.appendChild(d); } renderList(true); renderSessions(); }
+function applyPermissions(){ $("bottom-bar").style.display = (isAdmin()||isPaid()) ? 'flex' : 'none'; $("delete-all-btn").style.display = isAdmin() ? 'inline-flex' : 'none'; $("save-session").style.display = (isAdmin()||isPaid()) ? 'inline-flex' : 'none'; $("clear-session").style.display = (isAdmin()||isPaid()) ? 'inline-flex' : 'none'; const badges = $("badges"); badges.innerHTML=''; if(isAdmin()){ const d=document.createElement('div'); d.className='badge'; d.textContent='ADMIN'; badges.appendChild(d); $("btn-logout").style.display='inline-flex'; } else $("btn-logout").style.display='none'; if(isPaid()){ const d=document.createElement('div'); d.className='badge'; d.textContent='PAID'; badges.appendChild(d); } renderList(true); renderSessions(); }
 function refreshUI(){ populateSelects(); applyPermissions(); renderIndex=0; renderList(true); renderSessions(); }
 
 document.addEventListener('DOMContentLoaded', ()=>{ init(); });
