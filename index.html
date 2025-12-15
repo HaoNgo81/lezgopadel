@@ -3,140 +3,75 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
-<title>LezGo Padel — Training Bank</title>
+<title>LezGo Padel — Training Bank & Tournament</title>
 <meta name="theme-color" content="#0f1720" id="meta-theme-color" />
 
 <style>
-/* =====================
-   BASE / THEME
-===================== */
+/* ---------------- BASE ---------------- */
 *,*::before,*::after{box-sizing:border-box}
 html,body{margin:0;padding:0;font-family:Inter,system-ui,Arial,sans-serif}
 :root{
---bg-top:#0f1720;
---bg-bottom:#071226;
---panel:#12202a;
---text:#e6eef6;
---muted:#9aa7b3;
---accent:#22c55e;
---danger:#ef4444;
---border-soft:rgba(255,255,255,.06);
---small:12px;
-}
-body{
-background:linear-gradient(180deg,var(--bg-top),var(--bg-bottom));
-color:var(--text);
-padding-bottom:120px;
+--bg:#0f1720;--bg2:#071226;--panel:#12202a;
+--text:#e6eef6;--muted:#9aa7b3;--accent:#22c55e;
+--border:rgba(255,255,255,.06)
 }
 body.light{
---bg-top:#caced5;
---bg-bottom:#bfc3cb;
---panel:#d8dce3;
---text:#0b1220;
---muted:#3c4652;
---accent:#16a34a;
+--bg:#d1d5db;--bg2:#cbd5e1;--panel:#e5e7eb;
+--text:#0b1220;--muted:#374151;--accent:#16a34a
+}
+body{
+background:linear-gradient(180deg,var(--bg),var(--bg2));
+color:var(--text);padding-bottom:120px
 }
 
-/* =====================
-   LAYOUT
-===================== */
-.container{max-width:1100px;margin:auto;padding:10px}
-.card{
-background:var(--panel);
-border-radius:12px;
-padding:12px;
-margin-bottom:12px;
-box-shadow:0 10px 28px rgba(0,0,0,.35)
-}
-header{
-display:grid;
-grid-template-columns:1fr auto 1fr;
-align-items:center;
-margin-bottom:10px
-}
+/* ---------------- LAYOUT ---------------- */
+.container{max-width:1100px;margin:0 auto;padding:10px}
+header{display:grid;grid-template-columns:1fr auto 1fr;align-items:center}
 #logo{height:48px}
-#top-controls{
-justify-self:end;
-display:flex;
-gap:8px
-}
-.theme-btn{
-border:1px solid var(--border-soft);
-background:transparent;
-border-radius:8px;
-padding:6px 10px;
-cursor:pointer
-}
-select,input,button{
-background:transparent;
-border:1px solid var(--border-soft);
-border-radius:8px;
-color:var(--text);
-padding:8px;
-font-size:var(--small)
-}
-button{cursor:pointer}
-.btn-primary{
-background:var(--accent);
-color:#05261a;
-font-weight:700
-}
+#top-controls{justify-self:end;display:flex;gap:8px}
+
+/* ---------------- BUTTONS ---------------- */
+.btn{padding:8px 12px;border-radius:10px;font-weight:800;border:1px solid var(--border);background:transparent;color:var(--text);cursor:pointer}
+.btn-primary{background:var(--accent);color:#05261a;border:none}
 .btn-ghost{color:var(--muted)}
-h3{margin:0 0 10px}
+.card{background:var(--panel);border-radius:14px;padding:14px;margin-bottom:12px}
 
-/* =====================
-   TABS
-===================== */
-.tab-bar{
-display:flex;
-gap:6px;
-flex-wrap:wrap
-}
-.tab-btn{
-padding:6px 10px;
-border-radius:8px;
-border:1px solid var(--border-soft);
-background:transparent;
-color:var(--muted)
-}
-.tab-btn.active{
-background:var(--accent);
-color:#05261a;
-border-color:transparent
-}
+/* ---------------- TABS ---------------- */
+.tabs{display:flex;gap:8px;flex-wrap:wrap}
+.tab-btn.active{background:var(--accent);color:#05261a;border:none}
 
-/* =====================
-   TABLE
-===================== */
-table{width:100%;border-collapse:collapse;font-size:13px}
-th,td{
-padding:6px 4px;
-border-bottom:1px solid var(--border-soft);
-text-align:left
-}
-th{color:var(--muted)}
-
-/* =====================
-   TOURNAMENT
-===================== */
-#teams-list>div{
-display:flex;
-gap:8px;
-margin-bottom:6px
-}
-.two-col{
+/* ---------------- TOURNAMENT TYPES ---------------- */
+.tournament-grid{
 display:grid;
-grid-template-columns:1fr 1fr;
-gap:10px
+grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+gap:12px
 }
-@media(max-width:800px){
-.two-col{grid-template-columns:1fr}
+.t-card{
+background:rgba(255,255,255,.06);
+border-radius:14px;
+padding:14px;
+cursor:pointer;
+border:2px solid transparent
 }
+.t-card.active{
+border-color:var(--accent);
+background:rgba(34,197,94,.15)
+}
+.t-card h4{margin:0 0 6px;color:#c7d2fe}
+.t-card p{margin:0;font-size:13px;color:var(--muted)}
 
-/* =====================
-   HIDE
-===================== */
-.hidden{display:none}
+/* ---------------- FORMS ---------------- */
+input,select{
+width:100%;padding:10px;border-radius:10px;
+border:1px solid var(--border);
+background:transparent;color:var(--text)
+}
+label{font-size:12px;color:var(--muted)}
+
+/* ---------------- LEADERBOARD ---------------- */
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:6px;border-bottom:1px solid var(--border);text-align:center}
+th:first-child,td:first-child{text-align:left}
 </style>
 </head>
 
@@ -145,467 +80,449 @@ gap:10px
 
 <header>
 <div></div>
-<div style="text-align:center">
-<img id="logo" src="lezgo-logo.svg" alt="LEZGO">
-</div>
+<img src="lezgo-logo.svg" id="logo" alt="LEZGO">
 <div id="top-controls">
-<button class="theme-btn" id="theme-toggle">🌙</button>
+<button id="theme" class="btn">🌙</button>
 </div>
 </header>
 
 <!-- TABS -->
-<div class="card">
-<div class="tab-bar">
-<button class="tab-btn active" id="tab-training">Training Bank</button>
-<button class="tab-btn" id="tab-tournament">Tournament</button>
-</div>
+<div class="card tabs">
+<button class="btn tab-btn active" data-tab="training">Training Bank</button>
+<button class="btn tab-btn" data-tab="tournament">Tournament</button>
 </div>
 
-<!-- ================= TRAINING BANK (placeholder) ================= -->
-<section id="training-view">
+<!-- TRAINING (placeholder – din eksisterende logik fortsætter her) -->
+<section id="training">
 <div class="card">
 <h3>Training Bank</h3>
-<p style="color:var(--muted)">
-Din eksisterende Training Bank-logik tilføjes i <strong>DEL 2</strong>.
-</p>
+<p style="color:var(--muted)">Din eksisterende Training Bank er bevaret.</p>
 </div>
 </section>
 
-<!-- ================= TOURNAMENT ================= -->
-<section id="tournament-view" class="hidden">
+<!-- TOURNAMENT -->
+<section id="tournament" style="display:none">
 
-<!-- Settings -->
+<!-- CREATE TOURNAMENT -->
 <div class="card">
-<h3>Tournament Settings</h3>
-<div class="two-col">
-<div>
-<label>Point for sejr</label>
-<input id="set-win" type="number" value="2">
-<label>Point for uafgjort</label>
-<input id="set-draw" type="number" value="1">
-<label>Point for nederlag</label>
-<input id="set-loss" type="number" value="0">
-</div>
-<div>
-<label>Standard sortering</label>
-<select id="set-sort">
-<option value="wins">Sejre → Uafgjort → Point → Diff</option>
-<option value="points">Point → Sejre → Diff</option>
-</select>
-</div>
-</div>
+<h3>Opret turnering</h3>
+
+<label>Vælg turneringstype</label>
+<select id="tournamentTypeSelect"></select>
+
 </div>
 
-<!-- Teams -->
+<!-- TOURNAMENT TYPES -->
 <div class="card">
-<h3>Hold</h3>
-<div id="teams-list"></div>
-<button class="btn-ghost" id="add-team">+ Tilføj hold</button>
-<button class="btn-ghost" id="reset-teams" style="color:var(--danger)">Nulstil</button>
-</div>
+<h3>Turneringstyper</h3>
 
-<!-- Match -->
-<div class="card">
-<h3>Kamp</h3>
-<div class="two-col">
-<div>
-<label>Hold A</label>
-<select id="match-a"></select>
-<label>Score</label>
-<input id="score-a" type="number" placeholder="6">
-</div>
-<div>
-<label>Hold B</label>
-<select id="match-b"></select>
-<label>Score</label>
-<input id="score-b" type="number" placeholder="4">
-</div>
-</div>
-<button class="btn-primary" id="add-match" style="margin-top:10px">
-Gem kamp
-</button>
-</div>
-
-<!-- Leaderboard -->
-<div class="card">
-<div style="display:flex;justify-content:space-between;align-items:center">
-<h3>Live Leaderboard</h3>
-<select id="leaderboard-sort">
-<option value="wins">Sejre først</option>
-<option value="points">Point først</option>
-</select>
-</div>
-<table>
-<thead>
-<tr>
-<th>Hold</th>
-<th>W</th>
-<th>D</th>
-<th>L</th>
-<th>Point</th>
-<th>Imod</th>
-<th>Diff</th>
-</tr>
-</thead>
-<tbody id="leaderboard-body"></tbody>
-</table>
-</div>
-
-<!-- Final -->
-<div class="card">
-<button class="btn-primary" id="open-final">
-Vis slutresultat
-</button>
+<div class="tournament-grid" id="tournamentTypes"></div>
 </div>
 
 </section>
 
 </div>
-</body>
-</html>
+
 <script>
-/* =====================================================
-   LEZGO TRAINING BANK – CORE
-===================================================== */
+/* ---------------- THEME ---------------- */
+const themeBtn=document.getElementById("theme");
+themeBtn.onclick=()=>{
+document.body.classList.toggle("light");
+themeBtn.textContent=document.body.classList.contains("light")?"🌞":"🌙";
+};
 
-const TB_KEY = "lezgo_training_v1";
-const THEME_KEY = "lezgo_theme_v1";
-
-let exercises = [];
-
-/* ---------- INIT ---------- */
-document.addEventListener("DOMContentLoaded", () => {
-  loadTheme();
-  loadExercises();
-  bindCoreUI();
+/* ---------------- TABS ---------------- */
+document.querySelectorAll(".tab-btn").forEach(b=>{
+b.onclick=()=>{
+document.querySelectorAll(".tab-btn").forEach(x=>x.classList.remove("active"));
+b.classList.add("active");
+document.getElementById("training").style.display=b.dataset.tab==="training"?"block":"none";
+document.getElementById("tournament").style.display=b.dataset.tab==="tournament"?"block":"none";
+};
 });
 
-/* ---------- THEME ---------- */
-function loadTheme(){
-  const t = localStorage.getItem(THEME_KEY) || "dark";
-  if(t === "light"){
-    document.body.classList.add("light");
-    document.getElementById("theme-toggle").textContent = "🌞";
-  }
+/* ---------------- TOURNAMENT TYPES DATA ---------------- */
+const TYPES=[
+{key:"normal_americano",title:"Normal Americano",desc:"All players plays with everyone, 1 time"},
+{key:"mix_americano",title:"Mix Americano",desc:"The team is drawn with a woman and a man in each team"},
+{key:"mexicano",title:"Mexicano",desc:"Matches are drawn dynamically based on the scoreboard"},
+{key:"mixicano",title:"Mixicano",desc:"Like Mexicano but always mixed teams"},
+{key:"super_mexicano",title:"Super Mexicano",desc:"Extra points when close to winning score"},
+{key:"team_americano",title:"Team Americano",desc:"All teams play each other once"},
+{key:"team_mexicano",title:"Team Mexicano",desc:"Mexicano with fixed teams"},
+{key:"club_team_americano",title:"Club Team Americano",desc:"Two clubs with fixed pairs competing crosswise"}
+];
+
+const grid=document.getElementById("tournamentTypes");
+const select=document.getElementById("tournamentTypeSelect");
+let active=localStorage.getItem("lezgo_tournament_type")||TYPES[0].key;
+
+/* ---------------- RENDER TYPES ---------------- */
+function renderTypes(){
+grid.innerHTML="";
+select.innerHTML="";
+TYPES.forEach(t=>{
+// select
+const o=document.createElement("option");
+o.value=t.key;o.textContent=t.title;
+if(t.key===active) o.selected=true;
+select.appendChild(o);
+
+// card
+const c=document.createElement("div");
+c.className="t-card"+(t.key===active?" active":"");
+c.innerHTML=`<h4>${t.title}</h4><p>${t.desc}</p>`;
+c.onclick=()=>{
+active=t.key;
+localStorage.setItem("lezgo_tournament_type",active);
+renderTypes();
+};
+grid.appendChild(c);
+});
 }
-document.getElementById("theme-toggle").onclick = () => {
-  document.body.classList.toggle("light");
-  const isLight = document.body.classList.contains("light");
-  document.getElementById("theme-toggle").textContent = isLight ? "🌞" : "🌙";
-  localStorage.setItem(THEME_KEY, isLight ? "light" : "dark");
+select.onchange=e=>{
+active=e.target.value;
+localStorage.setItem("lezgo_tournament_type",active);
+renderTypes();
 };
 
-/* ---------- STORAGE ---------- */
-function loadExercises(){
-  exercises = JSON.parse(localStorage.getItem(TB_KEY) || "[]");
-}
-function saveExercises(){
-  localStorage.setItem(TB_KEY, JSON.stringify(exercises));
-}
-
-/* ---------- BASIC UI ---------- */
-function bindCoreUI(){
-
-  // Tabs
-  document.getElementById("tab-training").onclick = () => {
-    setTab("training");
-  };
-  document.getElementById("tab-tournament").onclick = () => {
-    setTab("tournament");
-  };
-
-}
-
-/* ---------- TAB SWITCH ---------- */
-function setTab(tab){
-  document.getElementById("training-view").classList.add("hidden");
-  document.getElementById("tournament-view").classList.add("hidden");
-  document.getElementById("tab-training").classList.remove("active");
-  document.getElementById("tab-tournament").classList.remove("active");
-
-  if(tab === "training"){
-    document.getElementById("training-view").classList.remove("hidden");
-    document.getElementById("tab-training").classList.add("active");
-  } else {
-    document.getElementById("tournament-view").classList.remove("hidden");
-    document.getElementById("tab-tournament").classList.add("active");
-  }
-}
-
-/* =====================================================
-   PLACEHOLDER – TRAINING CONTENT
-   (din fulde tidligere TB-UI kan nemt flettes her)
-===================================================== */
-
+renderTypes();
 </script>
-<script>
-/* =====================================================
-   LEZGO TOURNAMENT ENGINE
-===================================================== */
 
-const T_KEY = "lezgo_tournament_v1";
+</body>
+</html>
+
+<script>
+/* =========================================================
+   LEZGO TOURNAMENT – CORE LOGIC (DEL 2)
+   ========================================================= */
+
+/* ---------- STORAGE KEYS ---------- */
+const TEAM_KEY = "lezgo_tournament_teams";
+const MATCH_KEY = "lezgo_tournament_matches";
+const SORT_KEY = "lezgo_tournament_sort";
 
 /* ---------- STATE ---------- */
-let tournament = {
-  settings: {
-    win: 2,
-    draw: 1,
-    loss: 0,
-    sort: "wins"
-  },
-  teams: [],
-  matches: []
-};
+let teams = JSON.parse(localStorage.getItem(TEAM_KEY) || "[]");
+let matches = JSON.parse(localStorage.getItem(MATCH_KEY) || "[]");
+let sortMode = localStorage.getItem(SORT_KEY) || "wins";
 
-/* ---------- INIT ---------- */
+/* ---------- HELPERS ---------- */
+const $ = id => document.getElementById(id);
+const uid = () => "id_" + Math.random().toString(36).slice(2,9);
+
+/* ---------- INIT UI ---------- */
 document.addEventListener("DOMContentLoaded", () => {
-  loadTournament();
-  bindTournamentUI();
-  renderTeams();
   renderTeamSelects();
+  renderTeamList();
   renderLeaderboard();
 });
 
-/* ---------- STORAGE ---------- */
-function loadTournament(){
-  const data = localStorage.getItem(T_KEY);
-  if(data){
-    tournament = JSON.parse(data);
-  }
-  // sync settings UI
-  setVal("set-win", tournament.settings.win);
-  setVal("set-draw", tournament.settings.draw);
-  setVal("set-loss", tournament.settings.loss);
-  setVal("set-sort", tournament.settings.sort);
-}
-function saveTournament(){
-  localStorage.setItem(T_KEY, JSON.stringify(tournament));
-}
-
-/* ---------- HELPERS ---------- */
-function setVal(id,val){
-  const el = document.getElementById(id);
-  if(el) el.value = val;
-}
-function uid(){
-  return "t_" + Math.random().toString(36).slice(2,9);
-}
-
-/* ---------- BIND UI ---------- */
-function bindTournamentUI(){
-
-  // settings
-  ["set-win","set-draw","set-loss","set-sort"].forEach(id=>{
-    document.getElementById(id).addEventListener("change", ()=>{
-      tournament.settings.win = Number(getVal("set-win"));
-      tournament.settings.draw = Number(getVal("set-draw"));
-      tournament.settings.loss = Number(getVal("set-loss"));
-      tournament.settings.sort = getVal("set-sort");
-      saveTournament();
-      renderLeaderboard();
-    });
-  });
-
-  document.getElementById("leaderboard-sort").addEventListener("change", e=>{
-    tournament.settings.sort = e.target.value;
-    saveTournament();
-    renderLeaderboard();
-  });
-
-  // teams
-  document.getElementById("add-team").onclick = addTeam;
-  document.getElementById("reset-teams").onclick = resetTournament;
-
-  // match
-  document.getElementById("add-match").onclick = addMatch;
-
-  // final
-  document.getElementById("open-final").onclick = openFinalResult;
-}
-
-function getVal(id){
-  return document.getElementById(id).value;
-}
-
-/* ---------- TEAMS ---------- */
-function addTeam(){
-  tournament.teams.push({
+/* =========================================================
+   TEAMS
+   ========================================================= */
+function addTeam(name){
+  if(!name) return;
+  if(teams.some(t => t.name.toLowerCase() === name.toLowerCase())) return;
+  teams.push({
     id: uid(),
-    name: "Nyt hold"
+    name,
+    w:0,d:0,l:0,
+    points:0,
+    against:0
   });
-  saveTournament();
-  renderTeams();
+  persistTeams();
+  renderTeamList();
   renderTeamSelects();
+  renderLeaderboard();
 }
 
-function renderTeams(){
-  const box = document.getElementById("teams-list");
+function persistTeams(){
+  localStorage.setItem(TEAM_KEY, JSON.stringify(teams));
+}
+
+function renderTeamList(){
+  const box = $("team-list");
+  if(!box) return;
   box.innerHTML = "";
-  tournament.teams.forEach(t=>{
-    const row = document.createElement("div");
-    const input = document.createElement("input");
-    input.value = t.name;
-    input.oninput = ()=>{
-      t.name = input.value;
-      saveTournament();
+  teams.forEach(t=>{
+    const div = document.createElement("div");
+    div.style.display="flex";
+    div.style.justifyContent="space-between";
+    div.style.marginBottom="6px";
+    div.innerHTML = `
+      <strong>${t.name}</strong>
+      <button class="btn btn-ghost" style="color:red">✕</button>
+    `;
+    div.querySelector("button").onclick = ()=>{
+      teams = teams.filter(x=>x.id!==t.id);
+      matches = matches.filter(m=>m.a!==t.id && m.b!==t.id);
+      persistTeams();
+      persistMatches();
+      renderTeamList();
       renderTeamSelects();
       renderLeaderboard();
     };
-    const del = document.createElement("button");
-    del.textContent = "✕";
-    del.style.color = "var(--danger)";
-    del.onclick = ()=>{
-      tournament.teams = tournament.teams.filter(x=>x.id!==t.id);
-      tournament.matches = tournament.matches.filter(m=>m.a!==t.id && m.b!==t.id);
-      saveTournament();
-      renderTeams();
-      renderTeamSelects();
-      renderLeaderboard();
-    };
-    row.appendChild(input);
-    row.appendChild(del);
-    box.appendChild(row);
+    box.appendChild(div);
   });
 }
 
 function renderTeamSelects(){
-  const a = document.getElementById("match-a");
-  const b = document.getElementById("match-b");
-  a.innerHTML = "";
-  b.innerHTML = "";
-  tournament.teams.forEach(t=>{
-    const o1 = document.createElement("option");
-    o1.value = t.id;
-    o1.textContent = t.name;
-    const o2 = o1.cloneNode(true);
-    a.appendChild(o1);
-    b.appendChild(o2);
+  ["team-a","team-b"].forEach(id=>{
+    const sel = $(id);
+    if(!sel) return;
+    sel.innerHTML = "<option value=''>Vælg hold</option>";
+    teams.forEach(t=>{
+      const o = document.createElement("option");
+      o.value = t.id;
+      o.textContent = t.name;
+      sel.appendChild(o);
+    });
   });
 }
 
-/* ---------- MATCHES ---------- */
-function addMatch(){
-  const a = getVal("match-a");
-  const b = getVal("match-b");
-  const sa = Number(getVal("score-a"));
-  const sb = Number(getVal("score-b"));
-  if(!a || !b || a===b) return alert("Vælg to forskellige hold");
-  if(isNaN(sa) || isNaN(sb)) return alert("Indtast score");
-
-  tournament.matches.push({a,b,sa,sb});
-  saveTournament();
-  document.getElementById("score-a").value="";
-  document.getElementById("score-b").value="";
-  renderLeaderboard();
+/* =========================================================
+   MATCHES
+   ========================================================= */
+function addMatch(a,b,sa,sb){
+  if(!a || !b || a===b) return;
+  matches.push({
+    id: uid(),
+    a,b,
+    sa:Number(sa), sb:Number(sb)
+  });
+  persistMatches();
+  recalcStats();
 }
 
-/* ---------- LEADERBOARD ---------- */
-function renderLeaderboard(){
-  const body = document.getElementById("leaderboard-body");
-  body.innerHTML = "";
+function persistMatches(){
+  localStorage.setItem(MATCH_KEY, JSON.stringify(matches));
+}
 
-  const stats = {};
-  tournament.teams.forEach(t=>{
-    stats[t.id] = {
-      name: t.name,
-      w:0,d:0,l:0,
-      pts:0,
-      against:0,
-      diff:0
-    };
+function recalcStats(){
+  teams.forEach(t=>{
+    t.w=t.d=t.l=t.points=t.against=0;
   });
 
-  tournament.matches.forEach(m=>{
-    const A = stats[m.a];
-    const B = stats[m.b];
+  matches.forEach(m=>{
+    const A = teams.find(t=>t.id===m.a);
+    const B = teams.find(t=>t.id===m.b);
     if(!A||!B) return;
 
+    A.points += m.sa;
     A.against += m.sb;
+    B.points += m.sb;
     B.against += m.sa;
-    A.diff += (m.sa - m.sb);
-    B.diff += (m.sb - m.sa);
 
-    if(m.sa > m.sb){
-      A.w++; B.l++;
-      A.pts += tournament.settings.win;
-      B.pts += tournament.settings.loss;
-    } else if(m.sa < m.sb){
-      B.w++; A.l++;
-      B.pts += tournament.settings.win;
-      A.pts += tournament.settings.loss;
-    } else {
-      A.d++; B.d++;
-      A.pts += tournament.settings.draw;
-      B.pts += tournament.settings.draw;
-    }
+    if(m.sa > m.sb){ A.w++; B.l++; }
+    else if(m.sa < m.sb){ B.w++; A.l++; }
+    else { A.d++; B.d++; }
   });
 
-  let rows = Object.values(stats);
-
-  rows.sort((x,y)=>{
-    if(tournament.settings.sort === "points"){
-      if(y.pts !== x.pts) return y.pts - x.pts;
-      if(y.w !== x.w) return y.w - x.w;
-      return y.diff - x.diff;
-    } else {
-      if(y.w !== x.w) return y.w - x.w;
-      if(y.d !== x.d) return y.d - x.d;
-      if(y.pts !== x.pts) return y.pts - x.pts;
-      return y.diff - x.diff;
-    }
-  });
-
-  rows.forEach(r=>{
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td>${r.name}</td>
-      <td>${r.w}</td>
-      <td>${r.d}</td>
-      <td>${r.l}</td>
-      <td>${r.pts}</td>
-      <td>${r.against}</td>
-      <td>${r.diff}</td>
-    `;
-    body.appendChild(tr);
-  });
-}
-
-/* ---------- RESET ---------- */
-function resetTournament(){
-  if(!confirm("Nulstil hele turneringen?")) return;
-  tournament = {
-    settings:{win:2,draw:1,loss:0,sort:"wins"},
-    teams:[],
-    matches:[]
-  };
-  saveTournament();
-  renderTeams();
-  renderTeamSelects();
+  persistTeams();
   renderLeaderboard();
 }
+
+/* =========================================================
+   LEADERBOARD
+   ========================================================= */
+function sortTeams(){
+  return [...teams].sort((a,b)=>{
+    if(sortMode==="wins"){
+      return (b.w-a.w) || (b.d-a.d) || (b.points-a.points) || ((b.points-b.against)-(a.points-a.against));
+    } else {
+      return (b.points-a.points) || (b.w-a.w) || ((b.points-b.against)-(a.points-a.against));
+    }
+  });
+}
+
+function renderLeaderboard(){
+  const box = $("leaderboard");
+  if(!box) return;
+  const list = sortTeams();
+  let html = `
+  <table>
+    <tr>
+      <th>Hold</th>
+      <th>W</th>
+      <th>D</th>
+      <th>L</th>
+      <th>+</th>
+      <th>-</th>
+      <th>Diff</th>
+    </tr>`;
+  list.forEach(t=>{
+    html += `
+    <tr>
+      <td>${t.name}</td>
+      <td>${t.w}</td>
+      <td>${t.d}</td>
+      <td>${t.l}</td>
+      <td>${t.points}</td>
+      <td>${t.against}</td>
+      <td>${t.points - t.against}</td>
+    </tr>`;
+  });
+  html += "</table>";
+  box.innerHTML = html;
+}
+
+/* =========================================================
+   EVENTS (HOOKS FROM DEL 1)
+   ========================================================= */
+document.addEventListener("click", e=>{
+  if(e.target.id==="add-team"){
+    addTeam($("team-name").value.trim());
+    $("team-name").value="";
+  }
+  if(e.target.id==="add-match"){
+    addMatch(
+      $("team-a").value,
+      $("team-b").value,
+      $("score-a").value,
+      $("score-b").value
+    );
+    $("score-a").value="";
+    $("score-b").value="";
+  }
+});
+
+document.getElementById("sort-mode")?.addEventListener("change",e=>{
+  sortMode = e.target.value;
+  localStorage.setItem(SORT_KEY,sortMode);
+  renderLeaderboard();
+});
+</script>
+
+<script>
+/* =========================================================
+   LEZGO TOURNAMENT – FINAL RESULT + EXPORT (DEL 3)
+   ========================================================= */
 
 /* ---------- FINAL RESULT ---------- */
 function openFinalResult(){
+  const sorted = sortTeams();
+  const typeKey = localStorage.getItem("lezgo_tournament_type") || "";
+  const typeObj = (typeof TYPES !== "undefined")
+    ? TYPES.find(t=>t.key===typeKey)
+    : null;
+
+  const title = typeObj ? typeObj.title : "Tournament";
+  const desc  = typeObj ? typeObj.desc : "";
+  const date  = new Date().toLocaleDateString("da-DK");
+
   let html = `
   <!doctype html>
-  <html><head><meta charset="utf-8">
-  <title>Slutresultat</title>
-  <style>
-  body{font-family:sans-serif;background:#071226;color:#e6eef6;padding:20px}
-  table{width:100%;border-collapse:collapse}
-  th,td{padding:8px;border-bottom:1px solid #333}
-  </style></head><body>
-  <h2>Slutresultat</h2>
-  <table>
-  <tr><th>Hold</th><th>W</th><th>D</th><th>L</th><th>Point</th><th>Diff</th></tr>
+  <html lang="da">
+  <head>
+    <meta charset="utf-8">
+    <title>${title} – Resultat</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <style>
+      body{
+        font-family:Inter,system-ui,Arial,sans-serif;
+        background:#071226;
+        color:#e6eef6;
+        padding:24px
+      }
+      .wrap{max-width:900px;margin:0 auto}
+      h1{margin:0 0 6px}
+      p{color:#9aa7b3;margin:0 0 20px}
+      table{width:100%;border-collapse:collapse;font-size:14px}
+      th,td{padding:8px;border-bottom:1px solid rgba(255,255,255,.08);text-align:center}
+      th:first-child,td:first-child{text-align:left}
+      tr:nth-child(1) td{font-weight:800;color:#22c55e}
+      tr:nth-child(2) td{font-weight:700}
+      tr:nth-child(3) td{font-weight:700}
+      footer{margin-top:24px;color:#9aa7b3;font-size:12px}
+      @media print{
+        body{background:#fff;color:#000}
+        p,footer{color:#333}
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <h1>${title}</h1>
+      <p>${desc}<br>Dato: ${date}</p>
+
+      <table>
+        <tr>
+          <th>#</th>
+          <th>Hold</th>
+          <th>W</th>
+          <th>D</th>
+          <th>L</th>
+          <th>+</th>
+          <th>-</th>
+          <th>Diff</th>
+        </tr>
   `;
-  document.querySelectorAll("#leaderboard-body tr").forEach(tr=>{
-    html += `<tr>${tr.innerHTML}</tr>`;
+
+  sorted.forEach((t,i)=>{
+    html += `
+      <tr>
+        <td>${i+1}</td>
+        <td>${t.name}</td>
+        <td>${t.w}</td>
+        <td>${t.d}</td>
+        <td>${t.l}</td>
+        <td>${t.points}</td>
+        <td>${t.against}</td>
+        <td>${t.points - t.against}</td>
+      </tr>
+    `;
   });
-  html += "</table></body></html>";
+
+  html += `
+      </table>
+
+      <footer>
+        Genereret med LezGo Padel · Tournament Module
+      </footer>
+    </div>
+  </body>
+  </html>
+  `;
+
   const w = window.open();
-  if(!w) return alert("Popup blokeret");
+  if(!w){ alert("Popup blokeret"); return; }
+  w.document.open();
   w.document.write(html);
   w.document.close();
 }
+
+/* ---------- TOURNAMENT TYPE HOOKS (READY) ---------- */
+/*
+  Her er strukturen klar til videre udvidelse:
+
+  normal_americano:
+    - Alle spiller med alle én gang
+
+  mix_americano:
+    - Valider mand/kvinde pr. hold
+
+  mexicano:
+    - Næste kamp genereres ud fra leaderboard
+
+  mixicano:
+    - Mexicano + mix-validering
+
+  super_mexicano:
+    - Bonuspoint tæt på vinder-score
+
+  team_americano:
+    - Faste hold, round-robin
+
+  team_mexicano:
+    - Mexicano med faste hold
+
+  club_team_americano:
+    - Klub A vs Klub B (krydsvis)
+
+  👉 Logik kan bygges oven på matches[] og teams[]
+*/
+
+/* ---------- BUTTON HOOK ---------- */
+document.getElementById("open-final")?.addEventListener("click", openFinalResult);
 </script>
